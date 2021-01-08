@@ -13,8 +13,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
+                    <source>12</source>
+                    <target>12</target>
                 </configuration>
             </plugin>
         </plugins>
@@ -35,11 +35,6 @@
             <groupId>org.brotli</groupId>
             <artifactId>dec</artifactId>
             <version>0.1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-text</artifactId>
-            <version>1.9</version>
         </dependency>
     </dependencies>
 

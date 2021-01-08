@@ -1,21 +1,16 @@
 package service;
 
-import java.io.InputStream;
-import java.net.CookieManager;
 import java.net.http.HttpClient;
-import java.net.http.HttpHeaders;
 
 public class BaseHttpClient {
     public static class HttpContext {
         public final HttpClient httpClient;
-        public final HttpHeaders headers;
-        public final InputStream body;
-        public final CookieManager cookies;
+        public final String body;
+        public final CustomCookieManager cookies;
         public final String referer;
 
-        HttpContext(HttpClient httpClient, HttpHeaders headers, InputStream body, CookieManager cookies, String referer) {
+        HttpContext(HttpClient httpClient, String body, CustomCookieManager cookies, String referer) {
             this.httpClient = httpClient;
-            this.headers = headers;
             this.body = body;
             this.cookies = cookies;
             this.referer = referer;

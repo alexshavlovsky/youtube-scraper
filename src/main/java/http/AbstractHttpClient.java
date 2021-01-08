@@ -2,7 +2,7 @@ package http;
 
 import java.net.http.HttpClient;
 
-public class BaseHttpClient {
+abstract class AbstractHttpClient {
     public static class HttpContext {
         public final HttpClient httpClient;
         public final String body;

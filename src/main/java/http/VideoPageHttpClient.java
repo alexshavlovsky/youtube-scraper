@@ -8,7 +8,7 @@ import java.net.http.HttpResponse;
 
 import static http.IoUtil.*;
 
-public class VideoPageHttpClient extends BaseHttpClient {
+public class VideoPageHttpClient extends AbstractHttpClient {
 
     public static HttpContext fetchVideoPage(String videoId) {
 
@@ -27,7 +27,7 @@ public class VideoPageHttpClient extends BaseHttpClient {
                 .headers("Cache-Control", "no-cache")
                 .GET().build();
 
-        HttpResponse<InputStream> httpResponse = fetch(httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofInputStream()));
+        HttpResponse<InputStream> httpResponse = complete(httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofInputStream()));
 
         CustomCookieManager cookies = new CustomCookieManager("youtube.com");
         cookies.put(httpResponse.headers());

@@ -13,7 +13,15 @@ class ModelMapper {
     @SuppressWarnings("unchecked")
     static Map<String, Object> parseJsSoup(String json) {
         try {
-            return new ObjectMapper().readValue(json, HashMap.class);
+            return objectMapper.readValue(json, HashMap.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    static <T> T parse(String json, Class<T> valueType) {
+        try {
+            return objectMapper.readValue(json, valueType);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

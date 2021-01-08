@@ -1,24 +1,19 @@
 package service;
 
 import java.io.InputStream;
-import java.net.CookieManager;
-import java.net.CookiePolicy;
 import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Optional;
 
-import static service.IoUtil.applyBrotliDecoder;
-import static service.IoUtil.fetch;
+import static service.IoUtil.*;
 
 public class VideoPageHttpClient extends BaseHttpClient {
 
     public static HttpContext fetchVideoPage(String videoId) {
-        CookieManager cookies = new CookieManager();
-        cookies.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
-        HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).cookieHandler(cookies).build();
+
+        // TODO figure out why http2 is resulting in 400 error response
+        HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
 
         String referer = String.format("https://www.youtube.com/watch?v=%s", videoId);
 
@@ -34,12 +29,12 @@ public class VideoPageHttpClient extends BaseHttpClient {
                 .GET().build();
 
         HttpResponse<InputStream> httpResponse = fetch(httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofInputStream()));
-        HttpHeaders headers = httpResponse.headers();
-        InputStream body = httpResponse.body();
 
-        Optional<String> contentEncoding = headers.firstValue("content-encoding");
-        if (contentEncoding.isPresent() && "br".equals(contentEncoding.get())) body = applyBrotliDecoder(body);
+        CustomCookieManager cookies = new CustomCookieManager("youtube.com");
+        cookies.put(httpResponse.headers());
 
-        return new HttpContext(httpClient, headers, body, cookies, referer);
+        String body = readStreamToString(applyBrotliDecoderAndGetBody(httpResponse));
+
+        return new HttpContext(httpClient, body, cookies, referer);
     }
 }

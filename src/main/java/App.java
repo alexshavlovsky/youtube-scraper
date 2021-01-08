@@ -1,13 +1,13 @@
 import parser.VideoPageBodyParser;
-import service.VideoPageHttpClient;
+import http.VideoPageHttpClient;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static parser.VideoPageBodyParser.parseVideoPageBody;
-import static service.CommentApiHttpClient.fetchComments;
-import static service.VideoPageHttpClient.fetchVideoPage;
+import static http.CommentApiHttpClient.fetchComments;
+import static http.VideoPageHttpClient.fetchVideoPage;
 
 public class App {
 

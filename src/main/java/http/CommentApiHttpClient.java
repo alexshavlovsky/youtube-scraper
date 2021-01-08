@@ -1,4 +1,4 @@
-package service;
+package http;
 
 import parser.VideoPageBodyParser;
 
@@ -9,7 +9,7 @@ import java.net.http.HttpResponse;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static service.IoUtil.*;
+import static http.IoUtil.*;
 
 public class CommentApiHttpClient extends BaseHttpClient {
 
@@ -48,7 +48,6 @@ public class CommentApiHttpClient extends BaseHttpClient {
                 .headers("DNT", "1")
                 .headers("Pragma", "no-cache")
                 .headers("Cache-Control", "no-cache")
-                .headers("TE", "Trailers")
                 .POST(ofFormData(Map.of(session.ytCfg.XSRF_FIELD_NAME, session.ytCfg.XSRF_TOKEN))).build();
 
         HttpResponse<InputStream> httpResponse = fetch(context.httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofInputStream()));

@@ -1,19 +1,19 @@
 package parser;
 
-import model.YtCfg;
+import model.YoutubeConfig;
 
 import static parser.ModelMapper.parse;
 import static parser.ParserUtil.*;
 
 public class VideoPageBodyParser {
 
-    public static class VideoPageSession {
-        public final YtCfg ytCfg;
+    public static class YoutubeSession {
+        public final YoutubeConfig youtubeConfig;
         public final String continuation;
         public final String itct;
 
-        private VideoPageSession(YtCfg ytCfg, String continuation, String itct) {
-            this.ytCfg = ytCfg;
+        private YoutubeSession(YoutubeConfig youtubeConfig, String continuation, String itct) {
+            this.youtubeConfig = youtubeConfig;
             this.continuation = continuation;
             this.itct = itct;
         }
@@ -26,13 +26,13 @@ public class VideoPageBodyParser {
     private static final String ITEM_SECTION_CONTINUATION_KEY = "continuation";
     private static final String ITEM_SECTION_ITCT_KEY = "clickTrackingParams";
 
-    public static VideoPageSession parseVideoPageBody(String body) {
+    public static YoutubeSession parseVideoPageBody(String body) {
 
         String ytCfgSoup = parseMarkedJsonObject(CONFIG_MARKER, body);
 
 //        Map<String, Object> debug = parseJsSoup(ytCfgSoup);
 
-        YtCfg ytCfg = parse(ytCfgSoup, YtCfg.class);
+        YoutubeConfig youtubeConfig = parse(ytCfgSoup, YoutubeConfig.class);
 
         String itemSection = parseNestedJsonObject(ITEM_SECTION, body);
 
@@ -42,8 +42,8 @@ public class VideoPageBodyParser {
         String continuation = parseUniqueJsonEntry(ITEM_SECTION_CONTINUATION_KEY, itemSection);
         String itct = parseUniqueJsonEntry(ITEM_SECTION_ITCT_KEY, itemSection);
 
-        return new VideoPageSession(
-                ytCfg,
+        return new YoutubeSession(
+                youtubeConfig,
                 continuation,
                 itct
         );

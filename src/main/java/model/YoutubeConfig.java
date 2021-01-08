@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class YtCfg {
+public class YoutubeConfig {
     @JsonProperty("PAGE_CL")
     public String PAGE_CL;
     @JsonProperty("XSRF_TOKEN")

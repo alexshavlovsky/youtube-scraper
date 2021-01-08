@@ -13,8 +13,8 @@ public class App {
 
     public static void main(String[] args) throws IOException {
         VideoPageHttpClient.HttpContext httpContext = fetchVideoPage("tcqbAaXBq2s");
-        VideoPageBodyParser.VideoPageSession session = parseVideoPageBody(httpContext.body);
-        httpContext = fetchComments(httpContext, session);
+        VideoPageBodyParser.YoutubeSession youtubeSession = parseVideoPageBody(httpContext.body);
+        httpContext = fetchComments(httpContext, youtubeSession);
         Files.writeString(Path.of("comment_api_response.json"), httpContext.body);
 //        String s = Files.readString(Path.of("6.txt"));
     }

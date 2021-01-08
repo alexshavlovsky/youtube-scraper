@@ -1,4 +1,4 @@
-package service;
+package http;
 
 import org.brotli.dec.BrotliInputStream;
 

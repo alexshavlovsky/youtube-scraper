@@ -1,4 +1,4 @@
-package service;
+package http;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -6,14 +6,13 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-import static service.IoUtil.*;
+import static http.IoUtil.*;
 
 public class VideoPageHttpClient extends BaseHttpClient {
 
     public static HttpContext fetchVideoPage(String videoId) {
 
-        // TODO figure out why http2 is resulting in 400 error response
-        HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build();
+        HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).build();
 
         String referer = String.format("https://www.youtube.com/watch?v=%s", videoId);
 

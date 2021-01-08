@@ -1,4 +1,4 @@
-package service;
+package http;
 
 import java.io.IOException;
 import java.net.CookieManager;
@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 class CustomCookieManager extends CookieManager {
+
+    private static final String COOKIE_TEMPLATE = "%s; path=/; domain=.%s";
 
     private final String defaultDomain;
     private final URI defaultUri;
@@ -32,8 +34,6 @@ class CustomCookieManager extends CookieManager {
     void put(HttpHeaders headers) {
         put(defaultUri, headers);
     }
-
-    private static final String COOKIE_TEMPLATE = "%s; path=/; domain=.%s";
 
     void put(String cookie) {
         try {

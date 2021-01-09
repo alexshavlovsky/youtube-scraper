@@ -11,8 +11,4 @@ public class CommentApiResponse {
     public CommentItemSection getCommentItemSection() {
         return response.continuationContents.itemSectionContinuation;
     }
-
-    public String getXsrfToken() {
-        return xsrf_token;
-    }
 }

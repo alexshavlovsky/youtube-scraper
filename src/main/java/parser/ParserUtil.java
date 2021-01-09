@@ -19,6 +19,22 @@ class ParserUtil {
         throw new RuntimeException();
     }
 
+    static int enclosingParenPos(String s, int i, char p1, char p2) {
+        int counter = 1;
+        while (i >= 0) {
+            if (s.charAt(i) == p1 && --counter == 0) return i;
+            if (s.charAt(i) == p2) counter++;
+            i--;
+        }
+        throw new RuntimeException();
+    }
+
+    static int regexPos(String regex, String input) {
+        Matcher matcher = Pattern.compile(regex).matcher(input);
+        if (matcher.find()) return matcher.start();
+        throw new RuntimeException();
+    }
+
     private static int prefixedObjectPos(String template, String key, String input) {
         String regex = String.format(template, key);
         Matcher matcher = Pattern.compile(regex).matcher(input);
@@ -27,9 +43,9 @@ class ParserUtil {
     }
 
     private static String parsePrefixedObject(String template, String key, String input) {
-        int z = prefixedObjectPos(template, key, input);
-        int y = nextParenPos(input, z, '{', '}');
-        return input.substring(z, y + 1);
+        int objectPos = prefixedObjectPos(template, key, input);
+        int objectEnd = nextParenPos(input, objectPos, '{', '}');
+        return input.substring(objectPos, objectEnd + 1);
     }
 
     static String parseNestedJsonObject(String key, String input) {
@@ -38,6 +54,13 @@ class ParserUtil {
 
     static String parseMarkedJsonObject(String marker, String input) {
         return parsePrefixedObject(JSON_MARKED_OBJECT_REGEX_TEMPLATE, marker, input);
+    }
+
+    static String parseEnclosingObjectByEntryRegex(String regex, String input) {
+        int entryPos = regexPos(regex, input);
+        int objectPos = enclosingParenPos(input, entryPos, '{', '}');
+        int objectEnd = nextParenPos(input, objectPos, '{', '}');
+        return input.substring(objectPos, objectEnd + 1);
     }
 
     static String parseUniqueJsonEntry(String key, String input) {

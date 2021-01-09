@@ -1,51 +1,44 @@
 package parser;
 
 import model.YoutubeConfig;
+import model.commentapiresponse.CommentApiResponse;
+import model.commentitemsection.CommentItemSection;
 
 import static parser.ModelMapper.parse;
-import static parser.ParserUtil.*;
+import static parser.ParserUtil.parseEnclosingObjectByEntryRegex;
+import static parser.ParserUtil.parseMarkedJsonObject;
 
 public class VideoPageBodyParser {
 
-    public static class YoutubeSession {
+    public static class YoutubeContext {
         public final YoutubeConfig youtubeConfig;
-        public final String continuation;
-        public final String itct;
+        public final CommentItemSection commentItemSection;
 
-        private YoutubeSession(YoutubeConfig youtubeConfig, String continuation, String itct) {
+        private YoutubeContext(YoutubeConfig youtubeConfig, CommentItemSection commentItemSection) {
             this.youtubeConfig = youtubeConfig;
-            this.continuation = continuation;
-            this.itct = itct;
+            this.commentItemSection = commentItemSection;
         }
     }
 
     private static final String CONFIG_MARKER = "ytcfg.set\\(";
-    private static final String ITEM_SECTION = "itemSectionRenderer";
-    private static final String ITEM_SECTION_IDENTIFIER_KEY = "sectionIdentifier";
-    private static final String ITEM_SECTION_IDENTIFIER_VALUE = "comment-item-section";
-    private static final String ITEM_SECTION_CONTINUATION_KEY = "continuation";
-    private static final String ITEM_SECTION_ITCT_KEY = "clickTrackingParams";
+    private static final String INITIAL_CONFIG_MARKER = "var ytInitialData\\s*=\\s*";
+    private static final String COMMENT_ITEM_SECTION_ENTRY_REGEX = "\"sectionIdentifier\"\\s*:\\s*\"comment-item-section\"";
 
-    public static YoutubeSession parseVideoPageBody(String body) {
+    public static YoutubeContext scrapeYoutubeContext(String body) {
+        YoutubeConfig youtubeConfig = parse(parseMarkedJsonObject(CONFIG_MARKER, body), YoutubeConfig.class);
 
-        String ytCfgSoup = parseMarkedJsonObject(CONFIG_MARKER, body);
+        String ytInitialDataJson = parseMarkedJsonObject(INITIAL_CONFIG_MARKER, body);
+        String commentItemSectionJson = parseEnclosingObjectByEntryRegex(COMMENT_ITEM_SECTION_ENTRY_REGEX, ytInitialDataJson);
+        CommentItemSection commentItemSection = parse(commentItemSectionJson, CommentItemSection.class);
 
-//        Map<String, Object> debug = parseJsSoup(ytCfgSoup);
+        return new YoutubeContext(youtubeConfig, commentItemSection);
+    }
 
-        YoutubeConfig youtubeConfig = parse(ytCfgSoup, YoutubeConfig.class);
+    public static YoutubeContext parseCommentApiResponse(String responseBody, YoutubeContext youtubeContext) {
+        CommentApiResponse commentApiResponse = parse(responseBody, CommentApiResponse.class);
+        CommentItemSection commentItemSection = commentApiResponse.getCommentItemSection();
+        youtubeContext.youtubeConfig.setXSRF_TOKEN(commentApiResponse.getXsrf_token());
 
-        String itemSection = parseNestedJsonObject(ITEM_SECTION, body);
-
-        if (!ITEM_SECTION_IDENTIFIER_VALUE.equals(parseUniqueJsonEntry(ITEM_SECTION_IDENTIFIER_KEY, itemSection)))
-            throw new RuntimeException("Invalid Item Section");
-
-        String continuation = parseUniqueJsonEntry(ITEM_SECTION_CONTINUATION_KEY, itemSection);
-        String itct = parseUniqueJsonEntry(ITEM_SECTION_ITCT_KEY, itemSection);
-
-        return new YoutubeSession(
-                youtubeConfig,
-                continuation,
-                itct
-        );
+        return new YoutubeContext(youtubeContext.youtubeConfig, commentItemSection);
     }
 }

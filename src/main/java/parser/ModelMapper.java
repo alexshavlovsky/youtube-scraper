@@ -11,9 +11,9 @@ class ModelMapper {
     private static ObjectMapper objectMapper = new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
     @SuppressWarnings("unchecked")
-    static Map<String, Object> parseJsSoup(String json) {
+    static Map<String, Object> parseJsSoup(String jsonSoup) {
         try {
-            return objectMapper.readValue(json, Map.class);
+            return objectMapper.readValue(jsonSoup, Map.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

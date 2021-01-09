@@ -1,23 +1,22 @@
 package model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
 public class YoutubeConfig {
     @JsonProperty("PAGE_CL")
-    public String PAGE_CL;
+    public String pageCl;
     @JsonProperty("XSRF_TOKEN")
-    public String XSRF_TOKEN;
+    public String xsrfToken;
     @JsonProperty("XSRF_FIELD_NAME")
-    public String XSRF_FIELD_NAME;
+    public String xsrfFieldName;
     @JsonProperty("DEVICE")
-    public String DEVICE;
+    public String device;
     @JsonProperty("PAGE_BUILD_LABEL")
-    public String PAGE_BUILD_LABEL;
+    public String pageLabel;
     @JsonProperty("INNERTUBE_CONTEXT_CLIENT_NAME")
-    public String INNERTUBE_CONTEXT_CLIENT_NAME;
+    public String clientName;
     @JsonProperty("INNERTUBE_CONTEXT_CLIENT_VERSION")
-    public String INNERTUBE_CONTEXT_CLIENT_VERSION;
+    public String clientVersion;
 }

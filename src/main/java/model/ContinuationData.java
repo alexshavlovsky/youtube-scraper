@@ -1,5 +1,8 @@
 package model;
 
+import lombok.Data;
+
+@Data
 public class ContinuationData {
     public final String continuation;
     public final String clickTrackingParams;

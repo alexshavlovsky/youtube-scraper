@@ -1,8 +1,6 @@
 import http.VideoPageHttpClient;
 import parser.VideoPageBodyParser;
 
-import java.io.IOException;
-
 import static http.CommentApiHttpClient.fetchComments;
 import static http.VideoPageHttpClient.fetchVideoPage;
 import static parser.VideoPageBodyParser.parseCommentApiResponse;

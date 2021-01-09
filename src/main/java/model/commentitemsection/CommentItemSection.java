@@ -4,6 +4,7 @@ import lombok.Data;
 import model.ContinuationData;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 public class CommentItemSection {
@@ -14,18 +15,34 @@ public class CommentItemSection {
     public String sectionIdentifier;
 
     public boolean hasContinuation() {
-        return !continuations.isEmpty();
+        return continuations != null && !continuations.isEmpty();
     }
 
-    public ContinuationData getContinuationData() {
-        NextContinuationData nextContinuationData = continuations.get(0).nextContinuationData;
-        return new ContinuationData(nextContinuationData.continuation, nextContinuationData.clickTrackingParams);
+    public ContinuationData nextContinuation() {
+        if (!hasContinuation()) throw new IllegalStateException();
+        return newContinuationData(continuations.get(0).getNextContinuationData());
+    }
+
+    private static ContinuationData newContinuationData(NextContinuationData nextContinuationData) {
+        return new ContinuationData(nextContinuationData.getContinuation(), nextContinuationData.getClickTrackingParams());
+    }
+
+    private String joinRuns(List<Run> runs) {
+        return runs.stream().map(Run::getText).collect(Collectors.joining());
     }
 
     public void printComments() {
         for (Content content : contents) {
-            CommentRenderer comment = content.commentThreadRenderer.comment.commentRenderer;
-            System.out.println(comment);
+            CommentThreadRenderer commentContext = content.getCommentThreadRenderer();
+            CommentRenderer comment = commentContext.getComment().getCommentRenderer();
+            System.out.println("================================================================================");
+            System.out.println("CommentId:  " + comment.getCommentId());
+            System.out.println(String.format("Author:     %s %s (%s)",
+                    comment.getAuthorText().getSimpleText(),
+                    comment.getAuthorEndpoint().getBrowseEndpoint().getCanonicalBaseUrl(),
+                    joinRuns(comment.getPublishedTimeText().runs)));
+            System.out.println("Text:       " + joinRuns(comment.getContentText().getRuns()));
+            System.out.println("Like/Reply: " + comment.getLikeCount() + " / " + comment.getReplyCount());
         }
     }
 }

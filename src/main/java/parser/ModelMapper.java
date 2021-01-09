@@ -1,19 +1,19 @@
 package parser;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.HashMap;
 import java.util.Map;
 
 class ModelMapper {
 
-    private static ObjectMapper objectMapper = new ObjectMapper();
+    private static ObjectMapper objectMapper = new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
     @SuppressWarnings("unchecked")
     static Map<String, Object> parseJsSoup(String json) {
         try {
-            return objectMapper.readValue(json, HashMap.class);
+            return objectMapper.readValue(json, Map.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

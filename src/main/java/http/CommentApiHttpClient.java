@@ -18,7 +18,7 @@ public class CommentApiHttpClient extends AbstractHttpClient {
 
     public static HttpContext fetchComments(VideoPageHttpClient.HttpContext httpContext, VideoPageBodyParser.YoutubeContext youtubeContext) {
 
-        ContinuationData continuationData = youtubeContext.commentItemSection.getContinuationData();
+        ContinuationData continuationData = youtubeContext.commentItemSection.nextContinuation();
         YoutubeConfig youtubeConfig = youtubeContext.youtubeConfig;
 
         String queryParams = joinQueryParamsOrdered(

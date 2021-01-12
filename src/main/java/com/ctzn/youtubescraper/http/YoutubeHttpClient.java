@@ -1,6 +1,7 @@
 package com.ctzn.youtubescraper.http;
 
 import com.ctzn.youtubescraper.model.CommentThreadHeader;
+import com.ctzn.youtubescraper.model.ContinuationData;
 import com.ctzn.youtubescraper.model.YoutubeConfig;
 import com.ctzn.youtubescraper.model.commentapiresponse.CommentApiResponse;
 import com.ctzn.youtubescraper.model.commentitemsection.CommentItemSection;
@@ -42,7 +43,7 @@ public class YoutubeHttpClient {
 
     // values are set after the first comment section which contains a comment thread header is fetched
     private CommentThreadHeader commentThreadHeader;
-    private int totalCommentsCount;
+    private int headerCommentCounter;
 
     private final CommentApiRequestUriFactory commentApiRequestUriFactory = new CommentApiRequestUriFactory();
     private final CommentApiResponseParser commentApiResponseParser = new CommentApiResponseParser();
@@ -55,7 +56,7 @@ public class YoutubeHttpClient {
         String body = fetchVideoPage(videoPageUri);
         log.info(() -> "Scrape initial youtube context");
         youtubeConfig = VideoPageBodyParser.scrapeYoutubeConfig(body);
-        currentXsrfToken = youtubeConfig.getXsrfToken();
+        currentXsrfToken = youtubeConfig.xsrfToken;
         log.info(youtubeConfig::toString);
         commentItemSection = VideoPageBodyParser.scrapeInitialCommentItemSection(body);
         log.fine(() -> commentItemSection.nextContinuation().toString());
@@ -85,9 +86,9 @@ public class YoutubeHttpClient {
         return commentItemSection.hasContinuation();
     }
 
-    public CommentItemSection nextComments() {
-        if (!hasComments()) return null;
-        URI requestUri = commentApiRequestUriFactory.newRequestUri(commentItemSection.nextContinuation());
+    // Warning! XSRF token must be updated by the caller itself
+    private HttpResponse<InputStream> requestContinuation(ContinuationData continuationData) {
+        URI requestUri = commentApiRequestUriFactory.newRequestUri(continuationData);
         HttpRequest request = HttpRequest.newBuilder(requestUri)
                 .headers("User-Agent", USER_AGENT)
                 .headers("Accept", ACCEPT_ALL)
@@ -111,8 +112,13 @@ public class YoutubeHttpClient {
                 .headers("Pragma", "no-cache")
                 .headers("Cache-Control", "no-cache")
                 .POST(ofFormData(Map.of(youtubeConfig.xsrfFieldName, currentXsrfToken))).build();
+        return completeRequest(httpClient, request);
+    }
 
-        HttpResponse<InputStream> httpResponse = completeRequest(httpClient, request);
+    public CommentItemSection nextComments() {
+        if (!hasComments()) return null;
+
+        HttpResponse<InputStream> httpResponse = requestContinuation(commentItemSection.nextContinuation());
 
         String responseBody = readStreamToString(applyBrotliDecoderAndGetBody(httpResponse));
         CommentApiResponse commentApiResponse = commentApiResponseParser.parseResponseBody(responseBody);
@@ -122,21 +128,25 @@ public class YoutubeHttpClient {
 
         if (commentItemSection.hasHeader()) {
             commentThreadHeader = commentItemSection.getHeader();
-            totalCommentsCount = commentApiResponseParser.parseCommentsCountText(commentThreadHeader.commentsCountText);
-            log.info(() -> "Total comments count: " + totalCommentsCount);
+            headerCommentCounter = commentApiResponseParser.parseCommentsCountText(commentThreadHeader.commentsCountText);
+            log.info(() -> "Total comments count: " + headerCommentCounter);
         }
 
-        commentCounter.incContinuation();
-        commentCounter.add(commentItemSection.commentsCount());
+        commentCounter.addAll(commentItemSection.countComments(), 1);
+        replyCounter.addAll(commentItemSection.sumReplyCounters(), commentItemSection.countReplyContinuations());
         log.fine(() -> "Continuations processed: " + commentCounter.getContinuationCounter());
         log.fine(() -> "Comments processed: " + commentCounter.getCounter());
-
-        fetchReplies();
+        log.fine(() -> "Reply continuations processed: " + replyCounter.getContinuationCounter());
+        log.fine(() -> "Replies processed: " + replyCounter.getCounter());
 
         return commentItemSection;
     }
 
-    private void fetchReplies() {
-        // TODO implement this
+    public Counter getCommentCounter() {
+        return commentCounter;
+    }
+
+    public Counter getReplyCounter() {
+        return replyCounter;
     }
 }

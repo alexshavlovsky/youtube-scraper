@@ -12,7 +12,6 @@ class CommentRenderer {
     public boolean isLiked;
     public int likeCount;
     public String commentId;
-    public ActionButtons actionButtons;
     public boolean authorIsChannelOwner;
     public String voteStatus;
     public String trackingParams;

@@ -1,7 +1,8 @@
 package com.ctzn.youtubescraper.model.commentitemsection;
 
 import com.ctzn.youtubescraper.model.CommentThreadHeader;
-import com.ctzn.youtubescraper.model.ContinuationData;
+import com.ctzn.youtubescraper.model.continuation.Continuation;
+import com.ctzn.youtubescraper.model.continuation.NextContinuationData;
 import lombok.Value;
 
 import java.util.Collections;
@@ -17,10 +18,6 @@ public class CommentItemSection {
     public String trackingParams;
     public Header header;
     public String sectionIdentifier;
-
-    private static ContinuationData newContinuationData(NextContinuationData nextContinuationData) {
-        return new ContinuationData(nextContinuationData.continuation, nextContinuationData.clickTrackingParams);
-    }
 
     private String joinRuns(List<Run> runs) {
         return runs.stream().map(r -> r.text).collect(Collectors.joining());
@@ -46,17 +43,17 @@ public class CommentItemSection {
         return hasComments() ? contents.size() : 0;
     }
 
-    public ContinuationData nextContinuation() {
+    public NextContinuationData nextContinuation() {
         if (!hasContinuation()) throw new IllegalStateException();
-        return newContinuationData(continuations.get(0).nextContinuationData);
+        return continuations.get(0).nextContinuationData;
     }
 
     public CommentThreadHeader getHeader() {
         if (!hasHeader()) throw new IllegalStateException();
         CommentsHeaderRenderer headerContext = header.commentsHeaderRenderer;
         String commentsCountText = joinRuns(headerContext.countText.runs);
-        List<ContinuationData> continuations = headerContext.sortMenu.sortFilterSubMenuRenderer.subMenuItems.stream()
-                .map(i -> i.continuation.reloadContinuationData).map(CommentItemSection::newContinuationData).collect(Collectors.toList());
+        List<NextContinuationData> continuations = headerContext.sortMenu.sortFilterSubMenuRenderer.subMenuItems.stream()
+                .map(i -> i.continuation.reloadContinuationData).collect(Collectors.toList());
         return new CommentThreadHeader(continuations.get(0), continuations.get(1), commentsCountText);
     }
 
@@ -71,16 +68,17 @@ public class CommentItemSection {
                 .mapToInt(c -> c.replies == null ? 0 : c.replies.commentRepliesRenderer.continuations.size()).sum();
     }
 
-    public Map<String, ContinuationData> getReplyContinuationsMap() {
+    // keys - commentId
+    // values reply continuations
+    public Map<String, NextContinuationData> getReplyContinuationsMap() {
         if (!hasComments()) return Collections.emptyMap();
-        Map<String, ContinuationData> map = new LinkedHashMap<>();
+        Map<String, NextContinuationData> map = new LinkedHashMap<>();
         for (Content content : contents) {
             CommentThreadRenderer commentContext = content.commentThreadRenderer;
             if (commentContext.replies != null) {
                 CommentRenderer comment = commentContext.comment.commentRenderer;
                 CommentRepliesRenderer replies = commentContext.replies.commentRepliesRenderer;
-                map.put(comment.commentId,
-                        newContinuationData(replies.continuations.get(0).nextContinuationData));
+                map.put(comment.commentId, replies.continuations.get(0).nextContinuationData);
             }
         }
         return map;

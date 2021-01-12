@@ -1,8 +1,8 @@
-package com.ctzn.youtubescraper.model.commentitemsection;
+package com.ctzn.youtubescraper.model.continuation;
 
 import lombok.Value;
 
 @Value
-class ReloadContinuation {
+public class ReloadContinuation {
     public NextContinuationData reloadContinuationData;
 }

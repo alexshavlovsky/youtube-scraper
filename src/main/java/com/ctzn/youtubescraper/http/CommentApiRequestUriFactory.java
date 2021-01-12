@@ -1,6 +1,6 @@
 package com.ctzn.youtubescraper.http;
 
-import com.ctzn.youtubescraper.model.ContinuationData;
+import com.ctzn.youtubescraper.model.continuation.NextContinuationData;
 
 import java.net.URI;
 
@@ -10,7 +10,7 @@ class CommentApiRequestUriFactory {
 
     private final static String COMMENT_API_URI_TEMPLATE = "https://www.youtube.com/comment_service_ajax?%s";
 
-    private static String buildQueryParams(ContinuationData continuationData) {
+    private static String buildQueryParams(NextContinuationData continuationData) {
         return joinQueryParamsOrdered(
                 "action_get_comments", "1",
                 "pbj", "1",
@@ -20,7 +20,7 @@ class CommentApiRequestUriFactory {
         );
     }
 
-    URI newRequestUri(ContinuationData continuationData) {
+    URI newRequestUri(NextContinuationData continuationData) {
         return URI.create(String.format(COMMENT_API_URI_TEMPLATE, buildQueryParams(continuationData)));
     }
 }

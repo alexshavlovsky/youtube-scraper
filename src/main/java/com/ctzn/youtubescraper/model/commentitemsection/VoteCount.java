@@ -4,6 +4,5 @@ import lombok.Value;
 
 @Value
 class VoteCount {
-    public Accessibility accessibility;
     public String simpleText;
 }

@@ -1,6 +1,6 @@
 package com.ctzn.youtubescraper.parser;
 
-import com.ctzn.youtubescraper.model.commentapiresponse.CommentApiResponse;
+import com.ctzn.youtubescraper.model.CommentApiResponse;
 
 import static com.ctzn.youtubescraper.parser.ModelMapper.parse;
 import static com.ctzn.youtubescraper.parser.ParserUtil.parseDigitsToInt;

@@ -1,7 +1,7 @@
 package com.ctzn.youtubescraper;
 
 import com.ctzn.youtubescraper.http.YoutubeHttpClient;
-import com.ctzn.youtubescraper.model.commentitemsection.CommentItemSection;
+import com.ctzn.youtubescraper.model.CommentItemSection;
 
 public class App {
 

@@ -9,7 +9,6 @@ class SortFilterSubMenuRenderer {
     public List<SubMenuItem> subMenuItems;
     public String title;
     public Icon icon;
-    public Accessibility accessibility;
     public String tooltip;
     public String trackingParams;
 }

@@ -9,7 +9,6 @@ class ButtonRenderer {
     public Text text;
     public NavigationEndpoint navigationEndpoint;
     public String trackingParams;
-    public Accessibility accessibility;
     public Icon icon;
     public String iconPosition;
 }

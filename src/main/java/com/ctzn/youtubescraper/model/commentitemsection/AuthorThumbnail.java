@@ -7,5 +7,4 @@ import java.util.List;
 @Value
 class AuthorThumbnail {
     public List<Thumbnail> thumbnails;
-    public Accessibility accessibility;
 }

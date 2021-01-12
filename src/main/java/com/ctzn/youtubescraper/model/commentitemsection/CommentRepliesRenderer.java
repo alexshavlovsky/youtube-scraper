@@ -1,5 +1,6 @@
 package com.ctzn.youtubescraper.model.commentitemsection;
 
+import com.ctzn.youtubescraper.model.continuation.Continuation;
 import lombok.Value;
 
 import java.util.List;

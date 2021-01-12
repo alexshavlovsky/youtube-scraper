@@ -1,19 +1,22 @@
 package com.ctzn.youtubescraper.http;
 
 import com.ctzn.youtubescraper.model.CommentThreadHeader;
-import com.ctzn.youtubescraper.model.ContinuationData;
 import com.ctzn.youtubescraper.model.YoutubeConfig;
 import com.ctzn.youtubescraper.model.commentapiresponse.CommentApiResponse;
 import com.ctzn.youtubescraper.model.commentitemsection.CommentItemSection;
+import com.ctzn.youtubescraper.model.continuation.NextContinuationData;
 import com.ctzn.youtubescraper.parser.CommentApiResponseParser;
 import com.ctzn.youtubescraper.parser.VideoPageBodyParser;
 import lombok.extern.java.Log;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 
 import static com.ctzn.youtubescraper.http.IoUtil.*;
@@ -58,6 +61,11 @@ public class YoutubeHttpClient {
         youtubeConfig = VideoPageBodyParser.scrapeYoutubeConfig(body);
         currentXsrfToken = youtubeConfig.xsrfToken;
         log.info(youtubeConfig::toString);
+        try {
+            Files.writeString(Path.of("body.json"), body);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         commentItemSection = VideoPageBodyParser.scrapeInitialCommentItemSection(body);
         log.fine(() -> commentItemSection.nextContinuation().toString());
     }
@@ -87,7 +95,7 @@ public class YoutubeHttpClient {
     }
 
     // Warning! XSRF token must be updated by the caller itself
-    private HttpResponse<InputStream> requestContinuation(ContinuationData continuationData) {
+    private HttpResponse<InputStream> requestContinuation(NextContinuationData continuationData) {
         URI requestUri = commentApiRequestUriFactory.newRequestUri(continuationData);
         HttpRequest request = HttpRequest.newBuilder(requestUri)
                 .headers("User-Agent", USER_AGENT)
@@ -133,13 +141,29 @@ public class YoutubeHttpClient {
         }
 
         commentCounter.addAll(commentItemSection.countComments(), 1);
-        replyCounter.addAll(commentItemSection.sumReplyCounters(), commentItemSection.countReplyContinuations());
         log.fine(() -> "Continuations processed: " + commentCounter.getContinuationCounter());
         log.fine(() -> "Comments processed: " + commentCounter.getCounter());
+
+        replyCounter.addAll(commentItemSection.sumReplyCounters(), commentItemSection.countReplyContinuations());
         log.fine(() -> "Reply continuations processed: " + replyCounter.getContinuationCounter());
         log.fine(() -> "Replies processed: " + replyCounter.getCounter());
 
+        fetchReplies(commentItemSection.getReplyContinuationsMap());
+
         return commentItemSection;
+    }
+
+    private void fetchReplies(Map<String, NextContinuationData> replyContinuationsMap) {
+        replyContinuationsMap.forEach((key, value) -> {
+            System.out.println(key);
+            HttpResponse<InputStream> is = requestContinuation(value);
+            String responseBody = readStreamToString(applyBrotliDecoderAndGetBody(is));
+            try {
+                Files.writeString(Path.of(key + ".json"), responseBody);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
     }
 
     public Counter getCommentCounter() {

@@ -1,8 +1,13 @@
 package com.ctzn.youtubescraper.http;
 
-class Counter {
+public class Counter {
     private int counter = 0;
     private int continuationCounter = 0;
+
+    void addAll(int counterValue, int continuationCounterValue) {
+        counter += counterValue;
+        continuationCounter += continuationCounterValue;
+    }
 
     void add(int value) {
         counter += value;
@@ -12,11 +17,15 @@ class Counter {
         continuationCounter++;
     }
 
-    int getCounter() {
+    void addContinuations(int value) {
+        continuationCounter += value;
+    }
+
+    public int getCounter() {
         return counter;
     }
 
-    int getContinuationCounter() {
+    public int getContinuationCounter() {
         return continuationCounter;
     }
 }

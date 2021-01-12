@@ -1,10 +1,10 @@
 package com.ctzn.youtubescraper.http;
 
-import com.ctzn.youtubescraper.model.CommentThreadHeader;
-import com.ctzn.youtubescraper.model.YoutubeConfig;
-import com.ctzn.youtubescraper.model.commentapiresponse.CommentApiResponse;
-import com.ctzn.youtubescraper.model.commentitemsection.CommentItemSection;
-import com.ctzn.youtubescraper.model.continuation.NextContinuationData;
+import com.ctzn.youtubescraper.model.CommentApiResponse;
+import com.ctzn.youtubescraper.model.CommentItemSection;
+import com.ctzn.youtubescraper.model.SectionHeaderDTO;
+import com.ctzn.youtubescraper.model.YoutubeConfigDTO;
+import com.ctzn.youtubescraper.model.commons.NextContinuationData;
 import com.ctzn.youtubescraper.parser.CommentApiResponseParser;
 import com.ctzn.youtubescraper.parser.VideoPageBodyParser;
 import lombok.extern.java.Log;
@@ -35,7 +35,7 @@ public class YoutubeHttpClient {
     private final String videoPageUri;
     private final HttpClient httpClient;
     private final CustomCookieManager cookies;
-    private final YoutubeConfig youtubeConfig;
+    private final YoutubeConfigDTO youtubeConfig;
     private CommentItemSection commentItemSection;
 
     private Counter commentCounter = new Counter();
@@ -45,7 +45,7 @@ public class YoutubeHttpClient {
     private String currentXsrfToken;
 
     // values are set after the first comment section which contains a comment thread header is fetched
-    private CommentThreadHeader commentThreadHeader;
+    private SectionHeaderDTO commentThreadHeader;
     private int headerCommentCounter;
 
     private final CommentApiRequestUriFactory commentApiRequestUriFactory = new CommentApiRequestUriFactory();
@@ -61,11 +61,6 @@ public class YoutubeHttpClient {
         youtubeConfig = VideoPageBodyParser.scrapeYoutubeConfig(body);
         currentXsrfToken = youtubeConfig.xsrfToken;
         log.info(youtubeConfig::toString);
-        try {
-            Files.writeString(Path.of("body.json"), body);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         commentItemSection = VideoPageBodyParser.scrapeInitialCommentItemSection(body);
         log.fine(() -> commentItemSection.nextContinuation().toString());
     }
@@ -94,6 +89,7 @@ public class YoutubeHttpClient {
         return commentItemSection.hasContinuation();
     }
 
+    // TODO parametrize this using ApiResponse interface and update the token inside the method
     // Warning! XSRF token must be updated by the caller itself
     private HttpResponse<InputStream> requestContinuation(NextContinuationData continuationData) {
         URI requestUri = commentApiRequestUriFactory.newRequestUri(continuationData);
@@ -131,7 +127,7 @@ public class YoutubeHttpClient {
         String responseBody = readStreamToString(applyBrotliDecoderAndGetBody(httpResponse));
         CommentApiResponse commentApiResponse = commentApiResponseParser.parseResponseBody(responseBody);
 
-        commentItemSection = commentApiResponse.getCommentItemSection();
+        commentItemSection = commentApiResponse.getItemSection();
         currentXsrfToken = commentApiResponse.xsrf_token;
 
         if (commentItemSection.hasHeader()) {
@@ -156,13 +152,13 @@ public class YoutubeHttpClient {
     private void fetchReplies(Map<String, NextContinuationData> replyContinuationsMap) {
         replyContinuationsMap.forEach((key, value) -> {
             System.out.println(key);
-            HttpResponse<InputStream> is = requestContinuation(value);
-            String responseBody = readStreamToString(applyBrotliDecoderAndGetBody(is));
-            try {
-                Files.writeString(Path.of(key + ".json"), responseBody);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+//            HttpResponse<InputStream> is = requestContinuation(value);
+//            String responseBody = readStreamToString(applyBrotliDecoderAndGetBody(is));
+//            try {
+//                Files.writeString(Path.of(key + ".json"), responseBody);
+//            } catch (IOException ex) {
+//                ex.printStackTrace();
+//            }
         });
     }
 

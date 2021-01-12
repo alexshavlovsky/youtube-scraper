@@ -1,6 +1,6 @@
 package com.ctzn.youtubescraper.http;
 
-import com.ctzn.youtubescraper.model.continuation.NextContinuationData;
+import com.ctzn.youtubescraper.model.commons.NextContinuationData;
 
 import java.net.URI;
 

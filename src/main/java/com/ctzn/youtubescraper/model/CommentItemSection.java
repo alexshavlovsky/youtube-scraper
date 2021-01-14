@@ -2,10 +2,7 @@ package com.ctzn.youtubescraper.model;
 
 import com.ctzn.youtubescraper.model.commons.*;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CommentItemSection {
     public List<Content> contents;
@@ -46,7 +43,7 @@ public class CommentItemSection {
 
     public int sumReplyCounters() {
         if (!hasComments()) return 0;
-        return contents.stream().mapToInt(c -> c.commentThreadRenderer.comment.commentRenderer.replyCount).sum();
+        return contents.stream().mapToInt(c -> c.getCommentRenderer().replyCount).sum();
     }
 
     public int countReplyContinuations() {
@@ -56,7 +53,7 @@ public class CommentItemSection {
     }
 
     // keys - commentId
-    // values reply continuations
+    // values - reply continuations
     public Map<String, NextContinuationData> getReplyContinuationsMap() {
         if (!hasComments()) return Collections.emptyMap();
         Map<String, NextContinuationData> map = new LinkedHashMap<>();
@@ -71,35 +68,34 @@ public class CommentItemSection {
         return map;
     }
 
-    public void printComments() {
-        if (!hasComments()) return;
-        for (Content content : contents) {
-            CommentThreadRenderer commentContext = content.commentThreadRenderer;
-            CommentRenderer comment = commentContext.comment.commentRenderer;
-            System.out.println("================================================================================");
-            System.out.println("CommentId:  " + comment.commentId);
-            System.out.println(String.format("Author:     %s %s (%s)",
-                    comment.authorText.simpleText,
-                    comment.authorEndpoint.browseEndpoint.canonicalBaseUrl,
-                    comment.publishedTimeText.toString()));
-            System.out.println("Text:       " + comment.contentText.toString());
-            System.out.println("Like/Reply: " + comment.likeCount + " / " + comment.replyCount);
+    public List<CommentDTO> getComments(String videoId, String parentCommentId) {
+        if (!hasComments()) return Collections.emptyList();
+        List<CommentDTO> list = new ArrayList<>();
+        for (Content c : contents) {
+            CommentRenderer r = c.getCommentRenderer();
+            CommentDTO commentDTO = new CommentDTO(
+                    videoId,
+                    r.commentId,
+                    r.authorText == null ? "" : r.authorText.simpleText,
+                    r.authorEndpoint == null ? "" : r.authorEndpoint.browseEndpoint.canonicalBaseUrl,
+                    r.publishedTimeText.toString(),
+                    r.contentText.toString(),
+                    r.likeCount,
+                    r.replyCount,
+                    parentCommentId
+            );
+            list.add(commentDTO);
         }
+        return list;
     }
 
     static class Content {
         public CommentThreadRenderer commentThreadRenderer;
-    }
+        public CommentRenderer commentRenderer;
 
-    static class AuthorCommentBadgeRenderer {
-        public Icon icon;
-        public SimpleText authorText;
-        public AuthorEndpoint authorEndpoint;
-        public String iconTooltip;
-    }
-
-    static class AuthorCommentBadge {
-        public AuthorCommentBadgeRenderer authorCommentBadgeRenderer;
+        public CommentRenderer getCommentRenderer() {
+            return commentThreadRenderer != null ? commentThreadRenderer.comment.commentRenderer : commentRenderer;
+        }
     }
 
     static class CommentTargetTitle {
@@ -125,7 +121,6 @@ public class CommentItemSection {
         public String trackingParams;
         public SimpleText voteCount;
         public int replyCount;
-        public AuthorCommentBadge authorCommentBadge;
     }
 
     static class CommentThreadRenderer {

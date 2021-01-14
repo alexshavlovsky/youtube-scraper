@@ -11,19 +11,19 @@ class ModelMapper {
     private static ObjectMapper objectMapper = new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
     @SuppressWarnings("unchecked")
-    static Map<String, Object> parseJsSoup(String jsonSoup) {
+    static Map<String, Object> parseJsSoup(String jsonSoup) throws Exception {
         try {
             return objectMapper.readValue(jsonSoup, Map.class);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new Exception(e);
         }
     }
 
-    static <T> T parse(String json, Class<T> valueType) {
+    static <T> T parse(String json, Class<T> valueType) throws Exception {
         try {
             return objectMapper.readValue(json, valueType);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new Exception(e);
         }
     }
 }

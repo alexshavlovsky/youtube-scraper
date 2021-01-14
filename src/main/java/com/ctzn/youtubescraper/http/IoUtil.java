@@ -40,16 +40,22 @@ class IoUtil {
         }
     }
 
-    private static <T> HttpResponse<T> complete(CompletableFuture<HttpResponse<T>> future) {
+    private static <T> HttpResponse<T> complete(CompletableFuture<HttpResponse<T>> future) throws IOException {
         try {
             return future.get(5, TimeUnit.SECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            throw new RuntimeException(e);
+            throw new IOException(e);
         }
     }
 
-    static HttpResponse<InputStream> completeRequest(HttpClient httpClient, HttpRequest request) {
-        return complete(httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofInputStream()));
+    static HttpResponse<InputStream> completeRequest(HttpClient httpClient, HttpRequest request) throws IOException {
+        HttpResponse<InputStream> response = complete(httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofInputStream()));
+        if (response.statusCode() != 200) throw new IOException(
+                String.format("API call to [%s] responded with status code [%s]",
+                        response.uri(),
+                        response.statusCode())
+        );
+        return response;
     }
 
     private static String urlEncode(String source) {

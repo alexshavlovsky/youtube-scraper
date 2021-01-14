@@ -1,9 +1,7 @@
 package com.ctzn.youtubescraper.http;
 
-import com.ctzn.youtubescraper.model.CommentApiResponse;
-import com.ctzn.youtubescraper.model.CommentItemSection;
-import com.ctzn.youtubescraper.model.SectionHeaderDTO;
-import com.ctzn.youtubescraper.model.YoutubeConfigDTO;
+import com.ctzn.youtubescraper.handler.CommentHandler;
+import com.ctzn.youtubescraper.model.*;
 import com.ctzn.youtubescraper.model.commons.NextContinuationData;
 import com.ctzn.youtubescraper.parser.CommentApiResponseParser;
 import com.ctzn.youtubescraper.parser.VideoPageBodyParser;
@@ -15,8 +13,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import static com.ctzn.youtubescraper.http.IoUtil.*;
@@ -25,11 +23,13 @@ import static com.ctzn.youtubescraper.http.IoUtil.*;
 public class YoutubeHttpClient {
 
     private final static String VIDEO_PAGE_URI_TEMPLATE = "https://www.youtube.com/watch?v=%s";
+    private static final int REQUEST_URI_LENGTH_LIMIT = 14000;
+    private final String videoId;
 
     private final static String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0";
     private final static String ACCEPT = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8";
     private final static String ACCEPT_ALL = "*/*";
-    private final static String ACCEPT_LANGUAGE = "ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3";
+    private final static String ACCEPT_LANGUAGE = "en-US,en;q=0.5";
     private final static String ACCEPT_ENCODING = "gzip, deflate, br";
 
     private final String videoPageUri;
@@ -38,34 +38,39 @@ public class YoutubeHttpClient {
     private final YoutubeConfigDTO youtubeConfig;
     private CommentItemSection commentItemSection;
 
-    private Counter commentCounter = new Counter();
-    private Counter replyCounter = new Counter();
+    private Counter commentCounter = new Counter("Processed comments");
+    private Counter replyCounter = new Counter("Processed replies");
 
     // value is set in constructor after the video page is parsed and updated after each
     private String currentXsrfToken;
 
     // values are set after the first comment section which contains a comment thread header is fetched
     private SectionHeaderDTO commentThreadHeader;
-    private int headerCommentCounter;
+    private int renderCommentCounter;
+    private Counter renderReplyCounter;
+    private int currentUriLength;
 
     private final CommentApiRequestUriFactory commentApiRequestUriFactory = new CommentApiRequestUriFactory();
     private final CommentApiResponseParser commentApiResponseParser = new CommentApiResponseParser();
 
-    public YoutubeHttpClient(String videoId) {
+    private final CommentHandler[] handlers;
+
+    public YoutubeHttpClient(String videoId, CommentHandler... handlers) throws Exception {
+        this.videoId = videoId;
+        this.handlers = handlers;
         videoPageUri = String.format(VIDEO_PAGE_URI_TEMPLATE, videoId);
         httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).build();
         cookies = new CustomCookieManager("youtube.com");
-        log.info(() -> "Fetch video page: " + videoPageUri);
+        log.info(() -> String.format("Fetch video page: [%s]", videoPageUri));
         String body = fetchVideoPage(videoPageUri);
         log.info(() -> "Scrape initial youtube context");
         youtubeConfig = VideoPageBodyParser.scrapeYoutubeConfig(body);
         currentXsrfToken = youtubeConfig.xsrfToken;
-        log.info(youtubeConfig::toString);
+        log.info(() -> "Scrape comment section continuation");
         commentItemSection = VideoPageBodyParser.scrapeInitialCommentItemSection(body);
-        log.fine(() -> commentItemSection.nextContinuation().toString());
     }
 
-    private String fetchVideoPage(String uri) {
+    private String fetchVideoPage(String uri) throws IOException {
         HttpRequest request = HttpRequest.newBuilder(URI.create(uri))
                 .headers("User-Agent", USER_AGENT)
                 .headers("Accept", ACCEPT)
@@ -85,14 +90,15 @@ public class YoutubeHttpClient {
         return readStreamToString(applyBrotliDecoderAndGetBody(httpResponse));
     }
 
-    public boolean hasComments() {
-        return commentItemSection.hasContinuation();
+    public boolean hasContinuation() {
+        return commentItemSection != null && commentItemSection.hasContinuation();
     }
 
-    // TODO parametrize this using ApiResponse interface and update the token inside the method
-    // Warning! XSRF token must be updated by the caller itself
-    private HttpResponse<InputStream> requestContinuation(NextContinuationData continuationData) {
+    private <T extends ApiResponse> CommentItemSection requestContinuation(NextContinuationData continuationData, Class<T> valueType) throws Exception {
         URI requestUri = commentApiRequestUriFactory.newRequestUri(continuationData);
+        currentUriLength = requestUri.toString().length();
+        if (currentUriLength >= REQUEST_URI_LENGTH_LIMIT)
+            throw new Exception("Request entity size limit is exceeded: no further processing of the continuation branch is possible");
         HttpRequest request = HttpRequest.newBuilder(requestUri)
                 .headers("User-Agent", USER_AGENT)
                 .headers("Accept", ACCEPT_ALL)
@@ -106,7 +112,7 @@ public class YoutubeHttpClient {
                 .headers("X-YouTube-Page-Label", youtubeConfig.pageLabel)
                 .headers("X-YouTube-Utc-Offset", "180")
                 .headers("X-YouTube-Time-Zone", "Europe/Minsk")
-//                .headers("X-YouTube-Ad-Signals")
+//              .headers("X-YouTube-Ad-Signals")
                 .headers("X-SPF-Referer", videoPageUri)
                 .headers("X-SPF-Previous", videoPageUri)
                 .headers("Content-Type", "application/x-www-form-urlencoded")
@@ -116,49 +122,79 @@ public class YoutubeHttpClient {
                 .headers("Pragma", "no-cache")
                 .headers("Cache-Control", "no-cache")
                 .POST(ofFormData(Map.of(youtubeConfig.xsrfFieldName, currentXsrfToken))).build();
-        return completeRequest(httpClient, request);
+
+        HttpResponse<InputStream> response = completeRequest(httpClient, request);
+
+        String body = readStreamToString(applyBrotliDecoderAndGetBody(response));
+        T commentApiResponse = commentApiResponseParser.parseResponseBody(body, valueType);
+
+        currentXsrfToken = commentApiResponse.getToken();
+
+        return commentApiResponse.getItemSection();
     }
 
-    public CommentItemSection nextComments() {
-        if (!hasComments()) return null;
+    public YoutubeHttpClient nextContinuation() {
+        if (!hasContinuation()) return this;
 
-        HttpResponse<InputStream> httpResponse = requestContinuation(commentItemSection.nextContinuation());
-
-        String responseBody = readStreamToString(applyBrotliDecoderAndGetBody(httpResponse));
-        CommentApiResponse commentApiResponse = commentApiResponseParser.parseResponseBody(responseBody);
-
-        commentItemSection = commentApiResponse.getItemSection();
-        currentXsrfToken = commentApiResponse.xsrf_token;
+        try {
+            commentItemSection = requestContinuation(commentItemSection.nextContinuation(), CommentApiResponse.class);
+        } catch (Exception e) {
+            log.warning(e.getMessage());
+            commentItemSection = null;
+            return this;
+        }
 
         if (commentItemSection.hasHeader()) {
             commentThreadHeader = commentItemSection.getHeader();
-            headerCommentCounter = commentApiResponseParser.parseCommentsCountText(commentThreadHeader.commentsCountText);
-            log.info(() -> "Total comments count: " + headerCommentCounter);
+            renderCommentCounter = commentApiResponseParser.parseCommentsCountText(commentThreadHeader.commentsCountText);
+            log.info(() -> "Total comments count: " + renderCommentCounter);
         }
 
-        commentCounter.addAll(commentItemSection.countComments(), 1);
-        log.fine(() -> "Continuations processed: " + commentCounter.getContinuationCounter());
-        log.fine(() -> "Comments processed: " + commentCounter.getCounter());
+        commentCounter.addAll(commentItemSection.countComments(), 1, currentUriLength);
+        renderReplyCounter = new Counter("Render reply counter", commentItemSection.sumReplyCounters(), commentItemSection.countReplyContinuations());
 
-        replyCounter.addAll(commentItemSection.sumReplyCounters(), commentItemSection.countReplyContinuations());
-        log.fine(() -> "Reply continuations processed: " + replyCounter.getContinuationCounter());
-        log.fine(() -> "Replies processed: " + replyCounter.getCounter());
+        logStat();
 
-        fetchReplies(commentItemSection.getReplyContinuationsMap());
+        List<CommentDTO> comments = commentItemSection.getComments(videoId, null);
+        Map<String, NextContinuationData> replyContinuationsMap = commentItemSection.getReplyContinuationsMap();
 
-        return commentItemSection;
+        for (CommentDTO comment : comments) {
+            Arrays.stream(handlers).forEach(handler -> handler.handle(List.of(comment)));
+            NextContinuationData c = replyContinuationsMap.get(comment.commentId);
+            if (c != null) fetchReplies(Map.of(comment.commentId, c));
+        }
+
+        return this;
+    }
+
+    private void logStat() {
+        Counter c = Counter.sum("", commentCounter, replyCounter);
+        double commentRequestLimit = commentCounter.getUriLength() * 100f / REQUEST_URI_LENGTH_LIMIT;
+        double replyRequestLimit = replyCounter.getUriLength() * 100f / REQUEST_URI_LENGTH_LIMIT;
+        String s = String.format("[cnt/lim]: comment [%s/%.0f%%], reply [%s/%.0f%%], comments processed %s (%.1f%%)",
+                commentCounter.getContinuationCounter(), commentRequestLimit,
+                replyCounter.getContinuationCounter(), replyRequestLimit,
+                c.getCounter(), c.getCounter() * 100f / renderCommentCounter);
+        log.fine(s);
     }
 
     private void fetchReplies(Map<String, NextContinuationData> replyContinuationsMap) {
-        replyContinuationsMap.forEach((key, value) -> {
-            System.out.println(key);
-//            HttpResponse<InputStream> is = requestContinuation(value);
-//            String responseBody = readStreamToString(applyBrotliDecoderAndGetBody(is));
-//            try {
-//                Files.writeString(Path.of(key + ".json"), responseBody);
-//            } catch (IOException ex) {
-//                ex.printStackTrace();
-//            }
+        replyContinuationsMap.forEach((commentId, replyContinuation) -> {
+            do {
+                try {
+                    CommentItemSection replyItemSection = requestContinuation(replyContinuation, ReplyApiResponse.class);
+                    if (replyItemSection == null) return;
+                    List<CommentDTO> replies = replyItemSection.getComments(videoId, commentId);
+                    Arrays.stream(handlers).forEach(handler -> handler.handle(replies));
+                    replyContinuation = replyItemSection.hasContinuation() ? replyItemSection.nextContinuation() : null;
+                    replyCounter.addAll(replyItemSection.countComments(), 1, currentUriLength);
+                    logStat();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    log.warning(e.getMessage());
+                    return;
+                }
+            } while (replyContinuation != null);
         });
     }
 
@@ -168,5 +204,13 @@ public class YoutubeHttpClient {
 
     public Counter getReplyCounter() {
         return replyCounter;
+    }
+
+    public Counter getRenderReplyCounter() {
+        return renderReplyCounter;
+    }
+
+    public int getRenderCommentCounter() {
+        return renderCommentCounter;
     }
 }

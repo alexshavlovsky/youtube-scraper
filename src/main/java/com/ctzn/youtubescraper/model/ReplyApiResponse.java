@@ -6,7 +6,7 @@ public class ReplyApiResponse implements ApiResponse {
 
     @Override
     public CommentItemSection getItemSection() {
-        return response.continuationContents.commentRepliesContinuation;
+        return response.continuationContents == null ? null : response.continuationContents.commentRepliesContinuation;
     }
 
     @Override

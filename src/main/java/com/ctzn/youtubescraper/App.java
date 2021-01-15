@@ -1,10 +1,5 @@
 package com.ctzn.youtubescraper;
 
-import com.ctzn.youtubescraper.formatter.CommentFormatter;
-import com.ctzn.youtubescraper.formatter.CommentHumanReadableFormatter;
-import com.ctzn.youtubescraper.handler.FileAppenderHandler;
-import com.ctzn.youtubescraper.http.YoutubeHttpClient;
-
 public class App {
 
     static {
@@ -12,12 +7,12 @@ public class App {
     }
 
     public static void main(String[] args) throws Exception {
+//        ScraperFacade concurrent = new ScraperFacade("Pgc0ZYDzazY");
+//        Thread runner = new Thread(concurrent);
+//        runner.start();
+
         String videoId = args[0];
-        String fileName = videoId + "_" + System.currentTimeMillis() + ".txt";
-        CommentFormatter formatter = new CommentHumanReadableFormatter();
-        FileAppenderHandler fileHandler = new FileAppenderHandler(fileName, formatter);
-//        ConsolePrinterHandler consoleHandler = new ConsolePrinterHandler(formatter);
-        YoutubeHttpClient client = new YoutubeHttpClient(videoId, fileHandler);
-        while (client.hasContinuation()) client.nextContinuation();
+        ScraperFacade scraper = new ScraperFacade(videoId);
+        scraper.run();
     }
 }

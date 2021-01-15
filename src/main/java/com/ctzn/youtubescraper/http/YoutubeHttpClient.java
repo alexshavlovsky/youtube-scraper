@@ -171,10 +171,11 @@ public class YoutubeHttpClient {
         Counter c = Counter.sum("", commentCounter, replyCounter);
         double commentRequestLimit = commentCounter.getUriLength() * 100f / REQUEST_URI_LENGTH_LIMIT;
         double replyRequestLimit = replyCounter.getUriLength() * 100f / REQUEST_URI_LENGTH_LIMIT;
-        String s = String.format("[cnt/lim]: comment [%s/%.0f%%], reply [%s/%.0f%%], comments processed %s (%.1f%%)",
-                commentCounter.getContinuationCounter(), commentRequestLimit,
-                replyCounter.getContinuationCounter(), replyRequestLimit,
-                c.getCounter(), c.getCounter() * 100f / renderCommentCounter);
+        double done = c.getCounter() * 100f / renderCommentCounter;
+        String s = String.format("%s continuations (com/rep): %s/%s, limits com/rep: %.0f%%/%.0f%%, comments count/done: %s/%.1f%%", videoId,
+                commentCounter.getContinuationCounter(), replyCounter.getContinuationCounter(),
+                commentRequestLimit, replyRequestLimit,
+                c.getCounter(), done);
         log.fine(s);
     }
 

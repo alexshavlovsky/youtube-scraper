@@ -3,7 +3,9 @@ package com.ctzn.youtubescraper;
 import com.ctzn.youtubescraper.formatter.CommentHumanReadableFormatter;
 import com.ctzn.youtubescraper.handler.FileAppenderHandler;
 import com.ctzn.youtubescraper.http.YoutubeHttpClient;
+import lombok.extern.java.Log;
 
+@Log
 public class ScraperFacade implements Runnable {
     private final String videoId;
     private final FileAppenderHandler fileHandler;
@@ -16,13 +18,14 @@ public class ScraperFacade implements Runnable {
 
     @Override
     public void run() {
-        YoutubeHttpClient client = null;
+        YoutubeHttpClient client;
         try {
             client = new YoutubeHttpClient(videoId, fileHandler);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warning(videoId + " FAILED: " + e.getMessage());
             return;
         }
         while (client.hasContinuation()) client.nextContinuation();
+        log.info(videoId + " DONE");
     }
 }

@@ -63,10 +63,10 @@ public class YoutubeHttpClient {
         cookies = new CustomCookieManager("youtube.com");
         log.info(() -> String.format("Fetch video page: [%s]", videoPageUri));
         String body = fetchVideoPage(videoPageUri);
-        log.info(() -> "Scrape initial youtube context");
+        log.fine(() -> "Scrape initial youtube context");
         youtubeConfig = VideoPageBodyParser.scrapeYoutubeConfig(body);
         currentXsrfToken = youtubeConfig.xsrfToken;
-        log.info(() -> "Scrape comment section continuation");
+        log.fine(() -> "Scrape comment section continuation");
         commentItemSection = VideoPageBodyParser.scrapeInitialCommentItemSection(body);
     }
 
@@ -147,7 +147,7 @@ public class YoutubeHttpClient {
         if (commentItemSection.hasHeader()) {
             commentThreadHeader = commentItemSection.getHeader();
             renderCommentCounter = commentApiResponseParser.parseCommentsCountText(commentThreadHeader.commentsCountText);
-            log.info(() -> "Total comments count: " + renderCommentCounter);
+            log.info(() -> videoId + " total comments count: " + renderCommentCounter);
         }
 
         commentCounter.addAll(commentItemSection.countComments(), 1, currentUriLength);

@@ -5,7 +5,7 @@ import lombok.Value;
 
 @Value
 public class SectionHeaderDTO {
-    public NextContinuationData orderTopFirst;
-    public NextContinuationData orderNewestFirst;
-    public String commentsCountText;
+    NextContinuationData orderTopFirst;
+    NextContinuationData orderNewestFirst;
+    String commentsCountText;
 }

@@ -15,7 +15,7 @@ public class CommentItemSection {
         return header != null;
     }
 
-    public boolean hasComments() {
+    public boolean hasContent() {
         return contents != null && !contents.isEmpty();
     }
 
@@ -27,27 +27,27 @@ public class CommentItemSection {
         return sumReplyCounters() > 0;
     }
 
-    public int countComments() {
-        return hasComments() ? contents.size() : 0;
+    public int countContentPieces() {
+        return hasContent() ? contents.size() : 0;
     }
 
     public NextContinuationData nextContinuation() {
-        if (!hasContinuation()) throw new IllegalStateException();
+        if (!hasContinuation()) throw new IllegalStateException("The section hasn't continuation data");
         return continuations.get(0).nextContinuationData;
     }
 
     public SectionHeaderDTO getHeader() {
-        if (!hasHeader()) throw new IllegalStateException();
+        if (!hasHeader()) throw new IllegalStateException("The section hasn't a header");
         return header.getValue();
     }
 
     public int sumReplyCounters() {
-        if (!hasComments()) return 0;
+        if (!hasContent()) return 0;
         return contents.stream().mapToInt(c -> c.getCommentRenderer().replyCount).sum();
     }
 
     public int countReplyContinuations() {
-        if (!hasComments()) return 0;
+        if (!hasContent()) return 0;
         return contents.stream().map(c -> c.commentThreadRenderer)
                 .mapToInt(c -> c.replies == null ? 0 : c.replies.commentRepliesRenderer.continuations.size()).sum();
     }
@@ -55,9 +55,11 @@ public class CommentItemSection {
     // keys - commentId
     // values - reply continuations
     public Map<String, NextContinuationData> getReplyContinuationsMap() {
-        if (!hasComments()) return Collections.emptyMap();
+        if (!hasContent()) return Collections.emptyMap();
         Map<String, NextContinuationData> map = new LinkedHashMap<>();
         for (Content content : contents) {
+            if (content.commentThreadRenderer == null)
+                continue; // this is a reply continuation section and reply can't be relied
             CommentThreadRenderer commentContext = content.commentThreadRenderer;
             if (commentContext.replies != null) {
                 CommentRenderer comment = commentContext.comment.commentRenderer;
@@ -69,7 +71,7 @@ public class CommentItemSection {
     }
 
     public List<CommentDTO> getComments(String videoId, String parentCommentId) {
-        if (!hasComments()) return Collections.emptyList();
+        if (!hasContent()) return Collections.emptyList();
         List<CommentDTO> list = new ArrayList<>();
         for (Content c : contents) {
             CommentRenderer r = c.getCommentRenderer();

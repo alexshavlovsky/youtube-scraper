@@ -1,6 +1,9 @@
 package com.ctzn.youtubescraper.model.commons;
 
+import lombok.Value;
+
+@Value
 public class NextContinuationData {
-    public String continuation;
-    public String clickTrackingParams;
+    String continuation;
+    String clickTrackingParams;
 }

@@ -6,7 +6,7 @@ class CommentContextMeter implements RequestUriLengthLimiter {
     private final static int REQUEST_URI_LENGTH_LIMIT = 14000;
     private int counter;
     private int continuationCounter;
-    private int targetCounter;
+    private int targetCount;
     private int uriLength;
 
     CommentContextMeter() {
@@ -21,6 +21,11 @@ class CommentContextMeter implements RequestUriLengthLimiter {
         continuationCounter += meter.continuationCounter;
     }
 
+    void update(int count) {
+        incContinuation();
+        add(count);
+    }
+
     void incContinuation() {
         continuationCounter++;
     }
@@ -33,16 +38,16 @@ class CommentContextMeter implements RequestUriLengthLimiter {
         return continuationCounter;
     }
 
-    int getTargetCounter() {
-        return targetCounter;
+    int getTargetCount() {
+        return targetCount;
     }
 
-    void setTargetCounter(int targetCounter) {
-        this.targetCounter = targetCounter;
+    void setTargetCount(int targetCount) {
+        this.targetCount = targetCount;
     }
 
     double getCompletionPercent() {
-        return percent(counter, targetCounter);
+        return percent(counter, targetCount);
     }
 
     @Override
@@ -67,7 +72,7 @@ class CommentContextMeter implements RequestUriLengthLimiter {
     void reset() {
         counter = 0;
         continuationCounter = 0;
-        targetCounter = 0;
+        targetCount = 0;
         uriLength = 0;
     }
 

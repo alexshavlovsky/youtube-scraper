@@ -26,4 +26,6 @@ public interface IterableCommentContext {
     CommentContextMeter getReplyMeter();
 
     IterableCommentContext newReplyThread(CommentDTO comment, NextContinuationData replyThreadContinuation);
+
+    String getShortResultStat();
 }

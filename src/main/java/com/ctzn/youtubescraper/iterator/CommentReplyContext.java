@@ -19,7 +19,7 @@ class CommentReplyContext extends AbstractCommentContext {
         super(parentCommentContext);
         this.parentCommentContext = parentCommentContext;
         this.parentComment = parentComment;
-        getMeter().setTargetCounter(parentComment.replyCount);
+        getMeter().setTargetCount(parentComment.replyCount);
         nextSection(replyThreadContinuation);
     }
 
@@ -41,5 +41,10 @@ class CommentReplyContext extends AbstractCommentContext {
     @Override
     public IterableCommentContext newReplyThread(CommentDTO comment, NextContinuationData replyThreadContinuation) {
         throw new IllegalStateException("Youtube reply can't have child replies");
+    }
+
+    @Override
+    public String getShortResultStat() {
+        return getParentContext().getShortResultStat() + String.format(" > %s replies %s of %s (%.1f%%)", getParentId(), getMeter().getCounter(), getMeter().getTargetCount(), getMeter().getCompletionPercent());
     }
 }

@@ -1,5 +1,7 @@
 package com.ctzn.youtubescraper.http;
 
+import com.ctzn.youtubescraper.exception.ScraperHttpException;
+import com.ctzn.youtubescraper.exception.ScraperParserException;
 import com.ctzn.youtubescraper.model.ApiResponse;
 import com.ctzn.youtubescraper.model.CommentItemSection;
 import com.ctzn.youtubescraper.model.YoutubeCfgDTO;
@@ -8,7 +10,6 @@ import com.ctzn.youtubescraper.parser.CommentApiResponseParser;
 import com.ctzn.youtubescraper.parser.VideoPageBodyParser;
 import lombok.extern.java.Log;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -34,7 +35,7 @@ public class YoutubeHttpClient {
 
     private String currentXsrfToken;
 
-    public YoutubeHttpClient(UserAgentCfg userAgentCfg, String videoId) throws Exception {
+    public YoutubeHttpClient(UserAgentCfg userAgentCfg, String videoId) throws ScraperParserException, ScraperHttpException {
         this.videoId = videoId;
         this.userAgentCfg = userAgentCfg;
         this.videoPageUri = uriFactory.newVideoPageUri(videoId);
@@ -44,15 +45,15 @@ public class YoutubeHttpClient {
         log.fine(() -> "Scrape initial youtube context");
         youtubeCfg = videoPageBodyParser.scrapeYoutubeConfig(body);
         currentXsrfToken = youtubeCfg.getXsrfToken();
-        if (currentXsrfToken == null) throw new Exception("Initial XSRF token not found");
+        if (currentXsrfToken == null) throw new ScraperParserException("Initial XSRF token not found");
         log.fine(() -> "Scrape comment section continuation");
         CommentItemSection commentItemSection = videoPageBodyParser.scrapeInitialCommentItemSection(body);
         if (commentItemSection.hasContinuation())
-            initialCommentSectionContinuation = commentItemSection.nextContinuation();
-        else throw new Exception("Initial comment continuation not found");
+            initialCommentSectionContinuation = commentItemSection.getContinuation();
+        else throw new ScraperParserException("Initial comment continuation not found");
     }
 
-    private String fetchVideoPage() throws IOException {
+    private String fetchVideoPage() throws ScraperHttpException {
         HttpRequest request = HttpRequest.newBuilder(URI.create(videoPageUri))
                 .headers("User-Agent", userAgentCfg.getUserAgent())
                 .headers("Accept", userAgentCfg.getAccept())
@@ -72,11 +73,11 @@ public class YoutubeHttpClient {
         return readStreamToString(applyBrotliDecoderAndGetBody(httpResponse));
     }
 
-    public <T extends ApiResponse> CommentItemSection requestNextSection(NextContinuationData continuationData, RequestUriLengthLimiter limiter, Class<T> valueType) throws Exception {
+    public <T extends ApiResponse> CommentItemSection requestNextSection(NextContinuationData continuationData, RequestUriLengthLimiter limiter, Class<T> valueType) throws ScraperHttpException, ScraperParserException {
         URI requestUri = uriFactory.newCommentApiRequestUri(continuationData);
         limiter.setUriLength(requestUri.toString().length());
         if (limiter.getUriLengthLimitUsagePercent() > 100)
-            throw new Exception("Request entity size limit is exceeded: no further processing of the section is possible");
+            throw new ScraperHttpException("Request entity size limit is exceeded: no further processing of the section is possible");
 
         HttpRequest request = HttpRequest.newBuilder(requestUri)
                 .headers("User-Agent", userAgentCfg.getUserAgent())

@@ -1,5 +1,6 @@
 package com.ctzn.youtubescraper.iterator;
 
+import com.ctzn.youtubescraper.exception.ScraperException;
 import com.ctzn.youtubescraper.http.UserAgentCfg;
 import com.ctzn.youtubescraper.http.YoutubeHttpClient;
 
@@ -12,17 +13,17 @@ public class IterableCommentContextFactory {
             "gzip, deflate, br"
     );
 
-    private static CommentContext newYoutubeCommentContext(String videoId) throws Exception {
+    private static CommentContext newYoutubeDefaultCommentContext(String videoId) throws ScraperException {
         YoutubeHttpClient youtubeHttpClient = new YoutubeHttpClient(DEFAULT_USER_AGENT_CONTEXT, videoId);
         return new CommentContext(youtubeHttpClient);
     }
 
-    public static IterableCommentContext newDefaultContext(String videoId) throws Exception {
-        return newYoutubeCommentContext(videoId);
+    public static IterableCommentContext newTopCommentsFirstContext(String videoId) throws ScraperException {
+        return newYoutubeDefaultCommentContext(videoId);
     }
 
-    public static IterableCommentContext newNewestFirstContext(String videoId) throws Exception {
-        CommentContext context = newYoutubeCommentContext(videoId);
+    public static IterableCommentContext newNewestCommentsFirstContext(String videoId) throws ScraperException {
+        CommentContext context = newYoutubeDefaultCommentContext(videoId);
         context.sortNewestFirst();
         return context;
     }

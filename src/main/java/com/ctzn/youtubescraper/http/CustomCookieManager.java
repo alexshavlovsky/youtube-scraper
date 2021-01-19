@@ -1,5 +1,7 @@
 package com.ctzn.youtubescraper.http;
 
+import com.ctzn.youtubescraper.exception.ScraperHttpException;
+
 import java.io.IOException;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
@@ -23,23 +25,23 @@ class CustomCookieManager extends CookieManager {
         this.defaultUri = URI.create("www." + defaultDomain);
     }
 
-    private void put(URI uri, HttpHeaders headers) {
+    private void put(URI uri, HttpHeaders headers) throws ScraperHttpException {
         try {
             put(uri, headers.map());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ScraperHttpException(e.getMessage(), e);
         }
     }
 
-    void put(HttpHeaders headers) {
+    void put(HttpHeaders headers) throws ScraperHttpException {
         put(defaultUri, headers);
     }
 
-    void put(String cookie) {
+    void put(String cookie) throws ScraperHttpException {
         try {
             put(defaultUri, Map.of("Set-Cookie", List.of(String.format(COOKIE_TEMPLATE, cookie, defaultDomain))));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ScraperHttpException(e.getMessage(), e);
         }
     }
 

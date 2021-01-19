@@ -1,5 +1,7 @@
 package com.ctzn.youtubescraper.iterator;
 
+import com.ctzn.youtubescraper.exception.ScraperHttpException;
+import com.ctzn.youtubescraper.exception.ScraperParserException;
 import com.ctzn.youtubescraper.http.YoutubeHttpClient;
 import com.ctzn.youtubescraper.model.CommentItemSection;
 import com.ctzn.youtubescraper.model.commons.NextContinuationData;
@@ -29,10 +31,10 @@ abstract class AbstractCommentContext implements IterableCommentContext {
     @Override
     public NextContinuationData getContinuationData() {
         if (!hasContinuation()) throw new IllegalStateException("The context hasn't a continuation data");
-        return section.nextContinuation();
+        return section.getContinuation();
     }
 
-    abstract CommentItemSection fetchNextSection(YoutubeHttpClient youtubeHttpClient, NextContinuationData continuationData) throws Exception;
+    abstract CommentItemSection fetchNextSection(YoutubeHttpClient youtubeHttpClient, NextContinuationData continuationData) throws ScraperParserException, ScraperHttpException;
 
     @Override
     public void nextSection(NextContinuationData continuationData) {
@@ -44,8 +46,7 @@ abstract class AbstractCommentContext implements IterableCommentContext {
             if (section == null) return;
             meter.incContinuation();
             meter.add(section.countContentPieces());
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (ScraperHttpException | ScraperParserException e) {
             log.warning(e.toString());
             section = null;
         }

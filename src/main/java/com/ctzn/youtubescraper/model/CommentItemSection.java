@@ -31,7 +31,7 @@ public class CommentItemSection {
         return hasContent() ? contents.size() : 0;
     }
 
-    public NextContinuationData nextContinuation() {
+    public NextContinuationData getContinuation() {
         if (!hasContinuation()) throw new IllegalStateException("The section hasn't continuation data");
         return continuations.get(0).nextContinuationData;
     }

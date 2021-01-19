@@ -1,5 +1,6 @@
 package com.ctzn.youtubescraper.http;
 
+import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import org.brotli.dec.BrotliInputStream;
 
 import java.io.*;
@@ -19,42 +20,39 @@ import java.util.stream.Collectors;
 
 class IoUtil {
 
-    static private InputStream applyBrotliDecoder(InputStream inputStream) {
+    static private InputStream applyBrotliDecoder(InputStream inputStream) throws ScraperHttpException {
         try {
             return new BrotliInputStream(inputStream);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ScraperHttpException(e.getMessage(), e);
         }
     }
 
-    static InputStream applyBrotliDecoderAndGetBody(HttpResponse<InputStream> response) {
+    static InputStream applyBrotliDecoderAndGetBody(HttpResponse<InputStream> response) throws ScraperHttpException {
         Optional<String> contentEncoding = response.headers().firstValue("content-encoding");
         return contentEncoding.isPresent() && "br".equals(contentEncoding.get()) ? applyBrotliDecoder(response.body()) : response.body();
     }
 
-    static void transferInputStreamToFile(InputStream input, File file) {
+    static void transferInputStreamToFile(InputStream input, File file) throws IOException {
         try (OutputStream output = new FileOutputStream(file, false)) {
             input.transferTo(output);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
-    private static <T> HttpResponse<T> complete(CompletableFuture<HttpResponse<T>> future) throws IOException {
+    private static <T> HttpResponse<T> complete(CompletableFuture<HttpResponse<T>> future) throws ScraperHttpException {
         try {
             return future.get(5, TimeUnit.SECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            throw new IOException(e);
+        } catch (ExecutionException | TimeoutException e) {
+            throw new ScraperHttpException(e.getMessage(), e);
+        } catch (InterruptedException e) {
+            throw new ScraperHttpException("HTTP request has been interrupted", e);
         }
     }
 
-    static HttpResponse<InputStream> completeRequest(HttpClient httpClient, HttpRequest request) throws IOException {
+    static HttpResponse<InputStream> completeRequest(HttpClient httpClient, HttpRequest request) throws ScraperHttpException {
         HttpResponse<InputStream> response = complete(httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofInputStream()));
-        if (response.statusCode() != 200) throw new IOException(
-                String.format("API call to [%s] responded with status code [%s]",
-                        response.uri(),
-                        response.statusCode())
-        );
+        if (response.statusCode() != 200)
+            throw new ScraperHttpException("Status code [%s] was returned when requesting a resource at [%s]", response.statusCode(), response.uri());
         return response;
     }
 
@@ -67,7 +65,8 @@ class IoUtil {
     }
 
     static String joinQueryParamsOrdered(String... params) {
-        if (params.length % 2 != 0) throw new IllegalArgumentException();
+        if (params.length % 2 != 0)
+            throw new IllegalArgumentException("Invalid parameters passed to method: static String joinQueryParamsOrdered(String... params)");
         int pos = 0;
         Map<String, String> queryParams = new LinkedHashMap<>();
         while (pos < params.length) queryParams.put(params[pos++], params[pos++]);
@@ -78,11 +77,11 @@ class IoUtil {
         return HttpRequest.BodyPublishers.ofString(joinQueryParams(data));
     }
 
-    static String readStreamToString(InputStream inputStream) {
+    static String readStreamToString(InputStream inputStream) throws ScraperHttpException {
         try {
             return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ScraperHttpException(e.getMessage(), e);
         }
     }
 }

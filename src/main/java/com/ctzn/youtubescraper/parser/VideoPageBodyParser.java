@@ -1,5 +1,6 @@
 package com.ctzn.youtubescraper.parser;
 
+import com.ctzn.youtubescraper.exception.ScraperParserException;
 import com.ctzn.youtubescraper.model.CommentItemSection;
 import com.ctzn.youtubescraper.model.YoutubeCfgDTO;
 
@@ -13,11 +14,11 @@ public class VideoPageBodyParser {
     private static final String INITIAL_CONFIG_MARKER = "var ytInitialData\\s*=\\s*";
     private static final String COMMENT_ITEM_SECTION_ENTRY_REGEX = "\"sectionIdentifier\"\\s*:\\s*\"comment-item-section\"";
 
-    public YoutubeCfgDTO scrapeYoutubeConfig(String body) throws Exception {
+    public YoutubeCfgDTO scrapeYoutubeConfig(String body) throws ScraperParserException {
         return parse(parseMarkedJsonObject(CONFIG_MARKER, body), YoutubeCfgDTO.class);
     }
 
-    public CommentItemSection scrapeInitialCommentItemSection(String body) throws Exception {
+    public CommentItemSection scrapeInitialCommentItemSection(String body) throws ScraperParserException {
         String ytInitialDataJson = parseMarkedJsonObject(INITIAL_CONFIG_MARKER, body);
         String commentItemSectionJson = parseEnclosingObjectByEntryRegex(COMMENT_ITEM_SECTION_ENTRY_REGEX, ytInitialDataJson);
         return parse(commentItemSectionJson, CommentItemSection.class);

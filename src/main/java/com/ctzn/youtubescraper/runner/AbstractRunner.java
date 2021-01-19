@@ -26,7 +26,7 @@ abstract class AbstractRunner implements Runnable {
             IterableCommentContext commentContext = newCommentContext(videoId);
             CommentContextIterator iterator = new CommentContextIterator(commentContext, handlers);
             iterator.traverse();
-            log.info(videoId + " DONE");
+            log.info(videoId + " DONE " + commentContext.getShortResultStat());
         } catch (ScraperException e) {
             log.warning(videoId + " FAILED: " + e.toString());
         }

@@ -35,20 +35,15 @@ public class CommentContextIterator {
     private void handle(IterableCommentContext context) {
         CommentItemSection commentItemSection = context.getSection();
         List<CommentDTO> comments = commentItemSection.getComments(context.getVideoId(), context.getParentId());
-        Map<String, NextContinuationData> replyContinuationsMap = commentItemSection.getReplyContinuationsMap();
-        for (CommentDTO comment : comments) {
-            handlers.forEach(handler -> handler.handle(List.of(comment)));
-            NextContinuationData replyThreadContinuation = replyContinuationsMap.get(comment.commentId);
-            if (replyThreadContinuation != null) {
-                IterableCommentContext replyContext = context.newReplyThread(comment, replyThreadContinuation);
-                traverse(replyContext);
-                context.getMeter().add(replyContext.getMeter());
-                context.getReplyMeter().add(replyContext.getMeter());
+        if (context instanceof CommentReplyContext) handlers.forEach(handler -> handler.handle(comments));
+        else {
+            Map<String, NextContinuationData> replyContinuationsMap = commentItemSection.getReplyContinuationsMap();
+            for (CommentDTO comment : comments) {
+                handlers.forEach(handler -> handler.handle(List.of(comment)));
+                NextContinuationData replyThreadContinuation = replyContinuationsMap.get(comment.commentId);
+                if (replyThreadContinuation != null) traverse(context.newReplyThread(comment, replyThreadContinuation));
             }
         }
-        if (context.getParentContext() == null)
-            log.fine(context.getVideoId() + " " + context.getMeter().toString());
-        if (context.getParentContext() != null && context.getMeter().getCompletionPercent() < 99)
-            log.fine(context.getVideoId() + " " + context.getParentContext().getMeter().toString() + " > " + context.getParentId() + " " + context.getMeter().toString());
+        log.fine(context.getShortResultStat());
     }
 }

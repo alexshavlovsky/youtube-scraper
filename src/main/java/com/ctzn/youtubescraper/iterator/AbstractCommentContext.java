@@ -44,8 +44,13 @@ abstract class AbstractCommentContext implements IterableCommentContext {
             // For example if comment has 10 replies and size of reply continuation section is 10 then
             // First continuation section contains 10 replies and the second continuation section is empty so shouldn't we just ignore it
             if (section == null) return;
-            meter.incContinuation();
-            meter.add(section.countContentPieces());
+            // update meters
+            int itemsCount = section.countContentPieces();
+            meter.update(itemsCount);
+            if (getParentContext() != null) {
+                getParentContext().getMeter().update(itemsCount);
+                getParentContext().getReplyMeter().update(itemsCount);
+            }
         } catch (ScraperHttpException | ScraperParserException e) {
             log.warning(e.toString());
             section = null;
@@ -75,5 +80,10 @@ abstract class AbstractCommentContext implements IterableCommentContext {
     @Override
     public String getVideoId() {
         return youtubeHttpClient.getVideoId();
+    }
+
+    @Override
+    public String getShortResultStat() {
+        return String.format("%s %s comments, %s replies, total %s of %s (%.1f%%)", getVideoId(), meter.getCounter() - replyMeter.getCounter(), replyMeter.getCounter(), meter.getCounter(), meter.getTargetCount(), meter.getCompletionPercent());
     }
 }

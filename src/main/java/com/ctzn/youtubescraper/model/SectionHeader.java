@@ -37,7 +37,7 @@ public class SectionHeader {
     }
 
     static class CommentSimpleboxRenderer {
-        public AuthorThumbnail authorThumbnail;
+        public Thumbnails authorThumbnail;
         public Text placeholderText;
         public PrepareAccountEndpoint prepareAccountEndpoint;
         public String trackingParams;

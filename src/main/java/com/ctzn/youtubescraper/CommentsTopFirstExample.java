@@ -2,7 +2,7 @@ package com.ctzn.youtubescraper;
 
 import com.ctzn.youtubescraper.runner.RunnerFactory;
 
-public class TopCommentsFirstExample {
+public class CommentsTopFirstExample {
 
     static {
         System.setProperty("java.util.logging.config.file", "logging.properties");

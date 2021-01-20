@@ -8,6 +8,8 @@ import static com.ctzn.youtubescraper.http.IoUtil.joinQueryParamsOrdered;
 
 class YoutubeUriFactory {
 
+    private final static String CHANNEL_PAGE_URI_TEMPLATE = "https://www.youtube.com/channel/%s";
+    private final static String BROWSE_VIDEOS_PAGE_URI_TEMPLATE = "https://www.youtube.com/c/%s/videos";
     private final static String VIDEO_PAGE_URI_TEMPLATE = "https://www.youtube.com/watch?v=%s";
     private final static String COMMENT_API_URI_TEMPLATE = "https://www.youtube.com/comment_service_ajax?%s";
 
@@ -30,5 +32,13 @@ class YoutubeUriFactory {
 
     String newVideoPageUri(String videoId) {
         return String.format(VIDEO_PAGE_URI_TEMPLATE, videoId);
+    }
+
+    String newChanelPageUri(String chanelId) {
+        return String.format(CHANNEL_PAGE_URI_TEMPLATE, chanelId);
+    }
+
+    String newBrowseVideosPageUri(String channelVanityName) {
+        return String.format(BROWSE_VIDEOS_PAGE_URI_TEMPLATE, channelVanityName);
     }
 }

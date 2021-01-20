@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ConcurrentExample {
+public class CommentsConcurrentExample {
 
     static {
         System.setProperty("java.util.logging.config.file", "logging.properties");

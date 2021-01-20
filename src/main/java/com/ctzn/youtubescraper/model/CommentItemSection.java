@@ -111,7 +111,7 @@ public class CommentItemSection {
 
     static class CommentRenderer {
         public SimpleText authorText;
-        public AuthorThumbnail authorThumbnail;
+        public Thumbnails authorThumbnail;
         public AuthorEndpoint authorEndpoint;
         public Text contentText;
         public Text publishedTimeText;

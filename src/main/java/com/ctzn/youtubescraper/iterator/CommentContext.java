@@ -2,7 +2,7 @@ package com.ctzn.youtubescraper.iterator;
 
 import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.exception.ScraperParserException;
-import com.ctzn.youtubescraper.http.YoutubeHttpClient;
+import com.ctzn.youtubescraper.http.YoutubeVideoCommentsClient;
 import com.ctzn.youtubescraper.model.CommentApiResponse;
 import com.ctzn.youtubescraper.model.CommentDTO;
 import com.ctzn.youtubescraper.model.CommentItemSection;
@@ -17,7 +17,7 @@ class CommentContext extends AbstractCommentContext {
     private static final CommentThreadHeaderParser commentThreadHeaderParser = new CommentThreadHeaderParser();
     private SectionHeaderDTO commentThreadHeader;
 
-    CommentContext(YoutubeHttpClient youtubeHttpClient) {
+    CommentContext(YoutubeVideoCommentsClient youtubeHttpClient) {
         super(youtubeHttpClient);
         reset(youtubeHttpClient.getInitialCommentSectionContinuation());
         log.info(() -> youtubeHttpClient.getVideoId() + " total comments count: " + getMeter().getTargetCount());
@@ -39,7 +39,7 @@ class CommentContext extends AbstractCommentContext {
     }
 
     @Override
-    CommentItemSection fetchNextSection(YoutubeHttpClient youtubeHttpClient, NextContinuationData continuationData) throws ScraperParserException, ScraperHttpException {
+    CommentItemSection fetchNextSection(YoutubeVideoCommentsClient youtubeHttpClient, NextContinuationData continuationData) throws ScraperParserException, ScraperHttpException {
         return youtubeHttpClient.requestNextSection(continuationData, getMeter(), CommentApiResponse.class);
     }
 

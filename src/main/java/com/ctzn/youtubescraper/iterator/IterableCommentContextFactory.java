@@ -2,7 +2,7 @@ package com.ctzn.youtubescraper.iterator;
 
 import com.ctzn.youtubescraper.exception.ScraperException;
 import com.ctzn.youtubescraper.http.UserAgentCfg;
-import com.ctzn.youtubescraper.http.YoutubeHttpClient;
+import com.ctzn.youtubescraper.http.YoutubeVideoCommentsClient;
 
 public class IterableCommentContextFactory {
 
@@ -14,7 +14,7 @@ public class IterableCommentContextFactory {
     );
 
     private static CommentContext newYoutubeDefaultCommentContext(String videoId) throws ScraperException {
-        YoutubeHttpClient youtubeHttpClient = new YoutubeHttpClient(DEFAULT_USER_AGENT_CONTEXT, videoId);
+        YoutubeVideoCommentsClient youtubeHttpClient = new YoutubeVideoCommentsClient(DEFAULT_USER_AGENT_CONTEXT, videoId);
         return new CommentContext(youtubeHttpClient);
     }
 

@@ -4,15 +4,12 @@ import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.exception.ScraperParserException;
 import com.ctzn.youtubescraper.model.ApiResponse;
 import com.ctzn.youtubescraper.model.CommentItemSection;
-import com.ctzn.youtubescraper.model.YoutubeCfgDTO;
 import com.ctzn.youtubescraper.model.commons.NextContinuationData;
 import com.ctzn.youtubescraper.parser.CommentApiResponseParser;
-import com.ctzn.youtubescraper.parser.VideoPageBodyParser;
 import lombok.extern.java.Log;
 
 import java.io.InputStream;
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Map;
@@ -20,57 +17,16 @@ import java.util.Map;
 import static com.ctzn.youtubescraper.http.IoUtil.*;
 
 @Log
-public class YoutubeHttpClient {
+public class YoutubeVideoCommentsClient extends AbstractYoutubeClient<CommentItemSection> {
 
     private static final CommentApiResponseParser commentApiResponseParser = new CommentApiResponseParser();
-    private static final YoutubeUriFactory uriFactory = new YoutubeUriFactory();
 
-    private final HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).build();
-    private final CustomCookieManager cookies = new CustomCookieManager("youtube.com");
-    private final UserAgentCfg userAgentCfg;
     private final String videoId;
-    private final String videoPageUri;
-    private final YoutubeCfgDTO youtubeCfg;
-    private final NextContinuationData initialCommentSectionContinuation;
 
-    private String currentXsrfToken;
-
-    public YoutubeHttpClient(UserAgentCfg userAgentCfg, String videoId) throws ScraperParserException, ScraperHttpException {
+    public YoutubeVideoCommentsClient(UserAgentCfg userAgentCfg, String videoId) throws ScraperParserException, ScraperHttpException {
+        super(userAgentCfg, uriFactory.newVideoPageUri(videoId), videoPageBodyParser::scrapeInitialCommentItemSection);
         this.videoId = videoId;
-        this.userAgentCfg = userAgentCfg;
-        this.videoPageUri = uriFactory.newVideoPageUri(videoId);
-        VideoPageBodyParser videoPageBodyParser = new VideoPageBodyParser();
-        log.info(() -> String.format("Fetch video page: [%s]", videoPageUri));
-        String body = fetchVideoPage();
-        log.fine(() -> "Scrape initial youtube context");
-        youtubeCfg = videoPageBodyParser.scrapeYoutubeConfig(body);
-        currentXsrfToken = youtubeCfg.getXsrfToken();
-        if (currentXsrfToken == null) throw new ScraperParserException("Initial XSRF token not found");
-        log.fine(() -> "Scrape comment section continuation");
-        CommentItemSection commentItemSection = videoPageBodyParser.scrapeInitialCommentItemSection(body);
-        if (commentItemSection.hasContinuation())
-            initialCommentSectionContinuation = commentItemSection.getContinuation();
-        else throw new ScraperParserException("Initial comment continuation not found");
-    }
-
-    private String fetchVideoPage() throws ScraperHttpException {
-        HttpRequest request = HttpRequest.newBuilder(URI.create(videoPageUri))
-                .headers("User-Agent", userAgentCfg.getUserAgent())
-                .headers("Accept", userAgentCfg.getAccept())
-                .headers("Accept-Language", userAgentCfg.getAcceptLanguage())
-                .headers("Accept-Encoding", userAgentCfg.getAcceptEncoding())
-                .headers("DNT", "1")
-                .headers("Upgrade-Insecure-Requests", "1")
-                .headers("Pragma", "no-cache")
-                .headers("Cache-Control", "no-cache")
-                .GET().build();
-
-        HttpResponse<InputStream> httpResponse = completeRequest(httpClient, request);
-
-        cookies.put(httpResponse.headers());
-        cookies.put("PREF=f4=4000000");
-
-        return readStreamToString(applyBrotliDecoderAndGetBody(httpResponse));
+        if (!initialData.hasContinuation()) throw new ScraperParserException("Initial comment continuation not found");
     }
 
     public <T extends ApiResponse> CommentItemSection requestNextSection(NextContinuationData continuationData, RequestUriLengthLimiter limiter, Class<T> valueType) throws ScraperHttpException, ScraperParserException {
@@ -84,7 +40,7 @@ public class YoutubeHttpClient {
                 .headers("Accept", "*/*")
                 .headers("Accept-Language", userAgentCfg.getAcceptLanguage())
                 .headers("Accept-Encoding", userAgentCfg.getAcceptEncoding())
-                .headers("Referer", videoPageUri)
+                .headers("Referer", pageUri)
                 .headers("X-YouTube-Client-Name", youtubeCfg.getClientName())
                 .headers("X-YouTube-Client-Version", youtubeCfg.getClientVersion())
                 .headers("X-YouTube-Device", youtubeCfg.getDevice())
@@ -93,8 +49,8 @@ public class YoutubeHttpClient {
                 .headers("X-YouTube-Utc-Offset", "180")
                 .headers("X-YouTube-Time-Zone", "Europe/Minsk")
 //              .headers("X-YouTube-Ad-Signals")
-                .headers("X-SPF-Referer", videoPageUri)
-                .headers("X-SPF-Previous", videoPageUri)
+                .headers("X-SPF-Referer", pageUri)
+                .headers("X-SPF-Previous", pageUri)
                 .headers("Content-Type", "application/x-www-form-urlencoded")
                 .headers("Cookie", cookies.getHeader())
                 .headers("Origin", "https://www.youtube.com")
@@ -118,6 +74,6 @@ public class YoutubeHttpClient {
     }
 
     public NextContinuationData getInitialCommentSectionContinuation() {
-        return initialCommentSectionContinuation;
+        return initialData.getContinuation();
     }
 }

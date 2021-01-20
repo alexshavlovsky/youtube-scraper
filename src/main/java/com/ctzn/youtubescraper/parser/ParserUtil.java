@@ -5,7 +5,7 @@ import com.ctzn.youtubescraper.exception.ScraperParserException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class ParserUtil {
+public class ParserUtil {
 
     private static final String JSON_ENTRY_REGEX_TEMPLATE = "\"%s\"\\s*:\\s*\"(?<value>[^\"]+)\""; // ["key":"value"]
     private static final String JSON_NESTED_OBJECT_REGEX_TEMPLATE = "\"%s\"\\s*:\\s*\\{";  // ["key":{]
@@ -80,5 +80,9 @@ class ParserUtil {
         String number = input.replaceAll("[^\\d]+", "");
         if (number.isEmpty()) return 0;
         return Integer.parseInt(number);
+    }
+
+    public static void assertNotNull(String message, Object... objects) throws ScraperParserException {
+        for (Object object : objects) if (object == null) throw new ScraperParserException(message);
     }
 }

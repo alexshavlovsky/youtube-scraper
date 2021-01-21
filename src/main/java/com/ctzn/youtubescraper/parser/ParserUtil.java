@@ -65,7 +65,7 @@ public class ParserUtil {
         return input.substring(objectPos, objectEnd + 1);
     }
 
-    private static String matchUniqueNamedMatcherGroup(String regex, String groupName, String input) throws ScraperParserException {
+    static String matchUniqueNamedMatcherGroup(String regex, String groupName, String input) throws ScraperParserException {
         Matcher matcher = Pattern.compile(regex).matcher(input);
         if (matcher.find() && matcher.groupCount() == 1) return matcher.group(groupName);
         throw new ScraperParserException("Unique named matcher group not found: regex = [%s], groupName = [%s]", regex, groupName);

@@ -31,4 +31,8 @@ public class VideoPageBodyParser {
     public ChannelMetadata parseChannelMetadata(String ytInitialDataJson) throws ScraperParserException {
         return parse(ytInitialDataJson, ChannelMetadata.class);
     }
+
+    public String parseChannelVanityName(String vanityChannelUrl) throws ScraperParserException {
+        return ParserUtil.matchUniqueNamedMatcherGroup("/c/(?<name>.+)$", "name", vanityChannelUrl);
+    }
 }

@@ -12,6 +12,7 @@ import lombok.extern.java.Log;
 public class YoutubeChannelMetadataClient extends AbstractYoutubeClient<ChannelMetadata> {
 
     private final String channelId;
+    private final String channelVanityName;
 
     public YoutubeChannelMetadataClient(UserAgentCfg userAgentCfg, String channelId) throws ScraperHttpException, ScraperParserException {
         super(userAgentCfg, uriFactory.newChanelPageUri(channelId), videoPageBodyParser::parseChannelMetadata);
@@ -22,10 +23,15 @@ public class YoutubeChannelMetadataClient extends AbstractYoutubeClient<ChannelM
                 initialData.microformat,
                 initialData.microformat.microformatDataRenderer
         );
+        channelVanityName = videoPageBodyParser.parseChannelVanityName(getChannelMetadata().getVanityChannelUrl());
     }
 
     public String getChannelId() {
         return channelId;
+    }
+
+    public String getChannelVanityName() {
+        return channelVanityName;
     }
 
     public ChannelMetadataDTO getChannelMetadata() {

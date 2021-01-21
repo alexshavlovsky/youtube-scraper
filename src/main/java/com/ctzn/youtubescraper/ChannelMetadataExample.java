@@ -24,5 +24,6 @@ public class ChannelMetadataExample {
         System.out.println(channelHttpClient.getChannelMetadata());
         System.out.println(channelHttpClient.getChannelMicroformat());
         System.out.println(channelHttpClient.getChannelMetadata().getVanityChannelUrl());
+        System.out.println(channelHttpClient.getChannelVanityName());
     }
 }

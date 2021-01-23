@@ -76,7 +76,7 @@ public class ParserUtil {
         return matchUniqueNamedMatcherGroup(regex, "value", input);
     }
 
-    static int parseDigitsToInt(String input) {
+    public static int parseDigitsToInt(String input) {
         String number = input.replaceAll("[^\\d]+", "");
         if (number.isEmpty()) return 0;
         return Integer.parseInt(number);

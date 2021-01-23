@@ -8,13 +8,13 @@ import com.ctzn.youtubescraper.model.CommentDTO;
 import com.ctzn.youtubescraper.model.CommentItemSection;
 import com.ctzn.youtubescraper.model.SectionHeaderDTO;
 import com.ctzn.youtubescraper.model.commons.NextContinuationData;
-import com.ctzn.youtubescraper.parser.CommentThreadHeaderParser;
 import lombok.extern.java.Log;
+
+import static com.ctzn.youtubescraper.parser.ParserUtil.parseDigitsToInt;
 
 @Log
 class CommentContext extends AbstractCommentContext {
 
-    private static final CommentThreadHeaderParser commentThreadHeaderParser = new CommentThreadHeaderParser();
     private SectionHeaderDTO commentThreadHeader;
 
     CommentContext(YoutubeVideoCommentsClient youtubeHttpClient) {
@@ -27,7 +27,7 @@ class CommentContext extends AbstractCommentContext {
         getMeter().reset();
         nextSection(continuationData);
         commentThreadHeader = getSection().getHeader();
-        int totalCommentCount = commentThreadHeaderParser.parseCommentsCountText(commentThreadHeader.getCommentsCountText());
+        int totalCommentCount = parseDigitsToInt(commentThreadHeader.getCommentsCountText());
         getMeter().setTargetCount(totalCommentCount);
     }
 

@@ -4,10 +4,10 @@ import com.ctzn.youtubescraper.exception.ScraperParserException;
 import com.ctzn.youtubescraper.model.CommentItemSection;
 import com.ctzn.youtubescraper.model.YoutubeCfgDTO;
 import com.ctzn.youtubescraper.model.channelmetadata.ChannelMetadata;
+import com.ctzn.youtubescraper.model.channelvideos.VideosGrid;
 
 import static com.ctzn.youtubescraper.parser.ModelMapper.parse;
-import static com.ctzn.youtubescraper.parser.ParserUtil.parseEnclosingObjectByEntryRegex;
-import static com.ctzn.youtubescraper.parser.ParserUtil.parseMarkedJsonObject;
+import static com.ctzn.youtubescraper.parser.ParserUtil.*;
 
 public class VideoPageBodyParser {
 
@@ -32,7 +32,12 @@ public class VideoPageBodyParser {
         return parse(ytInitialDataJson, ChannelMetadata.class);
     }
 
+    public VideosGrid parseVideosGrid(String ytInitialDataJson) throws ScraperParserException {
+        String videosGridJson = parseMarkedJsonObject("\"gridRenderer\":", ytInitialDataJson);
+        return parse(videosGridJson, VideosGrid.class);
+    }
+
     public String parseChannelVanityName(String vanityChannelUrl) throws ScraperParserException {
-        return ParserUtil.matchUniqueNamedMatcherGroup("/c/(?<name>.+)$", "name", vanityChannelUrl);
+        return matchUniqueNamedMatcherGroup("/c/(?<name>.+)$", "name", vanityChannelUrl);
     }
 }

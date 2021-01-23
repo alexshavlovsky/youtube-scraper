@@ -78,7 +78,7 @@ public class CommentItemSection {
             CommentDTO commentDTO = new CommentDTO(
                     videoId,
                     r.commentId,
-                    r.authorText == null ? "" : r.authorText.simpleText,
+                    r.authorText == null ? "" : r.authorText.toString(),
                     r.authorEndpoint == null ? "" : r.authorEndpoint.browseEndpoint.canonicalBaseUrl,
                     r.publishedTimeText.toString(),
                     r.contentText.toString(),

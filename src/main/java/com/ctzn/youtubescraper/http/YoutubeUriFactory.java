@@ -12,6 +12,7 @@ class YoutubeUriFactory {
     private final static String CHANNEL_VIDEOS_PAGE_URI_TEMPLATE = "https://www.youtube.com/c/%s/videos";
     private final static String VIDEO_PAGE_URI_TEMPLATE = "https://www.youtube.com/watch?v=%s";
     private final static String COMMENT_API_URI_TEMPLATE = "https://www.youtube.com/comment_service_ajax?%s";
+    private final static String BROWSE_API_URI_TEMPLATE = "https://www.youtube.com/browse_ajax?%s";
 
     private static String buildQueryParams(NextContinuationData continuationData) {
         return joinQueryParamsOrdered(
@@ -26,8 +27,20 @@ class YoutubeUriFactory {
         );
     }
 
+    private static String buildBrowseQueryParams(NextContinuationData continuationData) {
+        return joinQueryParamsOrdered(
+                "ctoken", continuationData.getContinuation(),
+                "continuation", continuationData.getContinuation(),
+                "itct", continuationData.getClickTrackingParams()
+        );
+    }
+
     URI newCommentApiRequestUri(NextContinuationData continuationData) {
         return URI.create(String.format(COMMENT_API_URI_TEMPLATE, buildQueryParams(continuationData)));
+    }
+
+    URI newBrowseApiRequestUri(NextContinuationData continuationData) {
+        return URI.create(String.format(BROWSE_API_URI_TEMPLATE, buildBrowseQueryParams(continuationData)));
     }
 
     String newVideoPageUri(String videoId) {

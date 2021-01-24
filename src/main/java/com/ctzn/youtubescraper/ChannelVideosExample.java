@@ -4,6 +4,7 @@ import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.exception.ScraperParserException;
 import com.ctzn.youtubescraper.http.UserAgentCfg;
 import com.ctzn.youtubescraper.http.YoutubeChannelVideosClient;
+import com.ctzn.youtubescraper.model.channelvideos.VideosGrid;
 
 public class ChannelVideosExample {
 

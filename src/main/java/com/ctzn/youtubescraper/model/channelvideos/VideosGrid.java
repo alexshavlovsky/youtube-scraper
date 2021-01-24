@@ -18,6 +18,10 @@ public class VideosGrid {
         return items != null && !items.isEmpty();
     }
 
+    public int countContentPieces() {
+        return hasContent() ? items.size() : 0;
+    }
+
     public boolean hasContinuation() {
         return continuations != null && !continuations.isEmpty();
     }

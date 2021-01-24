@@ -1,9 +1,13 @@
 package com.ctzn.youtubescraper.iterator;
 
+import com.ctzn.youtubescraper.exception.ScraperHttpException;
+import com.ctzn.youtubescraper.exception.ScraperParserException;
 import com.ctzn.youtubescraper.http.YoutubeChannelVideosClient;
 import com.ctzn.youtubescraper.model.channelvideos.VideosGrid;
 import com.ctzn.youtubescraper.model.commons.NextContinuationData;
+import lombok.extern.java.Log;
 
+@Log
 public class VideoContext implements IterableVideoContext {
 
     private final VideoContextMeter meter = new VideoContextMeter();
@@ -32,7 +36,15 @@ public class VideoContext implements IterableVideoContext {
 
     @Override
     public void nextGrid(NextContinuationData continuationData) {
-        // TODO implement this
+        try {
+            grid = client.requestNextSection(continuationData);
+            if (grid == null) return;
+            int itemsCount = grid.countContentPieces();
+            meter.update(itemsCount);
+        } catch (ScraperHttpException | ScraperParserException e) {
+            log.warning(e.toString());
+            grid = null;
+        }
     }
 
     @Override

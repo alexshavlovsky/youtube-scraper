@@ -1,5 +1,6 @@
 package com.ctzn.youtubescraper.iterator;
 
+import com.ctzn.youtubescraper.handler.AbstractHandler;
 import com.ctzn.youtubescraper.handler.CommentHandler;
 import com.ctzn.youtubescraper.model.CommentDTO;
 import com.ctzn.youtubescraper.model.CommentItemSection;

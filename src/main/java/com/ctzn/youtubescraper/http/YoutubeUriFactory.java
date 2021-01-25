@@ -9,7 +9,7 @@ import static com.ctzn.youtubescraper.http.IoUtil.joinQueryParamsOrdered;
 class YoutubeUriFactory {
 
     private final static String CHANNEL_PAGE_URI_TEMPLATE = "https://www.youtube.com/channel/%s";
-    private final static String CHANNEL_VIDEOS_PAGE_URI_TEMPLATE = "https://www.youtube.com/c/%s/videos";
+    private final static String CHANNEL_VIDEOS_PAGE_URI_TEMPLATE = "https://www.youtube.com/%s/videos";
     private final static String VIDEO_PAGE_URI_TEMPLATE = "https://www.youtube.com/watch?v=%s";
     private final static String COMMENT_API_URI_TEMPLATE = "https://www.youtube.com/comment_service_ajax?%s";
     private final static String BROWSE_API_URI_TEMPLATE = "https://www.youtube.com/browse_ajax?%s";

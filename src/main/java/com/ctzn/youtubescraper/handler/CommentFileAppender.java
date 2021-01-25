@@ -14,6 +14,12 @@ public class CommentFileAppender implements CommentHandler {
     private final String file;
     private final CommentFormatter commentFormatter;
 
+    public CommentFileAppender(String file, CommentFormatter commentFormatter) {
+        this.file = file;
+        this.commentFormatter = commentFormatter;
+        deleteIfExists(file);
+    }
+
     private static void deleteIfExists(String file) {
         Path fileToDeletePath = Paths.get(file);
         try {
@@ -22,12 +28,6 @@ public class CommentFileAppender implements CommentHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public CommentFileAppender(String file, CommentFormatter commentFormatter) {
-        this.file = file;
-        this.commentFormatter = commentFormatter;
-        deleteIfExists(file);
     }
 
     @Override

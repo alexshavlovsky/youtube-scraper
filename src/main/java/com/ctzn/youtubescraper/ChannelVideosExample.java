@@ -10,14 +10,10 @@ public class ChannelVideosExample {
         System.setProperty("java.util.logging.config.file", "logging.properties");
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ScraperException {
         String chanelId = "UCksTNgiRyQGwi2ODBie8HdA";
         ChannelVideosCollector collector = new ChannelVideosCollector(chanelId);
-        try {
-            ChannelDTO channel = collector.call();
-            System.out.println(channel);
-        } catch (ScraperException e) {
-            e.printStackTrace();
-        }
+        ChannelDTO channel = collector.call();
+        System.out.println(channel);
     }
 }

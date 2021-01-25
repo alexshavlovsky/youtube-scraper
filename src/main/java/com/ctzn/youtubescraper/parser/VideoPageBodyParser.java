@@ -33,11 +33,17 @@ public class VideoPageBodyParser {
     }
 
     public VideosGrid parseVideosGrid(String ytInitialDataJson) throws ScraperParserException {
-        String videosGridJson = parseMarkedJsonObject("\"gridRenderer\":", ytInitialDataJson);
+        String videosGridJson;
+        try {
+            videosGridJson = parseMarkedJsonObject("\"gridRenderer\":", ytInitialDataJson);
+        } catch (ScraperParserException e) {
+            // it seems the channel hasn't any videos yet
+            return new VideosGrid();
+        }
         return parse(videosGridJson, VideosGrid.class);
     }
 
     public String parseChannelVanityName(String vanityChannelUrl) throws ScraperParserException {
-        return matchUniqueNamedMatcherGroup("/c/(?<name>.+)$", "name", vanityChannelUrl);
+        return matchUniqueNamedMatcherGroup("www.youtube.com/(?<name>.+)$", "name", vanityChannelUrl);
     }
 }

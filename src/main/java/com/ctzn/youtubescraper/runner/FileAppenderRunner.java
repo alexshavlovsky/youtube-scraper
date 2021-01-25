@@ -1,7 +1,7 @@
 package com.ctzn.youtubescraper.runner;
 
 import com.ctzn.youtubescraper.formatter.CommentHumanReadableFormatter;
-import com.ctzn.youtubescraper.handler.FileAppenderHandler;
+import com.ctzn.youtubescraper.handler.CommentFileAppender;
 import lombok.extern.java.Log;
 
 import java.util.List;
@@ -11,7 +11,7 @@ abstract class FileAppenderRunner extends AbstractRunner {
 
     FileAppenderRunner(String videoId) {
         super(videoId, List.of(
-                new FileAppenderHandler(
+                new CommentFileAppender(
                         videoId + "_" + System.currentTimeMillis() + ".txt",
                         new CommentHumanReadableFormatter()
                 )

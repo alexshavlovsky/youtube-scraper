@@ -17,6 +17,7 @@ public class VideoContext implements IterableVideoContext {
     public VideoContext(YoutubeChannelVideosClient client) {
         this.client = client;
         this.grid = client.getInitialGrid();
+        if (grid != null) meter.update(grid.countContentPieces());
     }
 
     @Override

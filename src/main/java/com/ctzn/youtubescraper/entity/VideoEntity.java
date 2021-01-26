@@ -1,11 +1,10 @@
 package com.ctzn.youtubescraper.entity;
 
-import com.ctzn.youtubescraper.model.ChannelDTO;
-import com.ctzn.youtubescraper.model.CommentDTO;
+import com.ctzn.youtubescraper.model.VideoDTO;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Getter
@@ -27,4 +26,15 @@ public class VideoEntity {
     int viewCountText;
     @OneToMany(mappedBy = "video", cascade = CascadeType.ALL)
     List<CommentEntity> comments;
+
+    public static VideoEntity fromVideoDTO(VideoDTO dto, ChannelEntity channel) {
+        return new VideoEntity(
+                dto.getVideoId(),
+                channel,
+                dto.getTitle(),
+                dto.getPublishedTimeText(),
+                dto.getViewCountText(),
+                Collections.emptyList()
+        );
+    }
 }

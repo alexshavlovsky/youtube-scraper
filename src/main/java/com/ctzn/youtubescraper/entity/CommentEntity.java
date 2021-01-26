@@ -1,8 +1,10 @@
 package com.ctzn.youtubescraper.entity;
 
+import com.ctzn.youtubescraper.model.CommentDTO;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.Collections;
 import java.util.List;
 
 @Getter
@@ -31,4 +33,34 @@ public class CommentEntity {
     public CommentEntity parent;
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     List<CommentEntity> replies;
+
+    public static CommentEntity fromCommentDTO(CommentDTO dto, VideoEntity videoEntity) {
+        return new CommentEntity(
+                dto.getCommentId(),
+                videoEntity,
+                dto.getAuthorText(),
+                dto.getAuthorUrl(),
+                dto.getPublishedTimeText(),
+                dto.getText(),
+                dto.getLikeCount(),
+                dto.getReplyCount(),
+                null,
+                Collections.emptyList()
+        );
+    }
+
+    public static CommentEntity fromCommentDTO(CommentDTO dto, VideoEntity videoEntity, CommentEntity parent) {
+        return new CommentEntity(
+                dto.getCommentId(),
+                videoEntity,
+                dto.getAuthorText(),
+                dto.getAuthorUrl(),
+                dto.getPublishedTimeText(),
+                dto.getText(),
+                dto.getLikeCount(),
+                dto.getReplyCount(),
+                parent,
+                Collections.emptyList()
+        );
+    }
 }

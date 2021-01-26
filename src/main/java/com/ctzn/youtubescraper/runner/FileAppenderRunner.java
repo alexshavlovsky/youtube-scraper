@@ -13,7 +13,7 @@ import java.util.List;
 @Log
 abstract class FileAppenderRunner extends AbstractRunner {
 
-    private final static String RESULT_FOLDER = "output" + File.separator;
+    private final static String RESULT_FOLDER = ".output" + File.separator;
 
     static {
         try {

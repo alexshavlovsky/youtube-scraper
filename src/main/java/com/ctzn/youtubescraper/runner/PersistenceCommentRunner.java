@@ -10,12 +10,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class PersistenceRunner implements Runnable {
+class PersistenceCommentRunner implements Runnable {
 
     private final String videoId;
     private final Map<String, VideoEntity> videoEntityMap;
 
-    public PersistenceRunner(String videoId, Map<String, VideoEntity> videoEntityMap) {
+    PersistenceCommentRunner(String videoId, Map<String, VideoEntity> videoEntityMap) {
         this.videoId = videoId;
         this.videoEntityMap = videoEntityMap;
     }

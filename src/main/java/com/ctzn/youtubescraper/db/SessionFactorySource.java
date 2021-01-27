@@ -11,7 +11,7 @@ import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
 @Log
-public class SessionFactorySource {
+class SessionFactorySource {
 
     private static final SessionFactorySource instance = new SessionFactorySource();
     private final SessionFactory sessionFactory;
@@ -32,11 +32,11 @@ public class SessionFactorySource {
         sessionFactory = metadata.getSessionFactoryBuilder().build();
     }
 
-    public static SessionFactorySource getInstance() {
+    static SessionFactorySource getInstance() {
         return instance;
     }
 
-    public SessionFactory getSessionFactory() {
+    SessionFactory getSessionFactory() {
         return sessionFactory;
     }
 }

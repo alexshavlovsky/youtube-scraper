@@ -6,6 +6,7 @@ import lombok.*;
 import javax.persistence.*;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -34,32 +35,17 @@ public class CommentEntity {
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     List<CommentEntity> replies;
 
-    public static CommentEntity fromCommentDTO(CommentDTO dto, VideoEntity videoEntity) {
+    public static CommentEntity fromCommentDTO(CommentDTO dto, Map<String, VideoEntity> videoEntityMap, Map<String, CommentEntity> commentEntityMap) {
         return new CommentEntity(
                 dto.getCommentId(),
-                videoEntity,
+                videoEntityMap.get(dto.getVideoId()),
                 dto.getAuthorText(),
                 dto.getAuthorUrl(),
                 dto.getPublishedTimeText(),
                 dto.getText(),
                 dto.getLikeCount(),
                 dto.getReplyCount(),
-                null,
-                Collections.emptyList()
-        );
-    }
-
-    public static CommentEntity fromCommentDTO(CommentDTO dto, VideoEntity videoEntity, CommentEntity parent) {
-        return new CommentEntity(
-                dto.getCommentId(),
-                videoEntity,
-                dto.getAuthorText(),
-                dto.getAuthorUrl(),
-                dto.getPublishedTimeText(),
-                dto.getText(),
-                dto.getLikeCount(),
-                dto.getReplyCount(),
-                parent,
+                dto.getParentCommentId() == null || commentEntityMap == null ? null : commentEntityMap.get(dto.getParentCommentId()),
                 Collections.emptyList()
         );
     }

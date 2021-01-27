@@ -25,7 +25,9 @@ public class SessionFactorySource {
                 .addAnnotatedClass(ChannelEntity.class)
                 .addAnnotatedClass(VideoEntity.class)
                 .addAnnotatedClass(CommentEntity.class)
-                .getMetadataBuilder().build();
+                .getMetadataBuilder()
+                .applyPhysicalNamingStrategy(new CustomPhysicalNamingStrategy())
+                .build();
 
         sessionFactory = metadata.getSessionFactoryBuilder().build();
     }

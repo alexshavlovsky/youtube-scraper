@@ -1,6 +1,6 @@
 package com.ctzn.youtubescraper;
 
-import com.ctzn.youtubescraper.runner.RunnerFactory;
+import com.ctzn.youtubescraper.runner.CommentRunnerFactory;
 
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
@@ -19,7 +19,7 @@ public class CommentsConcurrentExample {
 
     public static void main(String[] args) {
         ExecutorService executor = Executors.newFixedThreadPool(10);
-        Arrays.stream(ids).map(RunnerFactory::newNewestCommentsFirstFileAppenderRunner).forEach(executor::submit);
+        Arrays.stream(ids).map(CommentRunnerFactory::newNewestCommentsFirstFileAppenderRunner).forEach(executor::submit);
         executor.shutdown();
     }
 }

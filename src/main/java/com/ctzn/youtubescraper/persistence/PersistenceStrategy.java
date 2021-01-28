@@ -1,4 +1,4 @@
-package com.ctzn.youtubescraper.db;
+package com.ctzn.youtubescraper.persistence;
 
 import org.hibernate.Session;
 

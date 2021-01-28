@@ -4,7 +4,7 @@ import com.ctzn.youtubescraper.exception.ScraperException;
 import com.ctzn.youtubescraper.model.ChannelDTO;
 import com.ctzn.youtubescraper.model.VideoDTO;
 import com.ctzn.youtubescraper.runner.ChannelVideosCollector;
-import com.ctzn.youtubescraper.runner.RunnerFactory;
+import com.ctzn.youtubescraper.runner.CommentRunnerFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -23,7 +23,7 @@ public class ChannelAllCommentsExample {
 
         ExecutorService executor = Executors.newFixedThreadPool(10);
         channel.videos.stream().map(VideoDTO::getVideoId)
-                .map(RunnerFactory::newNewestCommentsFirstFileAppenderRunner).forEach(executor::submit);
+                .map(CommentRunnerFactory::newNewestCommentsFirstFileAppenderRunner).forEach(executor::submit);
         executor.shutdown();
     }
 }

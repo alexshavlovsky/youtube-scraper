@@ -14,6 +14,8 @@ public class ChannelVideosExample {
         String chanelId = "UCksTNgiRyQGwi2ODBie8HdA";
         ChannelVideosCollector collector = new ChannelVideosCollector(chanelId);
         ChannelDTO channel = collector.call();
-        System.out.println(channel);
+        channel.getVideos().forEach(
+                v -> System.out.println(v.getVideoId() + " " + v.getTitle())
+        );
     }
 }

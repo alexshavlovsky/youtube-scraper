@@ -42,27 +42,7 @@ public class YoutubeChannelVideosClient extends AbstractYoutubeClient<VideosGrid
     public VideosGrid requestNextSection(NextContinuationData continuationData) throws ScraperHttpException, ScraperParserException {
         URI requestUri = uriFactory.newBrowseApiRequestUri(continuationData);
 
-        HttpRequest request = HttpRequest.newBuilder(requestUri)
-                .headers("User-Agent", userAgentCfg.getUserAgent())
-                .headers("Accept", "*/*")
-                .headers("Accept-Language", userAgentCfg.getAcceptLanguage())
-                .headers("Accept-Encoding", userAgentCfg.getAcceptEncoding())
-                .headers("X-YouTube-Client-Name", youtubeCfg.getClientName())
-                .headers("X-YouTube-Client-Version", youtubeCfg.getClientVersion())
-                .headers("X-YouTube-Device", youtubeCfg.getDevice())
-                .headers("X-YouTube-Page-CL", youtubeCfg.getPageCl())
-                .headers("X-YouTube-Page-Label", youtubeCfg.getPageLabel())
-                .headers("X-YouTube-Utc-Offset", "180")
-                .headers("X-YouTube-Time-Zone", "Europe/Minsk")
-//              .headers("X-YouTube-Ad-Signals")
-                .headers("X-SPF-Referer", pageUri)
-                .headers("X-SPF-Previous", pageUri)
-                .headers("DNT", "1")
-                .headers("Referer", pageUri)
-                .headers("Cookie", cookies.getHeader())
-                .headers("Pragma", "no-cache")
-                .headers("Cache-Control", "no-cache")
-                .GET().build();
+        HttpRequest request = newApiRequestBuilder(requestUri).GET().build();
 
         HttpResponse<InputStream> response = completeRequest(httpClient, request);
 

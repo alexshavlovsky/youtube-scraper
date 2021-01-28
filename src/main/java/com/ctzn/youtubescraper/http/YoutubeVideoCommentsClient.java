@@ -35,28 +35,9 @@ public class YoutubeVideoCommentsClient extends AbstractYoutubeClient<CommentIte
         if (limiter.getUriLengthLimitUsagePercent() > 100)
             throw new ScraperHttpException("Request entity size limit is exceeded: no further processing of the section is possible");
 
-        HttpRequest request = HttpRequest.newBuilder(requestUri)
-                .headers("User-Agent", userAgentCfg.getUserAgent())
-                .headers("Accept", "*/*")
-                .headers("Accept-Language", userAgentCfg.getAcceptLanguage())
-                .headers("Accept-Encoding", userAgentCfg.getAcceptEncoding())
-                .headers("Referer", pageUri)
-                .headers("X-YouTube-Client-Name", youtubeCfg.getClientName())
-                .headers("X-YouTube-Client-Version", youtubeCfg.getClientVersion())
-                .headers("X-YouTube-Device", youtubeCfg.getDevice())
-                .headers("X-YouTube-Page-CL", youtubeCfg.getPageCl())
-                .headers("X-YouTube-Page-Label", youtubeCfg.getPageLabel())
-                .headers("X-YouTube-Utc-Offset", "180")
-                .headers("X-YouTube-Time-Zone", "Europe/Minsk")
-//              .headers("X-YouTube-Ad-Signals")
-                .headers("X-SPF-Referer", pageUri)
-                .headers("X-SPF-Previous", pageUri)
+        HttpRequest request = newApiRequestBuilder(requestUri)
                 .headers("Content-Type", "application/x-www-form-urlencoded")
-                .headers("Cookie", cookies.getHeader())
                 .headers("Origin", "https://www.youtube.com")
-                .headers("DNT", "1")
-                .headers("Pragma", "no-cache")
-                .headers("Cache-Control", "no-cache")
                 .POST(ofFormData(Map.of(youtubeCfg.getXsrfFieldName(), currentXsrfToken))).build();
 
         HttpResponse<InputStream> response = completeRequest(httpClient, request);

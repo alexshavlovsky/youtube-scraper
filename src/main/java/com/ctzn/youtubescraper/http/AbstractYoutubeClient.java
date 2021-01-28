@@ -20,9 +20,9 @@ abstract class AbstractYoutubeClient<E> {
     static final VideoPageBodyParser videoPageBodyParser = new VideoPageBodyParser();
     final YoutubeCfgDTO youtubeCfg;
     final HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).build();
-    final CustomCookieManager cookies = new CustomCookieManager("youtube.com");
-    final UserAgentCfg userAgentCfg;
-    final String pageUri;
+    private final CustomCookieManager cookies = new CustomCookieManager("youtube.com");
+    private final UserAgentCfg userAgentCfg;
+    private final String pageUri;
     final E initialData;
     String currentXsrfToken;
 
@@ -41,16 +41,36 @@ abstract class AbstractYoutubeClient<E> {
         initialData = youtubeInitialDataHandler.handle(ytInitialDataJson);
     }
 
-    private String fetchPage() throws ScraperHttpException {
-        HttpRequest request = HttpRequest.newBuilder(URI.create(pageUri))
+    private HttpRequest.Builder newRequestBuilder(URI requestUri, String acceptHeader) {
+        return HttpRequest.newBuilder(requestUri)
                 .headers("User-Agent", userAgentCfg.getUserAgent())
-                .headers("Accept", userAgentCfg.getAccept())
+                .headers("Accept", acceptHeader)
                 .headers("Accept-Language", userAgentCfg.getAcceptLanguage())
                 .headers("Accept-Encoding", userAgentCfg.getAcceptEncoding())
                 .headers("DNT", "1")
-                .headers("Upgrade-Insecure-Requests", "1")
                 .headers("Pragma", "no-cache")
-                .headers("Cache-Control", "no-cache")
+                .headers("Cache-Control", "no-cache");
+    }
+
+    HttpRequest.Builder newApiRequestBuilder(URI requestUri) {
+        return newRequestBuilder(requestUri, "*/*")
+                .headers("Referer", pageUri)
+                .headers("X-YouTube-Client-Name", youtubeCfg.getClientName())
+                .headers("X-YouTube-Client-Version", youtubeCfg.getClientVersion())
+                .headers("X-YouTube-Device", youtubeCfg.getDevice())
+                .headers("X-YouTube-Page-CL", youtubeCfg.getPageCl())
+                .headers("X-YouTube-Page-Label", youtubeCfg.getPageLabel())
+                .headers("X-YouTube-Utc-Offset", "180")
+                .headers("X-YouTube-Time-Zone", "Europe/Minsk")
+//              .headers("X-YouTube-Ad-Signals")
+                .headers("X-SPF-Referer", pageUri)
+                .headers("X-SPF-Previous", pageUri)
+                .headers("Cookie", cookies.getHeader());
+    }
+
+    private String fetchPage() throws ScraperHttpException {
+        HttpRequest request = newRequestBuilder(URI.create(pageUri), userAgentCfg.getAccept())
+                .headers("Upgrade-Insecure-Requests", "1")
                 .GET().build();
 
         HttpResponse<InputStream> httpResponse = completeRequest(httpClient, request);

@@ -4,7 +4,7 @@ import com.ctzn.youtubescraper.exception.ScraperException;
 import com.ctzn.youtubescraper.iterator.IterableCommentContext;
 import com.ctzn.youtubescraper.iterator.IterableCommentContextFactory;
 
-public class RunnerFactory {
+public class CommentRunnerFactory {
 
     public static Runnable newNewestCommentsFirstFileAppenderRunner(String videoId) {
         return new FileAppenderRunner(videoId) {

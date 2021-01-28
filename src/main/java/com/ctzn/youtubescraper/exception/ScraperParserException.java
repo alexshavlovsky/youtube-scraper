@@ -1,6 +1,7 @@
 package com.ctzn.youtubescraper.exception;
 
 public class ScraperParserException extends ScraperException {
+
     public ScraperParserException(String message) {
         super(message);
     }

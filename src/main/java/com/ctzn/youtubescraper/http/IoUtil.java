@@ -1,6 +1,7 @@
 package com.ctzn.youtubescraper.http;
 
 import com.ctzn.youtubescraper.exception.ScraperHttpException;
+import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
 import org.brotli.dec.BrotliInputStream;
 
 import java.io.*;
@@ -14,8 +15,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 class IoUtil {
@@ -39,17 +38,18 @@ class IoUtil {
         }
     }
 
-    private static <T> HttpResponse<T> complete(CompletableFuture<HttpResponse<T>> future) throws ScraperHttpException {
+    private static <T> HttpResponse<T> complete(CompletableFuture<HttpResponse<T>> future) throws ScraperHttpException, ScrapperInterruptedException {
         try {
-            return future.get(5, TimeUnit.SECONDS);
-        } catch (ExecutionException | TimeoutException e) {
+            if (!Thread.currentThread().isInterrupted()) return future.get();
+        } catch (ExecutionException e) {
             throw new ScraperHttpException(e.getMessage(), e);
         } catch (InterruptedException e) {
-            throw new ScraperHttpException("HTTP request has been interrupted", e);
+            Thread.currentThread().interrupt();
         }
+        throw new ScrapperInterruptedException("Http request has been interrupted");
     }
 
-    static HttpResponse<InputStream> completeRequest(HttpClient httpClient, HttpRequest request) throws ScraperHttpException {
+    static HttpResponse<InputStream> completeRequest(HttpClient httpClient, HttpRequest request) throws ScraperHttpException, ScrapperInterruptedException {
         HttpResponse<InputStream> response = complete(httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofInputStream()));
         if (response.statusCode() != 200)
             throw new ScraperHttpException("Status code [%s] was returned when requesting a resource at [%s]", response.statusCode(), response.uri());

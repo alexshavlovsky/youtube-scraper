@@ -2,6 +2,7 @@ package com.ctzn.youtubescraper.iterator;
 
 import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.exception.ScraperParserException;
+import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
 import com.ctzn.youtubescraper.http.YoutubeChannelVideosClient;
 import com.ctzn.youtubescraper.model.channelvideos.VideosGrid;
 import com.ctzn.youtubescraper.model.commons.NextContinuationData;
@@ -43,7 +44,9 @@ public class VideoContext implements IterableVideoContext {
             int itemsCount = grid.countContentPieces();
             meter.update(itemsCount);
         } catch (ScraperHttpException | ScraperParserException e) {
-            log.warning(e.toString());
+            log.warning(client.getChannelId() + " " + e.toString());
+            grid = null;
+        } catch (ScrapperInterruptedException e) {
             grid = null;
         }
     }

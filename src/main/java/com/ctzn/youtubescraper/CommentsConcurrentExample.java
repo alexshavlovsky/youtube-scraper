@@ -1,10 +1,10 @@
 package com.ctzn.youtubescraper;
 
 import com.ctzn.youtubescraper.runner.CommentRunnerFactory;
+import com.ctzn.youtubescraper.executor.CustomExecutorService;
 
 import java.util.Arrays;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class CommentsConcurrentExample {
 
@@ -17,9 +17,10 @@ public class CommentsConcurrentExample {
             "Dtk2xgBZTec", "pEr1TtCB7_Y", "NMg6DQSO5VE", "bhE2RaN4VcI", "pJJE7R8xteQ"
     };
 
-    public static void main(String[] args) {
-        ExecutorService executor = Executors.newFixedThreadPool(10);
+    public static void main(String[] args) throws InterruptedException {
+        CustomExecutorService executor = new CustomExecutorService(
+                "CommentWorker", 10, 5, TimeUnit.MINUTES);
         Arrays.stream(ids).map(CommentRunnerFactory::newNewestCommentsFirstFileAppenderRunner).forEach(executor::submit);
-        executor.shutdown();
+        executor.awaitAndTerminate();
     }
 }

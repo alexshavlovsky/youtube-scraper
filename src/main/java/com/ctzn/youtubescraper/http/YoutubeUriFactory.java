@@ -47,8 +47,8 @@ class YoutubeUriFactory {
         return String.format(VIDEO_PAGE_URI_TEMPLATE, videoId);
     }
 
-    String newChanelPageUri(String chanelId) {
-        return String.format(CHANNEL_PAGE_URI_TEMPLATE, chanelId);
+    String newChanelPageUri(String channelId) {
+        return String.format(CHANNEL_PAGE_URI_TEMPLATE, channelId);
     }
 
     String newChannelVideosPageUri(String channelVanityName) {

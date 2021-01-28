@@ -1,7 +1,6 @@
 package com.ctzn.youtubescraper;
 
-import com.ctzn.youtubescraper.exception.ScraperHttpException;
-import com.ctzn.youtubescraper.exception.ScraperParserException;
+import com.ctzn.youtubescraper.exception.ScraperException;
 import com.ctzn.youtubescraper.http.UserAgentCfgFactory;
 import com.ctzn.youtubescraper.http.YoutubeChannelMetadataClient;
 
@@ -11,10 +10,10 @@ public class ChannelMetadataExample {
         System.setProperty("java.util.logging.config.file", "logging.properties");
     }
 
-    public static void main(String[] args) throws ScraperParserException, ScraperHttpException {
-        String chanelId = "UCksTNgiRyQGwi2ODBie8HdA";
+    public static void main(String[] args) throws ScraperException {
+        String channelId = "UCksTNgiRyQGwi2ODBie8HdA";
         YoutubeChannelMetadataClient channelHttpClient =
-                new YoutubeChannelMetadataClient(UserAgentCfgFactory.getDefaultUserAgentCfg(), chanelId);
+                new YoutubeChannelMetadataClient(UserAgentCfgFactory.getDefaultUserAgentCfg(), channelId);
         System.out.println(channelHttpClient.getChannelMetadata());
         System.out.println(channelHttpClient.getChannelMicroformat());
         System.out.println(channelHttpClient.getChannelMetadata().getVanityChannelUrl());

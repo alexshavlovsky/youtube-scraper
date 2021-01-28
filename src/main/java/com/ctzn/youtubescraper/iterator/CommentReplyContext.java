@@ -2,6 +2,7 @@ package com.ctzn.youtubescraper.iterator;
 
 import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.exception.ScraperParserException;
+import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
 import com.ctzn.youtubescraper.http.YoutubeVideoCommentsClient;
 import com.ctzn.youtubescraper.model.CommentDTO;
 import com.ctzn.youtubescraper.model.CommentItemSection;
@@ -24,7 +25,7 @@ class CommentReplyContext extends AbstractCommentContext {
     }
 
     @Override
-    CommentItemSection fetchNextSection(YoutubeVideoCommentsClient youtubeHttpClient, NextContinuationData continuationData) throws ScraperParserException, ScraperHttpException {
+    CommentItemSection fetchNextSection(YoutubeVideoCommentsClient youtubeHttpClient, NextContinuationData continuationData) throws ScraperParserException, ScraperHttpException, ScrapperInterruptedException {
         return youtubeHttpClient.requestNextSection(continuationData, getMeter(), ReplyApiResponse.class);
     }
 

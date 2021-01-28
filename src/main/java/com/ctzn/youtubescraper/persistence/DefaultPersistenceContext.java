@@ -13,6 +13,7 @@ public class DefaultPersistenceContext implements PersistenceContext {
 
     @Override
     public void commitTransaction(PersistenceStrategy persistenceStrategy) {
+        boolean interrupted = Thread.interrupted();
         Transaction tx = null;
         try (Session session = sessionFactory.openSession()) {
             tx = session.beginTransaction();
@@ -20,6 +21,8 @@ public class DefaultPersistenceContext implements PersistenceContext {
             tx.commit();
         } catch (PersistenceException ex) {
             if (tx != null) tx.rollback();
+        } finally {
+            if (interrupted) Thread.currentThread().interrupt();
         }
     }
 }

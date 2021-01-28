@@ -1,5 +1,6 @@
 package com.ctzn.youtubescraper.iterator;
 
+import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
 import com.ctzn.youtubescraper.handler.VideoHandler;
 import com.ctzn.youtubescraper.model.VideoDTO;
 import com.ctzn.youtubescraper.model.channelvideos.VideosGrid;
@@ -18,13 +19,15 @@ public class VideoContextIterator {
         this.handlers = handlers;
     }
 
-    public void traverse() {
+    public void traverse() throws ScrapperInterruptedException {
         traverse(context);
     }
 
-    private void traverse(IterableVideoContext context) {
+    private void traverse(IterableVideoContext context) throws ScrapperInterruptedException {
         while (true) {
             if (context.hasGrid()) handle(context);
+            if (Thread.currentThread().isInterrupted())
+                throw new ScrapperInterruptedException("Thread has been interrupted");
             if (context.hasContinuation()) context.nextGrid(context.getContinuationData());
             else return;
         }

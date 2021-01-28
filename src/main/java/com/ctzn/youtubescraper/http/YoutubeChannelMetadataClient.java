@@ -2,6 +2,7 @@ package com.ctzn.youtubescraper.http;
 
 import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.exception.ScraperParserException;
+import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
 import com.ctzn.youtubescraper.model.channelmetadata.ChannelMetadata;
 import com.ctzn.youtubescraper.model.channelmetadata.ChannelMetadataDTO;
 import com.ctzn.youtubescraper.model.channelmetadata.ChannelMicroformatDTO;
@@ -14,7 +15,7 @@ public class YoutubeChannelMetadataClient extends AbstractYoutubeClient<ChannelM
     private final String channelId;
     private final String channelVanityName;
 
-    public YoutubeChannelMetadataClient(UserAgentCfg userAgentCfg, String channelId) throws ScraperHttpException, ScraperParserException {
+    public YoutubeChannelMetadataClient(UserAgentCfg userAgentCfg, String channelId) throws ScraperHttpException, ScraperParserException, ScrapperInterruptedException {
         super(userAgentCfg, uriFactory.newChanelPageUri(channelId), videoPageBodyParser::parseChannelMetadata);
         this.channelId = channelId;
         ParserUtil.assertNotNull("Channel metadata not found",

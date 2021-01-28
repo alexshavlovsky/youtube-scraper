@@ -1,6 +1,6 @@
 package com.ctzn.youtubescraper.iterator;
 
-import com.ctzn.youtubescraper.handler.AbstractHandler;
+import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
 import com.ctzn.youtubescraper.handler.CommentHandler;
 import com.ctzn.youtubescraper.model.CommentDTO;
 import com.ctzn.youtubescraper.model.CommentItemSection;
@@ -21,19 +21,21 @@ public class CommentContextIterator {
         this.handlers = handlers;
     }
 
-    public void traverse() {
+    public void traverse() throws ScrapperInterruptedException {
         traverse(context);
     }
 
-    private void traverse(IterableCommentContext context) {
+    private void traverse(IterableCommentContext context) throws ScrapperInterruptedException {
         while (true) {
             if (context.hasSection()) handle(context);
+            if (Thread.currentThread().isInterrupted())
+                throw new ScrapperInterruptedException("Thread has been interrupted");
             if (context.hasContinuation()) context.nextSection(context.getContinuationData());
             else return;
         }
     }
 
-    private void handle(IterableCommentContext context) {
+    private void handle(IterableCommentContext context) throws ScrapperInterruptedException {
         CommentItemSection commentItemSection = context.getSection();
         List<CommentDTO> comments = commentItemSection.getComments(context.getVideoId(), context.getParentId());
         if (context instanceof CommentReplyContext) handlers.forEach(handler -> handler.handle(comments));
@@ -42,6 +44,7 @@ public class CommentContextIterator {
             for (CommentDTO comment : comments) {
                 handlers.forEach(handler -> handler.handle(List.of(comment)));
                 NextContinuationData replyThreadContinuation = replyContinuationsMap.get(comment.commentId);
+                if (Thread.currentThread().isInterrupted()) break;
                 if (replyThreadContinuation != null) traverse(context.newReplyThread(comment, replyThreadContinuation));
             }
         }

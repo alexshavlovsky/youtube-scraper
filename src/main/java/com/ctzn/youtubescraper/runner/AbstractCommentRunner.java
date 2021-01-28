@@ -1,6 +1,7 @@
 package com.ctzn.youtubescraper.runner;
 
 import com.ctzn.youtubescraper.exception.ScraperException;
+import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
 import com.ctzn.youtubescraper.handler.CommentHandler;
 import com.ctzn.youtubescraper.iterator.CommentContextIterator;
 import com.ctzn.youtubescraper.iterator.IterableCommentContext;
@@ -26,9 +27,11 @@ abstract class AbstractCommentRunner implements Runnable {
             IterableCommentContext commentContext = newCommentContext(videoId);
             CommentContextIterator iterator = new CommentContextIterator(commentContext, handlers);
             iterator.traverse();
-            log.info("DONE: " + commentContext.getShortResultStat());
+            log.info("DONE " + commentContext.getShortResultStat());
+        } catch (ScrapperInterruptedException e) {
+            log.warning("INTERRUPTED " + videoId + ": " + e.toString());
         } catch (ScraperException e) {
-            log.warning("FAILED: " + e.toString());
+            log.warning("FAILED " + videoId + ": " + e.toString());
         }
     }
 }

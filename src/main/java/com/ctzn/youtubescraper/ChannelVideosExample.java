@@ -11,8 +11,8 @@ public class ChannelVideosExample {
     }
 
     public static void main(String[] args) throws ScraperException {
-        String chanelId = "UCksTNgiRyQGwi2ODBie8HdA";
-        ChannelVideosCollector collector = new ChannelVideosCollector(chanelId);
+        String channelId = "UCksTNgiRyQGwi2ODBie8HdA";
+        ChannelVideosCollector collector = new ChannelVideosCollector(channelId);
         ChannelDTO channel = collector.call();
         channel.getVideos().forEach(
                 v -> System.out.println(v.getVideoId() + " " + v.getTitle())

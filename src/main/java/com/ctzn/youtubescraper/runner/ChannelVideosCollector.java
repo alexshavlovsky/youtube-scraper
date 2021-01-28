@@ -1,6 +1,7 @@
 package com.ctzn.youtubescraper.runner;
 
 import com.ctzn.youtubescraper.exception.ScraperException;
+import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
 import com.ctzn.youtubescraper.handler.VideoCollector;
 import com.ctzn.youtubescraper.http.UserAgentCfg;
 import com.ctzn.youtubescraper.http.UserAgentCfgFactory;
@@ -47,10 +48,13 @@ public class ChannelVideosCollector implements Callable<ChannelDTO> {
             IterableVideoContext videosContext = new VideoContext(videosClient);
             VideoContextIterator iterator = new VideoContextIterator(videosContext, List.of(handler));
             iterator.traverse();
-            log.info("DONE: " + videosContext.getShortResultStat());
+            log.info("DONE " + videosContext.getShortResultStat());
             return new ChannelDTO(channelId, metadataClient.getChannelVanityName(), handler.getVideos());
+        } catch (ScrapperInterruptedException e) {
+            log.warning("INTERRUPTED " + channelId + ": " + e.toString());
+            throw e;
         } catch (ScraperException e) {
-            log.warning("FAILED: " + e.toString());
+            log.warning("FAILED " + channelId + ": " + e.toString());
             throw e;
         }
     }

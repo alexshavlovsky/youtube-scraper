@@ -2,6 +2,7 @@ package com.ctzn.youtubescraper.http;
 
 import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.exception.ScraperParserException;
+import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
 import com.ctzn.youtubescraper.model.ApiResponse;
 import com.ctzn.youtubescraper.model.CommentItemSection;
 import com.ctzn.youtubescraper.model.commons.NextContinuationData;
@@ -23,13 +24,13 @@ public class YoutubeVideoCommentsClient extends AbstractYoutubeClient<CommentIte
 
     private final String videoId;
 
-    public YoutubeVideoCommentsClient(UserAgentCfg userAgentCfg, String videoId) throws ScraperParserException, ScraperHttpException {
+    public YoutubeVideoCommentsClient(UserAgentCfg userAgentCfg, String videoId) throws ScraperParserException, ScraperHttpException, ScrapperInterruptedException {
         super(userAgentCfg, uriFactory.newVideoPageUri(videoId), videoPageBodyParser::scrapeInitialCommentItemSection);
         this.videoId = videoId;
         if (!initialData.hasContinuation()) throw new ScraperParserException("Initial comment continuation not found");
     }
 
-    public <T extends ApiResponse> CommentItemSection requestNextSection(NextContinuationData continuationData, RequestUriLengthLimiter limiter, Class<T> valueType) throws ScraperHttpException, ScraperParserException {
+    public <T extends ApiResponse> CommentItemSection requestNextSection(NextContinuationData continuationData, RequestUriLengthLimiter limiter, Class<T> valueType) throws ScraperHttpException, ScraperParserException, ScrapperInterruptedException {
         URI requestUri = uriFactory.newCommentApiRequestUri(continuationData);
         limiter.setUriLength(requestUri.toString().length());
         if (limiter.getUriLengthLimitUsagePercent() > 100)

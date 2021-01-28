@@ -2,6 +2,7 @@ package com.ctzn.youtubescraper.http;
 
 import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.exception.ScraperParserException;
+import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
 import com.ctzn.youtubescraper.model.BrowseApiResponse;
 import com.ctzn.youtubescraper.model.channelvideos.VideosGrid;
 import com.ctzn.youtubescraper.model.commons.NextContinuationData;
@@ -21,7 +22,7 @@ public class YoutubeChannelVideosClient extends AbstractYoutubeClient<VideosGrid
     private final String channelId;
     private final String channelVanityName;
 
-    public YoutubeChannelVideosClient(UserAgentCfg userAgentCfg, String channelId, String channelVanityName) throws ScraperHttpException, ScraperParserException {
+    public YoutubeChannelVideosClient(UserAgentCfg userAgentCfg, String channelId, String channelVanityName) throws ScraperHttpException, ScraperParserException, ScrapperInterruptedException {
         super(userAgentCfg, uriFactory.newChannelVideosPageUri(channelVanityName), videoPageBodyParser::parseVideosGrid);
         this.channelId = channelId;
         this.channelVanityName = channelVanityName;
@@ -39,7 +40,7 @@ public class YoutubeChannelVideosClient extends AbstractYoutubeClient<VideosGrid
         return initialData;
     }
 
-    public VideosGrid requestNextSection(NextContinuationData continuationData) throws ScraperHttpException, ScraperParserException {
+    public VideosGrid requestNextSection(NextContinuationData continuationData) throws ScraperHttpException, ScraperParserException, ScrapperInterruptedException {
         URI requestUri = uriFactory.newBrowseApiRequestUri(continuationData);
 
         HttpRequest request = newApiRequestBuilder(requestUri).GET().build();

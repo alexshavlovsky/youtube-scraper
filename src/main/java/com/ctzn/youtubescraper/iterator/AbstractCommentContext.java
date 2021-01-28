@@ -2,6 +2,7 @@ package com.ctzn.youtubescraper.iterator;
 
 import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.exception.ScraperParserException;
+import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
 import com.ctzn.youtubescraper.http.YoutubeVideoCommentsClient;
 import com.ctzn.youtubescraper.model.CommentItemSection;
 import com.ctzn.youtubescraper.model.commons.NextContinuationData;
@@ -34,7 +35,7 @@ abstract class AbstractCommentContext implements IterableCommentContext {
         return section.getContinuation();
     }
 
-    abstract CommentItemSection fetchNextSection(YoutubeVideoCommentsClient youtubeHttpClient, NextContinuationData continuationData) throws ScraperParserException, ScraperHttpException;
+    abstract CommentItemSection fetchNextSection(YoutubeVideoCommentsClient youtubeHttpClient, NextContinuationData continuationData) throws ScraperParserException, ScraperHttpException, ScrapperInterruptedException;
 
     @Override
     public void nextSection(NextContinuationData continuationData) {
@@ -52,7 +53,9 @@ abstract class AbstractCommentContext implements IterableCommentContext {
                 getParentContext().getReplyMeter().update(itemsCount);
             }
         } catch (ScraperHttpException | ScraperParserException e) {
-            log.warning(e.toString());
+            log.warning(youtubeHttpClient.getVideoId() + " " + e.toString());
+            section = null;
+        } catch (ScrapperInterruptedException e) {
             section = null;
         }
     }

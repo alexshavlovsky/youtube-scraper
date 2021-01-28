@@ -2,6 +2,7 @@ package com.ctzn.youtubescraper.http;
 
 import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.exception.ScraperParserException;
+import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
 import com.ctzn.youtubescraper.model.YoutubeCfgDTO;
 import com.ctzn.youtubescraper.parser.VideoPageBodyParser;
 import lombok.extern.java.Log;
@@ -11,6 +12,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 
 import static com.ctzn.youtubescraper.http.IoUtil.*;
 
@@ -26,7 +28,7 @@ abstract class AbstractYoutubeClient<E> {
     final E initialData;
     String currentXsrfToken;
 
-    AbstractYoutubeClient(UserAgentCfg userAgentCfg, String pageUri, YoutubeInitialDataHandler<E> youtubeInitialDataHandler) throws ScraperHttpException, ScraperParserException {
+    AbstractYoutubeClient(UserAgentCfg userAgentCfg, String pageUri, YoutubeInitialDataHandler<E> youtubeInitialDataHandler) throws ScraperHttpException, ScraperParserException, ScrapperInterruptedException {
         this.userAgentCfg = userAgentCfg;
         this.pageUri = pageUri;
         log.info(() -> String.format("Fetch page: [%s]", pageUri));
@@ -42,7 +44,7 @@ abstract class AbstractYoutubeClient<E> {
     }
 
     private HttpRequest.Builder newRequestBuilder(URI requestUri, String acceptHeader) {
-        return HttpRequest.newBuilder(requestUri)
+        return HttpRequest.newBuilder(requestUri).timeout(Duration.ofSeconds(5))
                 .headers("User-Agent", userAgentCfg.getUserAgent())
                 .headers("Accept", acceptHeader)
                 .headers("Accept-Language", userAgentCfg.getAcceptLanguage())
@@ -68,7 +70,7 @@ abstract class AbstractYoutubeClient<E> {
                 .headers("Cookie", cookies.getHeader());
     }
 
-    private String fetchPage() throws ScraperHttpException {
+    private String fetchPage() throws ScraperHttpException, ScrapperInterruptedException {
         HttpRequest request = newRequestBuilder(URI.create(pageUri), userAgentCfg.getAccept())
                 .headers("Upgrade-Insecure-Requests", "1")
                 .GET().build();

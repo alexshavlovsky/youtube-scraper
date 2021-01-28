@@ -9,7 +9,6 @@ public class ScraperException extends Exception {
         super(String.format(format, args));
     }
 
-
     public ScraperException(String message, Throwable cause) {
         super(message, cause);
     }

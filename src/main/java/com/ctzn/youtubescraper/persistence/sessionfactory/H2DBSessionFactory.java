@@ -1,24 +1,21 @@
-package com.ctzn.youtubescraper.db;
+package com.ctzn.youtubescraper.persistence.sessionfactory;
 
-import com.ctzn.youtubescraper.entity.ChannelEntity;
-import com.ctzn.youtubescraper.entity.CommentEntity;
-import com.ctzn.youtubescraper.entity.VideoEntity;
-import lombok.extern.java.Log;
+import com.ctzn.youtubescraper.persistence.entity.ChannelEntity;
+import com.ctzn.youtubescraper.persistence.entity.CommentEntity;
+import com.ctzn.youtubescraper.persistence.entity.VideoEntity;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
-@Log
-class SessionFactorySource {
+public class H2DBSessionFactory {
 
-    private static final SessionFactorySource instance = new SessionFactorySource();
-    private final SessionFactory sessionFactory;
+    private final static SessionFactory instance = newInstance();
 
-    private SessionFactorySource() {
+    private static SessionFactory newInstance() {
         StandardServiceRegistry standardRegistry = new StandardServiceRegistryBuilder()
-                .configure("hibernate.cfg.xml")
+                .configure("h2db.cfg.xml")
                 .build();
 
         Metadata metadata = new MetadataSources(standardRegistry)
@@ -29,14 +26,10 @@ class SessionFactorySource {
                 .applyPhysicalNamingStrategy(new CustomPhysicalNamingStrategy())
                 .build();
 
-        sessionFactory = metadata.getSessionFactoryBuilder().build();
+        return metadata.getSessionFactoryBuilder().build();
     }
 
-    static SessionFactorySource getInstance() {
+    public static SessionFactory getInstance() {
         return instance;
-    }
-
-    SessionFactory getSessionFactory() {
-        return sessionFactory;
     }
 }

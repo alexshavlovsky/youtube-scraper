@@ -1,6 +1,6 @@
 package com.ctzn.youtubescraper.handler;
 
-import com.ctzn.youtubescraper.formatter.CommentFormatter;
+import com.ctzn.youtubescraper.commentformatter.CommentFormatter;
 import com.ctzn.youtubescraper.model.CommentDTO;
 
 import java.io.IOException;

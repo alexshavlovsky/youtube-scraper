@@ -1,6 +1,6 @@
 package com.ctzn.youtubescraper.runner;
 
-import com.ctzn.youtubescraper.formatter.CommentHumanReadableFormatter;
+import com.ctzn.youtubescraper.commentformatter.CommentHumanReadableFormatter;
 import com.ctzn.youtubescraper.handler.CommentFileAppender;
 import lombok.extern.java.Log;
 
@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 @Log
-abstract class FileAppenderRunner extends AbstractRunner {
+abstract class FileAppenderRunner extends AbstractCommentRunner {
 
     private final static String RESULT_FOLDER = ".output" + File.separator;
 

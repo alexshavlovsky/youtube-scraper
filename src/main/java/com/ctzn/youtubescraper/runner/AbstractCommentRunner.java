@@ -9,11 +9,11 @@ import lombok.extern.java.Log;
 import java.util.List;
 
 @Log
-abstract class AbstractRunner implements Runnable {
+abstract class AbstractCommentRunner implements Runnable {
     private final String videoId;
     private final List<CommentHandler> handlers;
 
-    AbstractRunner(String videoId, List<CommentHandler> handlers) {
+    AbstractCommentRunner(String videoId, List<CommentHandler> handlers) {
         this.videoId = videoId;
         this.handlers = handlers;
     }

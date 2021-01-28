@@ -1,4 +1,4 @@
-package com.ctzn.youtubescraper.db;
+package com.ctzn.youtubescraper.persistence.sessionfactory;
 
 import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.boot.model.naming.PhysicalNamingStrategy;

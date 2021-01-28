@@ -1,4 +1,4 @@
-package com.ctzn.youtubescraper.formatter;
+package com.ctzn.youtubescraper.commentformatter;
 
 import com.ctzn.youtubescraper.model.CommentDTO;
 

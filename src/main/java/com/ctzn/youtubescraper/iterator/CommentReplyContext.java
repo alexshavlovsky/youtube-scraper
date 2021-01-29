@@ -46,6 +46,7 @@ class CommentReplyContext extends AbstractCommentContext {
 
     @Override
     public String getShortResultStat() {
-        return getParentContext().getShortResultStat() + String.format(" > %s replies %s of %s (%.1f%%)", getParentId(), getMeter().getCounter(), getMeter().getTargetCount(), getMeter().getCompletionPercent());
+        CommentContextMeter m = getMeter();
+        return getParentContext().getShortResultStat() + String.format(" > %s replies %s of %s%s", getParentId(), m.getCounter(), m.getTargetCount(), m.formatCompletionPercent(" (%.1f%%)"));
     }
 }

@@ -29,7 +29,7 @@ abstract class AbstractCommentRunner implements Runnable {
             iterator.traverse();
             log.info("DONE " + commentContext.getShortResultStat());
         } catch (ScrapperInterruptedException e) {
-            log.warning("INTERRUPTED " + videoId + ": " + e.toString());
+            log.info("INTERRUPTED " + videoId + ": " + e.toString());
         } catch (ScraperException e) {
             log.warning("FAILED " + videoId + ": " + e.toString());
         }

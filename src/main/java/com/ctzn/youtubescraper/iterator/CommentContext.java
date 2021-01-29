@@ -21,7 +21,7 @@ class CommentContext extends AbstractCommentContext {
     CommentContext(YoutubeVideoCommentsClient youtubeHttpClient) {
         super(youtubeHttpClient);
         reset(youtubeHttpClient.getInitialCommentSectionContinuation());
-        log.info(() -> youtubeHttpClient.getVideoId() + " total comments count: " + getMeter().getTargetCount());
+        log.fine(() -> youtubeHttpClient.getVideoId() + " total comments count: " + getMeter().getTargetCount());
     }
 
     private void reset(NextContinuationData continuationData) {
@@ -34,7 +34,7 @@ class CommentContext extends AbstractCommentContext {
 
     void sortNewestFirst() {
         if (getMeter().getTargetCount() != 0) {
-            log.info("Sort newest first");
+            log.fine("Sort newest first");
             reset(commentThreadHeader.getOrderNewestFirst());
         }
     }

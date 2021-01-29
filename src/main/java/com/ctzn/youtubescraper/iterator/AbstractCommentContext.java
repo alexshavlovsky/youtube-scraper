@@ -87,6 +87,6 @@ abstract class AbstractCommentContext implements IterableCommentContext {
 
     @Override
     public String getShortResultStat() {
-        return String.format("%s %s comments, %s replies, total %s of %s (%.1f%%)", getVideoId(), meter.getCounter() - replyMeter.getCounter(), replyMeter.getCounter(), meter.getCounter(), meter.getTargetCount(), meter.getCompletionPercent());
+        return String.format("%s %s comments, %s replies, total %s of %s%s", getVideoId(), meter.getCounter() - replyMeter.getCounter(), replyMeter.getCounter(), meter.getCounter(), meter.getTargetCount(), meter.formatCompletionPercent(" (%.1f%%)"));
     }
 }

@@ -31,7 +31,7 @@ abstract class AbstractYoutubeClient<E> {
     AbstractYoutubeClient(UserAgentCfg userAgentCfg, String pageUri, YoutubeInitialDataHandler<E> youtubeInitialDataHandler) throws ScraperHttpException, ScraperParserException, ScrapperInterruptedException {
         this.userAgentCfg = userAgentCfg;
         this.pageUri = pageUri;
-        log.info(() -> String.format("Fetch page: [%s]", pageUri));
+        log.info(String.format("Fetch page: [%s]", pageUri));
         String body = fetchPage();
         log.fine(() -> "Scrape initial youtube config");
         youtubeCfg = videoPageBodyParser.scrapeYoutubeConfig(body);

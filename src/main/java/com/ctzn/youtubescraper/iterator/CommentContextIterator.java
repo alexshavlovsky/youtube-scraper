@@ -38,6 +38,7 @@ public class CommentContextIterator {
     private void handle(IterableCommentContext context) throws ScrapperInterruptedException {
         CommentItemSection commentItemSection = context.getSection();
         List<CommentDTO> comments = commentItemSection.getComments(context.getVideoId(), context.getParentId());
+        boolean doLog = true;
         if (context instanceof CommentReplyContext) handlers.forEach(handler -> handler.handle(comments));
         else {
             Map<String, NextContinuationData> replyContinuationsMap = commentItemSection.getReplyContinuationsMap();
@@ -45,9 +46,12 @@ public class CommentContextIterator {
                 handlers.forEach(handler -> handler.handle(List.of(comment)));
                 NextContinuationData replyThreadContinuation = replyContinuationsMap.get(comment.commentId);
                 if (Thread.currentThread().isInterrupted()) break;
-                if (replyThreadContinuation != null) traverse(context.newReplyThread(comment, replyThreadContinuation));
+                if (replyThreadContinuation != null) {
+                    traverse(context.newReplyThread(comment, replyThreadContinuation));
+                    doLog = false;
+                }
             }
         }
-        log.fine(context.getShortResultStat());
+        if (doLog) log.fine(context::getShortResultStat);
     }
 }

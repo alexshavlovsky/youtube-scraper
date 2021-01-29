@@ -51,7 +51,7 @@ public class ChannelVideosCollector implements Callable<ChannelDTO> {
             log.info("DONE " + videosContext.getShortResultStat());
             return new ChannelDTO(channelId, metadataClient.getChannelVanityName(), handler.getVideos());
         } catch (ScrapperInterruptedException e) {
-            log.warning("INTERRUPTED " + channelId + ": " + e.toString());
+            log.info("INTERRUPTED " + channelId + ": " + e.toString());
             throw e;
         } catch (ScraperException e) {
             log.warning("FAILED " + channelId + ": " + e.toString());

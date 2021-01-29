@@ -50,6 +50,10 @@ class CommentContextMeter implements RequestUriLengthLimiter {
         return percent(counter, targetCount);
     }
 
+    String formatCompletionPercent(String format) {
+        return targetCount == 0 ? "" : String.format(format, percent(counter, targetCount));
+    }
+
     @Override
     public int getUriLength() {
         return uriLength;

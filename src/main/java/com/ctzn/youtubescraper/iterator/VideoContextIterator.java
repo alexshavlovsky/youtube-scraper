@@ -37,6 +37,6 @@ public class VideoContextIterator {
         VideosGrid grid = context.getGrid();
         List<VideoDTO> videos = grid.getVideos(context.getChannelId());
         handlers.forEach(handler -> handler.handle(videos));
-        log.fine(context.getShortResultStat());
+        log.fine(context::getShortResultStat);
     }
 }

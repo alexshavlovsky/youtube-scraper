@@ -1,10 +1,11 @@
 package com.ctzn.youtubescraper;
 
-import com.ctzn.youtubescraper.runner.CommentRunnerFactory;
 import com.ctzn.youtubescraper.executor.CustomExecutorService;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
+
+import static com.ctzn.youtubescraper.runner.CommentRunnerFactory.newDefaultFileAppender;
 
 public class CommentsConcurrentExample {
 
@@ -18,9 +19,8 @@ public class CommentsConcurrentExample {
     };
 
     public static void main(String[] args) throws InterruptedException {
-        CustomExecutorService executor = new CustomExecutorService(
-                "CommentWorker", 10, 5, TimeUnit.MINUTES);
-        Arrays.stream(ids).map(CommentRunnerFactory::newNewestCommentsFirstFileAppenderRunner).forEach(executor::submit);
+        CustomExecutorService executor = new CustomExecutorService("CommentWorker", 10, 5, TimeUnit.MINUTES);
+        Arrays.stream(ids).map(videoId -> newDefaultFileAppender(videoId, true)).forEach(executor::submit);
         executor.awaitAndTerminate();
     }
 }

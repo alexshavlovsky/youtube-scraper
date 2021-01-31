@@ -13,26 +13,23 @@ import java.util.Map;
 @Log
 public class CommentContextIterator {
 
-    private final IterableCommentContext context;
     private final List<CommentHandler> handlers;
     private final int commentCountLimit;
     private final int replyThreadCountLimit;
 
-    public CommentContextIterator(IterableCommentContext context, List<CommentHandler> handlers) {
-        this.context = context;
+    public CommentContextIterator(List<CommentHandler> handlers) {
         this.handlers = handlers;
         this.commentCountLimit = 0;
         this.replyThreadCountLimit = 0;
     }
 
-    public CommentContextIterator(IterableCommentContext context, List<CommentHandler> handlers, int commentCountLimit, int replyThreadCountLimit) {
-        this.context = context;
+    public CommentContextIterator(List<CommentHandler> handlers, int commentCountLimit, int replyThreadCountLimit) {
         this.handlers = handlers;
         this.commentCountLimit = commentCountLimit;
         this.replyThreadCountLimit = replyThreadCountLimit;
     }
 
-    public void traverse() throws ScrapperInterruptedException {
+    public void traverse(IterableCommentContext context) throws ScrapperInterruptedException {
         traverse(context, commentCountLimit);
     }
 

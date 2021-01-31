@@ -13,7 +13,7 @@ public class HibernateH2DBExample {
     }
 
     public static void main(String[] args) throws Exception {
-        String channelId = "UCXe92kCAWPdWRW7Ylfku_rw";
+        String channelId = "UCksTNgiRyQGwi2ODBie8HdA";
         Callable<Void> runner = new PersistenceChannelRunner(
                 channelId,
                 new DefaultPersistenceContext(),

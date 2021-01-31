@@ -10,7 +10,7 @@ public class CommentsTopFirstExample {
 
     public static void main(String[] args) {
         String videoId = "v9ejT8FO-7I";
-        Runnable runner = CommentRunnerFactory.newTopCommentsFirstFileAppenderRunner(videoId);
+        Runnable runner = CommentRunnerFactory.newDefaultFileAppender(videoId, false);
         runner.run();
     }
 }

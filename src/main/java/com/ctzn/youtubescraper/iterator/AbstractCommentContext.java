@@ -52,6 +52,7 @@ abstract class AbstractCommentContext implements IterableCommentContext {
                 getParentContext().getMeter().update(itemsCount);
                 getParentContext().getReplyMeter().update(itemsCount);
             }
+            // TODO maybe it would be better to rethrow the exceptions in some use cases
         } catch (ScraperHttpException | ScraperParserException e) {
             log.warning(youtubeHttpClient.getVideoId() + " " + e.toString());
             section = null;

@@ -15,19 +15,31 @@ public class CommentContextIterator {
 
     private final IterableCommentContext context;
     private final List<CommentHandler> handlers;
+    private final int commentCountLimit;
+    private final int replyThreadCountLimit;
 
     public CommentContextIterator(IterableCommentContext context, List<CommentHandler> handlers) {
         this.context = context;
         this.handlers = handlers;
+        this.commentCountLimit = 0;
+        this.replyThreadCountLimit = 0;
+    }
+
+    public CommentContextIterator(IterableCommentContext context, List<CommentHandler> handlers, int commentCountLimit, int replyThreadCountLimit) {
+        this.context = context;
+        this.handlers = handlers;
+        this.commentCountLimit = commentCountLimit;
+        this.replyThreadCountLimit = replyThreadCountLimit;
     }
 
     public void traverse() throws ScrapperInterruptedException {
-        traverse(context);
+        traverse(context, commentCountLimit);
     }
 
-    private void traverse(IterableCommentContext context) throws ScrapperInterruptedException {
+    private void traverse(IterableCommentContext context, int limit) throws ScrapperInterruptedException {
         while (true) {
             if (context.hasSection()) handle(context);
+            if (limit > 0 && context.getMeter().getCounter() >= limit) return;
             if (Thread.currentThread().isInterrupted())
                 throw new ScrapperInterruptedException("Thread has been interrupted");
             if (context.hasContinuation()) context.nextSection(context.getContinuationData());
@@ -47,7 +59,7 @@ public class CommentContextIterator {
                 NextContinuationData replyThreadContinuation = replyContinuationsMap.get(comment.commentId);
                 if (Thread.currentThread().isInterrupted()) break;
                 if (replyThreadContinuation != null) {
-                    traverse(context.newReplyThread(comment, replyThreadContinuation));
+                    traverse(context.newReplyThread(comment, replyThreadContinuation), replyThreadCountLimit);
                     doLog = false;
                 }
             }

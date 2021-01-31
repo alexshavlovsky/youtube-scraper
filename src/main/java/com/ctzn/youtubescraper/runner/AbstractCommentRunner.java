@@ -21,11 +21,13 @@ abstract class AbstractCommentRunner implements Runnable {
 
     abstract IterableCommentContext newCommentContext(String videoId) throws ScraperException;
 
+    abstract CommentContextIterator newCommentContextIterator(IterableCommentContext commentContext, List<CommentHandler> handlers);
+
     @Override
     public void run() {
         try {
             IterableCommentContext commentContext = newCommentContext(videoId);
-            CommentContextIterator iterator = new CommentContextIterator(commentContext, handlers);
+            CommentContextIterator iterator = newCommentContextIterator(commentContext, handlers);
             iterator.traverse();
             log.info("DONE " + commentContext.getShortResultStat());
         } catch (ScrapperInterruptedException e) {

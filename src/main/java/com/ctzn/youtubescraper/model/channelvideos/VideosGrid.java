@@ -40,7 +40,7 @@ public class VideosGrid {
                     channelId,
                     r.getVideoId(),
                     r.getTitle().toString(),
-                    r.getPublishedTimeText().toString(),
+                    r.getPublishedTimeText() == null ? null : r.getPublishedTimeText().toString(), // if null then this video is probably a live stream
                     parseDigitsToInt(r.getViewCountText().toString())
             );
             list.add(videoDTO);

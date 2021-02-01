@@ -1,4 +1,4 @@
-package com.ctzn.youtubescraper.iterator;
+package com.ctzn.youtubescraper.iterator.video;
 
 import com.ctzn.youtubescraper.model.channelvideos.VideosGrid;
 import com.ctzn.youtubescraper.model.commons.NextContinuationData;

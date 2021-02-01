@@ -1,7 +1,7 @@
 package com.ctzn.youtubescraper.parser;
 
 import com.ctzn.youtubescraper.exception.ScraperParserException;
-import com.ctzn.youtubescraper.model.CommentItemSection;
+import com.ctzn.youtubescraper.model.comments.CommentItemSection;
 import com.ctzn.youtubescraper.model.YoutubeCfgDTO;
 import com.ctzn.youtubescraper.model.channelmetadata.ChannelMetadata;
 import com.ctzn.youtubescraper.model.channelvideos.VideosGrid;

@@ -1,6 +1,6 @@
 package com.ctzn.youtubescraper.persistence.entity;
 
-import com.ctzn.youtubescraper.model.CommentDTO;
+import com.ctzn.youtubescraper.model.comments.CommentDTO;
 import lombok.*;
 
 import javax.persistence.*;

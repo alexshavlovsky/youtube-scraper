@@ -1,4 +1,4 @@
-package com.ctzn.youtubescraper.iterator;
+package com.ctzn.youtubescraper.iterator.video;
 
 class VideoContextMeter {
     private int counter;

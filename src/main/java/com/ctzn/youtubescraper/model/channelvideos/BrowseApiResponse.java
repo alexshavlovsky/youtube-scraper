@@ -1,4 +1,4 @@
-package com.ctzn.youtubescraper.model;
+package com.ctzn.youtubescraper.model.channelvideos;
 
 import com.ctzn.youtubescraper.model.channelvideos.BrowseResponse;
 import com.ctzn.youtubescraper.model.channelvideos.VideosGrid;

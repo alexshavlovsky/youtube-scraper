@@ -1,7 +1,7 @@
 package com.ctzn.youtubescraper.parser;
 
 import com.ctzn.youtubescraper.exception.ScraperParserException;
-import com.ctzn.youtubescraper.model.BrowseApiResponse;
+import com.ctzn.youtubescraper.model.channelvideos.BrowseApiResponse;
 
 import static com.ctzn.youtubescraper.parser.ModelMapper.parse;
 

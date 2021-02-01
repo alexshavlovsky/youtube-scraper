@@ -1,4 +1,4 @@
-package com.ctzn.youtubescraper.iterator;
+package com.ctzn.youtubescraper.iterator.video;
 
 import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.exception.ScraperParserException;

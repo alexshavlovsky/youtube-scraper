@@ -12,7 +12,7 @@ public class CustomThreadFactory implements ThreadFactory {
     private final List<Thread> threads = new ArrayList<>();
     private final String prefix;
 
-    public CustomThreadFactory(String prefix) {
+    CustomThreadFactory(String prefix) {
         this.prefix = prefix;
     }
 
@@ -22,11 +22,11 @@ public class CustomThreadFactory implements ThreadFactory {
         return thread;
     }
 
-    public List<Thread> getAliveThreads() {
+    private List<Thread> getAliveThreads() {
         return threads.stream().filter(t -> t.getState() != Thread.State.TERMINATED).collect(Collectors.toList());
     }
 
-    public void interruptAll(int timeout) throws InterruptedException {
+    private void interruptAll(int timeout) throws InterruptedException {
         while (timeout-- > 0) {
             Thread.sleep(1000);
             List<Thread> th = getAliveThreads();
@@ -35,7 +35,7 @@ public class CustomThreadFactory implements ThreadFactory {
         }
     }
 
-    public void awaitAndTerminate(ExecutorService executor, long timeout, TimeUnit timeUnit) throws InterruptedException {
+    void awaitAndTerminate(ExecutorService executor, long timeout, TimeUnit timeUnit) throws InterruptedException {
         executor.shutdown();
         if (!executor.awaitTermination(timeout, timeUnit)) {
             executor.shutdownNow();

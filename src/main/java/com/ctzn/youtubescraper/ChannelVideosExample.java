@@ -1,8 +1,8 @@
 package com.ctzn.youtubescraper;
 
 import com.ctzn.youtubescraper.exception.ScraperException;
-import com.ctzn.youtubescraper.model.ChannelDTO;
-import com.ctzn.youtubescraper.model.VideoDTO;
+import com.ctzn.youtubescraper.model.channelvideos.ChannelDTO;
+import com.ctzn.youtubescraper.model.channelvideos.VideoDTO;
 import com.ctzn.youtubescraper.runner.ChannelVideosCollector;
 
 import java.util.List;

@@ -7,10 +7,10 @@ import com.ctzn.youtubescraper.http.UserAgentCfg;
 import com.ctzn.youtubescraper.http.UserAgentCfgFactory;
 import com.ctzn.youtubescraper.http.YoutubeChannelMetadataClient;
 import com.ctzn.youtubescraper.http.YoutubeChannelVideosClient;
-import com.ctzn.youtubescraper.iterator.IterableVideoContext;
-import com.ctzn.youtubescraper.iterator.VideoContext;
-import com.ctzn.youtubescraper.iterator.VideoContextIterator;
-import com.ctzn.youtubescraper.model.ChannelDTO;
+import com.ctzn.youtubescraper.iterator.video.IterableVideoContext;
+import com.ctzn.youtubescraper.iterator.video.VideoContext;
+import com.ctzn.youtubescraper.iterator.video.VideoContextIterator;
+import com.ctzn.youtubescraper.model.channelvideos.ChannelDTO;
 import lombok.extern.java.Log;
 
 import java.util.List;

@@ -1,6 +1,6 @@
 package com.ctzn.youtubescraper.handler;
 
-import com.ctzn.youtubescraper.model.VideoDTO;
+import com.ctzn.youtubescraper.model.channelvideos.VideoDTO;
 
 import java.util.ArrayList;
 import java.util.List;

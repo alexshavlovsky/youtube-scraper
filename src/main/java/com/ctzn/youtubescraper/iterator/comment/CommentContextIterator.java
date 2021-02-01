@@ -1,9 +1,9 @@
-package com.ctzn.youtubescraper.iterator;
+package com.ctzn.youtubescraper.iterator.comment;
 
 import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
 import com.ctzn.youtubescraper.handler.CommentHandler;
-import com.ctzn.youtubescraper.model.CommentDTO;
-import com.ctzn.youtubescraper.model.CommentItemSection;
+import com.ctzn.youtubescraper.model.comments.CommentDTO;
+import com.ctzn.youtubescraper.model.comments.CommentItemSection;
 import com.ctzn.youtubescraper.model.commons.NextContinuationData;
 import lombok.extern.java.Log;
 

@@ -1,6 +1,6 @@
 package com.ctzn.youtubescraper.commentformatter;
 
-import com.ctzn.youtubescraper.model.CommentDTO;
+import com.ctzn.youtubescraper.model.comments.CommentDTO;
 
 import java.util.ArrayList;
 import java.util.Arrays;

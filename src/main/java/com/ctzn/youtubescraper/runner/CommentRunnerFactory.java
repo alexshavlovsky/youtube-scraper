@@ -3,8 +3,8 @@ package com.ctzn.youtubescraper.runner;
 import com.ctzn.youtubescraper.commentformatter.CommentHumanReadableFormatter;
 import com.ctzn.youtubescraper.handler.CommentConsolePrinter;
 import com.ctzn.youtubescraper.handler.CommentHandler;
-import com.ctzn.youtubescraper.iterator.CommentContextIterator;
-import com.ctzn.youtubescraper.iterator.IterableCommentContextBuilder;
+import com.ctzn.youtubescraper.iterator.comment.CommentContextIterator;
+import com.ctzn.youtubescraper.iterator.comment.IterableCommentContextBuilder;
 
 import java.util.List;
 

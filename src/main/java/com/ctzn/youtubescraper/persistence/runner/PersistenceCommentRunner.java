@@ -5,6 +5,7 @@ import com.ctzn.youtubescraper.model.comments.CommentDTO;
 import com.ctzn.youtubescraper.persistence.PersistenceContext;
 import com.ctzn.youtubescraper.persistence.entity.CommentEntity;
 import com.ctzn.youtubescraper.persistence.entity.VideoEntity;
+import com.ctzn.youtubescraper.persistence.repository.CommentRepository;
 import com.ctzn.youtubescraper.runner.CommentRunnerFactory;
 
 import java.util.List;
@@ -43,8 +44,8 @@ class PersistenceCommentRunner implements Runnable {
                 .map(c -> CommentEntity.fromCommentDTO(c, videoEntityMap, commentEntityMap)).collect(Collectors.toList());
 
         persistenceContext.commitTransaction(session -> {
-            commentEntities.forEach(session::saveOrUpdate);
-            replyEntities.forEach(session::saveOrUpdate);
+            commentEntities.forEach(comment -> CommentRepository.saveOrUpdate(comment, session));
+            replyEntities.forEach(comment -> CommentRepository.saveOrUpdate(comment, session));
         });
     }
 }

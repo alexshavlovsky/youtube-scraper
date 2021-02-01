@@ -1,10 +1,12 @@
 package com.ctzn.youtubescraper.persistence.entity;
 
 import com.ctzn.youtubescraper.model.channelvideos.VideoDTO;
+import com.ctzn.youtubescraper.persistence.sessionfactory.TimeStamped;
 import lombok.*;
 
 import javax.persistence.*;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -14,7 +16,7 @@ import java.util.List;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "videos")
-public class VideoEntity {
+public class VideoEntity implements TimeStamped {
     @Id
     @EqualsAndHashCode.Include
     String videoId;
@@ -26,6 +28,8 @@ public class VideoEntity {
     int viewCountText;
     @OneToMany(mappedBy = "video", cascade = CascadeType.ALL)
     List<CommentEntity> comments;
+    public Date createdDate;
+    public Date lastUpdatedDate;
 
     public static VideoEntity fromVideoDTO(VideoDTO dto, ChannelEntity channel) {
         return new VideoEntity(
@@ -34,7 +38,9 @@ public class VideoEntity {
                 dto.getTitle(),
                 dto.getPublishedTimeText(),
                 dto.getViewCountText(),
-                Collections.emptyList()
+                Collections.emptyList(),
+                null,
+                null
         );
     }
 }

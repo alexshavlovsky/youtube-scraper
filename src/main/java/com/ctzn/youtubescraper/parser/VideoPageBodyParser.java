@@ -6,7 +6,7 @@ import com.ctzn.youtubescraper.model.YoutubeCfgDTO;
 import com.ctzn.youtubescraper.model.channelmetadata.ChannelMetadata;
 import com.ctzn.youtubescraper.model.channelvideos.VideosGrid;
 
-import static com.ctzn.youtubescraper.parser.ModelMapper.parse;
+import static com.ctzn.youtubescraper.parser.JsMapper.parse;
 import static com.ctzn.youtubescraper.parser.ParserUtil.*;
 
 public class VideoPageBodyParser {

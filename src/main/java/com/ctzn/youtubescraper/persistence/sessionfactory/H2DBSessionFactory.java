@@ -26,7 +26,9 @@ public class H2DBSessionFactory {
                 .applyPhysicalNamingStrategy(new CustomPhysicalNamingStrategy())
                 .build();
 
-        return metadata.getSessionFactoryBuilder().build();
+        return metadata.getSessionFactoryBuilder()
+                .applyInterceptor(new TimeStampInterceptor())
+                .build();
     }
 
     public static SessionFactory getInstance() {

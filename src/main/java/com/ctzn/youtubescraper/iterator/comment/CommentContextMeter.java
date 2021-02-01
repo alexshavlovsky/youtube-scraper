@@ -1,4 +1,4 @@
-package com.ctzn.youtubescraper.iterator;
+package com.ctzn.youtubescraper.iterator.comment;
 
 import com.ctzn.youtubescraper.http.RequestUriLengthLimiter;
 

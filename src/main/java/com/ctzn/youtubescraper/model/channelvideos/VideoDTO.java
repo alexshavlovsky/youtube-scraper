@@ -1,4 +1,4 @@
-package com.ctzn.youtubescraper.model;
+package com.ctzn.youtubescraper.model.channelvideos;
 
 import lombok.Value;
 

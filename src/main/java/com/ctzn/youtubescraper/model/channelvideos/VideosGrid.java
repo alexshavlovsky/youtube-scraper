@@ -1,6 +1,5 @@
 package com.ctzn.youtubescraper.model.channelvideos;
 
-import com.ctzn.youtubescraper.model.VideoDTO;
 import com.ctzn.youtubescraper.model.commons.Continuation;
 import com.ctzn.youtubescraper.model.commons.NextContinuationData;
 

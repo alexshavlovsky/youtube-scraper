@@ -1,8 +1,8 @@
-package com.ctzn.youtubescraper.iterator;
+package com.ctzn.youtubescraper.iterator.video;
 
 import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
 import com.ctzn.youtubescraper.handler.VideoHandler;
-import com.ctzn.youtubescraper.model.VideoDTO;
+import com.ctzn.youtubescraper.model.channelvideos.VideoDTO;
 import com.ctzn.youtubescraper.model.channelvideos.VideosGrid;
 import lombok.extern.java.Log;
 

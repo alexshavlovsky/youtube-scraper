@@ -3,7 +3,7 @@ package com.ctzn.youtubescraper.http;
 import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.exception.ScraperParserException;
 import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
-import com.ctzn.youtubescraper.model.BrowseApiResponse;
+import com.ctzn.youtubescraper.model.channelvideos.BrowseApiResponse;
 import com.ctzn.youtubescraper.model.channelvideos.VideosGrid;
 import com.ctzn.youtubescraper.model.commons.NextContinuationData;
 import com.ctzn.youtubescraper.parser.BrowseApiResponseParser;

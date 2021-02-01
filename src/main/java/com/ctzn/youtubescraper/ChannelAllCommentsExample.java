@@ -2,7 +2,7 @@ package com.ctzn.youtubescraper;
 
 import com.ctzn.youtubescraper.exception.ScraperException;
 import com.ctzn.youtubescraper.executor.CustomExecutorService;
-import com.ctzn.youtubescraper.model.ChannelDTO;
+import com.ctzn.youtubescraper.model.channelvideos.ChannelDTO;
 import com.ctzn.youtubescraper.runner.ChannelVideosCollector;
 
 import java.util.concurrent.TimeUnit;

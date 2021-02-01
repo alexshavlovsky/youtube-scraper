@@ -1,4 +1,4 @@
-package com.ctzn.youtubescraper.model;
+package com.ctzn.youtubescraper.model.comments;
 
 import com.ctzn.youtubescraper.model.commons.*;
 
@@ -52,7 +52,6 @@ public class SectionHeader {
     static class SortFilterSubMenuRenderer {
         public List<SubMenuItem> subMenuItems;
         public String title;
-        public Icon icon;
         public String tooltip;
         public String trackingParams;
     }

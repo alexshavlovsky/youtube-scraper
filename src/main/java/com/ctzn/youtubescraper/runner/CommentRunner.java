@@ -2,9 +2,9 @@ package com.ctzn.youtubescraper.runner;
 
 import com.ctzn.youtubescraper.exception.ScraperException;
 import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
-import com.ctzn.youtubescraper.iterator.CommentContextIterator;
-import com.ctzn.youtubescraper.iterator.IterableCommentContext;
-import com.ctzn.youtubescraper.iterator.IterableCommentContextBuilder;
+import com.ctzn.youtubescraper.iterator.comment.CommentContextIterator;
+import com.ctzn.youtubescraper.iterator.comment.IterableCommentContext;
+import com.ctzn.youtubescraper.iterator.comment.IterableCommentContextBuilder;
 import lombok.extern.java.Log;
 
 @Log

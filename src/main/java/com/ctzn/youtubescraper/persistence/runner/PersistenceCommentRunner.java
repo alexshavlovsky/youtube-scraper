@@ -1,7 +1,7 @@
 package com.ctzn.youtubescraper.persistence.runner;
 
 import com.ctzn.youtubescraper.handler.CommentCollector;
-import com.ctzn.youtubescraper.model.CommentDTO;
+import com.ctzn.youtubescraper.model.comments.CommentDTO;
 import com.ctzn.youtubescraper.persistence.PersistenceContext;
 import com.ctzn.youtubescraper.persistence.entity.CommentEntity;
 import com.ctzn.youtubescraper.persistence.entity.VideoEntity;

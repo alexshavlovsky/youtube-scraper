@@ -1,6 +1,6 @@
 package com.ctzn.youtubescraper.persistence.entity;
 
-import com.ctzn.youtubescraper.model.ChannelDTO;
+import com.ctzn.youtubescraper.model.channelvideos.ChannelDTO;
 import lombok.*;
 
 import javax.persistence.*;

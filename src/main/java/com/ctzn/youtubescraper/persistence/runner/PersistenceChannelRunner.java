@@ -6,6 +6,8 @@ import com.ctzn.youtubescraper.model.channelvideos.ChannelDTO;
 import com.ctzn.youtubescraper.persistence.PersistenceContext;
 import com.ctzn.youtubescraper.persistence.entity.ChannelEntity;
 import com.ctzn.youtubescraper.persistence.entity.VideoEntity;
+import com.ctzn.youtubescraper.persistence.repository.ChannelRepository;
+import com.ctzn.youtubescraper.persistence.repository.VideoRepository;
 import com.ctzn.youtubescraper.runner.ChannelVideosCollector;
 
 import java.util.LinkedHashMap;
@@ -51,17 +53,21 @@ public class PersistenceChannelRunner implements Callable<Void> {
         ChannelVideosCollector collector = new ChannelVideosCollector(channelId);
         ChannelDTO channel = collector.call();
         ChannelEntity channelEntity = ChannelEntity.fromChannelDTO(channel);
-        List<VideoEntity> videoEntities = channel.getVideos().stream().map(v -> VideoEntity.fromVideoDTO(v, channelEntity)).collect(Collectors.toList());
+        List<VideoEntity> videoEntities =
+                (videoCountLimit > 0 ?
+                        channel.getVideos().stream().limit(videoCountLimit) :
+                        channel.getVideos().stream()
+                ).map(v -> VideoEntity.fromVideoDTO(v, channelEntity)).collect(Collectors.toList());
         persistenceContext.commitTransaction(session -> {
-            session.saveOrUpdate(channelEntity);
-            videoEntities.forEach(session::saveOrUpdate);
+            ChannelRepository.saveOrUpdate(channelEntity, session);
+            videoEntities.forEach(video -> VideoRepository.saveOrUpdate(video, session));
         });
         return videoEntities.stream().collect(LinkedHashMap::new, (map, video) -> map.put(video.getVideoId(), video), Map::putAll);
     }
 
     private void grabComments(Map<String, VideoEntity> videoEntityMap) throws InterruptedException {
         CustomExecutorService executor = new CustomExecutorService("CommentWorker" + channelId, nThreads, timeout, timeUnit);
-        (videoCountLimit > 0 ? videoEntityMap.keySet().stream().limit(videoCountLimit) : videoEntityMap.keySet().stream())
+        videoEntityMap.keySet().stream()
                 .map(videoId -> new PersistenceCommentRunner(videoId, videoEntityMap, persistenceContext, sortNewestCommentsFirst, commentCountPerVideoLimit, replyThreadCountLimit))
                 .forEach(executor::submit);
         executor.awaitAndTerminate();

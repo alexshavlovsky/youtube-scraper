@@ -1,4 +1,4 @@
-package com.ctzn.youtubescraper.parser;
+package com.ctzn.youtubescraper.parser.json;
 
 import com.ctzn.youtubescraper.exception.ScraperParserException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -7,12 +7,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Map;
 
-class JsMapper {
+public class JsonMapper {
 
     private static ObjectMapper objectMapper = new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
     @SuppressWarnings("unchecked")
-    static Map<String, Object> parseJsSoup(String jsonSoup) throws ScraperParserException {
+    public static Map<String, Object> parseJsSoup(String jsonSoup) throws ScraperParserException {
         try {
             return objectMapper.readValue(jsonSoup, Map.class);
         } catch (JsonProcessingException e) {
@@ -20,7 +20,7 @@ class JsMapper {
         }
     }
 
-    static <T> T parse(String json, Class<T> valueType) throws ScraperParserException {
+    public static <T> T parse(String json, Class<T> valueType) throws ScraperParserException {
         try {
             return objectMapper.readValue(json, valueType);
         } catch (JsonProcessingException e) {

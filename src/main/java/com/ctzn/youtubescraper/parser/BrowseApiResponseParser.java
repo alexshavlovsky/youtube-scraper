@@ -3,7 +3,7 @@ package com.ctzn.youtubescraper.parser;
 import com.ctzn.youtubescraper.exception.ScraperParserException;
 import com.ctzn.youtubescraper.model.channelvideos.BrowseApiResponse;
 
-import static com.ctzn.youtubescraper.parser.JsMapper.parse;
+import static com.ctzn.youtubescraper.parser.json.JsonMapper.parse;
 
 public class BrowseApiResponseParser {
 

@@ -34,7 +34,7 @@ public class ParserUtil {
     private static int regexPos(String regex, String input) throws ScraperParserException {
         Matcher matcher = Pattern.compile(regex).matcher(input);
         if (matcher.find()) return matcher.start();
-        throw new ScraperParserException("Token not found: regex = [%s]", regex);
+        throw new ScraperParserException("Token not found: regex = [%s], input = [%s]", regex, input);
     }
 
     private static int prefixedObjectPos(String template, String key, String input) throws ScraperParserException {

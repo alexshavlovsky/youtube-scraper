@@ -10,6 +10,8 @@ import lombok.extern.java.Log;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.logging.Level.INFO;
+
 @Log
 public class CommentContextIterator {
 
@@ -33,6 +35,9 @@ public class CommentContextIterator {
         traverse(context, commentCountLimit);
     }
 
+    private final static int LOG_PERIOD = 100;
+    private int iterationCounter;
+
     private void traverse(IterableCommentContext context, int limit) throws ScrapperInterruptedException {
         while (true) {
             if (context.hasSection()) handle(context);
@@ -41,6 +46,10 @@ public class CommentContextIterator {
                 throw new ScrapperInterruptedException("Thread has been interrupted");
             if (context.hasContinuation()) context.nextSection(context.getContinuationData());
             else return;
+            if (log.getLevel() == INFO && context instanceof CommentContext && ++iterationCounter >= LOG_PERIOD) {
+                iterationCounter -= LOG_PERIOD;
+                log.info(context::getShortResultStat);
+            }
         }
     }
 

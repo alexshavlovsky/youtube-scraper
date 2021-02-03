@@ -1,12 +1,15 @@
 package com.ctzn.youtubescraper.model.comments;
 
+import com.ctzn.youtubescraper.parser.json.JsonUnwrapProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class CommentApiResponse implements ApiResponse {
     public Response response;
     public String xsrf_token;
 
     @Override
     public CommentItemSection getItemSection() {
-        return response.continuationContents.itemSectionContinuation;
+        return response.itemSection;
     }
 
     @Override
@@ -14,12 +17,9 @@ public class CommentApiResponse implements ApiResponse {
         return xsrf_token;
     }
 
-    static class ContinuationContents {
-        public CommentItemSection itemSectionContinuation;
-    }
-
     static class Response {
-        public ContinuationContents continuationContents;
-        public String trackingParams;
+        @JsonProperty("continuationContents")
+        @JsonUnwrapProperty("itemSectionContinuation")
+        CommentItemSection itemSection;
     }
 }

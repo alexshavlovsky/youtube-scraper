@@ -5,7 +5,7 @@ public class BrowseApiResponse {
     public String xsrf_token;
 
     public VideosGrid getVideosGrid() {
-        return response.grid;
+        return response.continuationContents.gridContinuation;
     }
 
     public String getToken() {

@@ -19,8 +19,8 @@ public class YoutubeChannelMetadataClient extends AbstractYoutubeClient<ChannelM
         super(userAgentCfg, uriFactory.newChanelPageUri(channelId), videoPageBodyParser::parseChannelMetadata);
         this.channelId = channelId;
         ParserUtil.assertNotNull("Channel metadata not found",
-                initialData.channelMetadata,
-                initialData.channelMicroformat
+                initialData.metadata.channelMetadataRenderer,
+                initialData.microformat.microformatDataRenderer
         );
         channelVanityName = videoPageBodyParser.parseChannelVanityName(getChannelMetadata().getVanityChannelUrl());
     }
@@ -34,10 +34,10 @@ public class YoutubeChannelMetadataClient extends AbstractYoutubeClient<ChannelM
     }
 
     public ChannelMetadataDTO getChannelMetadata() {
-        return initialData.channelMetadata;
+        return initialData.metadata.channelMetadataRenderer;
     }
 
     public ChannelMicroformatDTO getChannelMicroformat() {
-        return initialData.channelMicroformat;
+        return initialData.microformat.microformatDataRenderer;
     }
 }

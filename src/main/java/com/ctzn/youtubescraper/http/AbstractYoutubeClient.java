@@ -20,13 +20,14 @@ import static com.ctzn.youtubescraper.http.IoUtil.*;
 abstract class AbstractYoutubeClient<E> {
     static final YoutubeUriFactory uriFactory = new YoutubeUriFactory();
     static final VideoPageBodyParser videoPageBodyParser = new VideoPageBodyParser();
-    final YoutubeCfgDTO youtubeCfg;
     final HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).build();
-    private final CustomCookieManager cookies = new CustomCookieManager("youtube.com");
+    final CustomCookieManager cookies = new CustomCookieManager("youtube.com");
     private final UserAgentCfg userAgentCfg;
-    private final String pageUri;
+    final String pageUri;
     final E initialData;
     String currentXsrfToken;
+    final String youtubeCfgJson;
+    final YoutubeCfgDTO youtubeCfg;
 
     AbstractYoutubeClient(UserAgentCfg userAgentCfg, String pageUri, YoutubeInitialDataHandler<E> youtubeInitialDataHandler) throws ScraperHttpException, ScraperParserException, ScrapperInterruptedException {
         this.userAgentCfg = userAgentCfg;
@@ -34,7 +35,8 @@ abstract class AbstractYoutubeClient<E> {
         log.info(String.format("Fetch page: [%s]", pageUri));
         String body = fetchPage();
         log.fine(() -> "Scrape initial youtube config");
-        youtubeCfg = videoPageBodyParser.scrapeYoutubeConfig(body);
+        youtubeCfgJson = videoPageBodyParser.scrapeYoutubeConfigJson(body);
+        youtubeCfg = videoPageBodyParser.parseYoutubeConfig(youtubeCfgJson);
         currentXsrfToken = youtubeCfg.getXsrfToken();
         if (currentXsrfToken == null) throw new ScraperParserException("Initial XSRF token not found");
         log.fine(() -> "Scrape initial youtube data");
@@ -43,7 +45,7 @@ abstract class AbstractYoutubeClient<E> {
         initialData = youtubeInitialDataHandler.handle(ytInitialDataJson);
     }
 
-    private HttpRequest.Builder newRequestBuilder(URI requestUri, String acceptHeader) {
+    HttpRequest.Builder newRequestBuilder(URI requestUri, String acceptHeader) {
         return HttpRequest.newBuilder(requestUri).timeout(Duration.ofSeconds(5))
                 .headers("User-Agent", userAgentCfg.getUserAgent())
                 .headers("Accept", acceptHeader)

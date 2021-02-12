@@ -1,5 +1,6 @@
 package com.ctzn.youtubescraper.http;
 
+import com.ctzn.youtubescraper.model.YoutubeCfgDTO;
 import com.ctzn.youtubescraper.model.commons.NextContinuationData;
 
 import java.net.URI;
@@ -13,6 +14,7 @@ class YoutubeUriFactory {
     private final static String VIDEO_PAGE_URI_TEMPLATE = "https://www.youtube.com/watch?v=%s";
     private final static String COMMENT_API_URI_TEMPLATE = "https://www.youtube.com/comment_service_ajax?%s";
     private final static String BROWSE_API_URI_TEMPLATE = "https://www.youtube.com/browse_ajax?%s";
+    private final static String BROWSE_API_V1_URI_TEMPLATE = "https://www.youtube.com/youtubei/v1/browse?%s";
 
     private static String buildQueryParams(NextContinuationData continuationData) {
         return joinQueryParamsOrdered(
@@ -35,12 +37,20 @@ class YoutubeUriFactory {
         );
     }
 
+    private static String buildBrowseV1QueryParams(YoutubeCfgDTO youtubeCfgDTO) {
+        return joinQueryParamsOrdered("key", youtubeCfgDTO.getApiKey());
+    }
+
     URI newCommentApiRequestUri(NextContinuationData continuationData) {
         return URI.create(String.format(COMMENT_API_URI_TEMPLATE, buildQueryParams(continuationData)));
     }
 
     URI newBrowseApiRequestUri(NextContinuationData continuationData) {
         return URI.create(String.format(BROWSE_API_URI_TEMPLATE, buildBrowseQueryParams(continuationData)));
+    }
+
+    URI newBrowseApiV1RequestUri(YoutubeCfgDTO youtubeCfgDTO) {
+        return URI.create(String.format(BROWSE_API_V1_URI_TEMPLATE, buildBrowseV1QueryParams(youtubeCfgDTO)));
     }
 
     String newVideoPageUri(String videoId) {

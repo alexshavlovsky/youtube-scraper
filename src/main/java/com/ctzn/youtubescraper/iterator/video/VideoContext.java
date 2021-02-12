@@ -3,7 +3,7 @@ package com.ctzn.youtubescraper.iterator.video;
 import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.exception.ScraperParserException;
 import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
-import com.ctzn.youtubescraper.http.YoutubeChannelVideosClient;
+import com.ctzn.youtubescraper.http.IterableHttpClient;
 import com.ctzn.youtubescraper.model.channelvideos.VideosGrid;
 import com.ctzn.youtubescraper.model.commons.NextContinuationData;
 import lombok.extern.java.Log;
@@ -12,18 +12,18 @@ import lombok.extern.java.Log;
 public class VideoContext implements IterableVideoContext {
 
     private final VideoContextMeter meter = new VideoContextMeter();
-    private final YoutubeChannelVideosClient client;
+    private final IterableHttpClient<VideosGrid> client;
     private VideosGrid grid;
 
-    public VideoContext(YoutubeChannelVideosClient client) {
+    public VideoContext(IterableHttpClient<VideosGrid> client) {
         this.client = client;
-        this.grid = client.getInitialGrid();
+        this.grid = client.getInitial();
         if (grid != null) meter.update(grid.countContentPieces());
     }
 
     @Override
     public String getChannelId() {
-        return client.getChannelId();
+        return client.getParentId();
     }
 
     @Override
@@ -39,12 +39,12 @@ public class VideoContext implements IterableVideoContext {
     @Override
     public void nextGrid(NextContinuationData continuationData) {
         try {
-            grid = client.requestNextSection(continuationData);
+            grid = client.requestNext(continuationData);
             if (grid == null) return;
             int itemsCount = grid.countContentPieces();
             meter.update(itemsCount);
         } catch (ScraperHttpException | ScraperParserException e) {
-            log.warning(client.getChannelId() + " " + e.toString());
+            log.warning(client.getParentId() + " " + e.toString());
             grid = null;
         } catch (ScrapperInterruptedException e) {
             grid = null;

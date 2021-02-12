@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 
 import java.io.IOException;
 
+@Deprecated
 public class JsonUnwrapPropertyDeserializer extends JsonDeserializer<Object> implements ContextualDeserializer {
 
     private JavaType unwrappedJavaType;

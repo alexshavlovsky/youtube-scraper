@@ -1,0 +1,47 @@
+package com.ctzn.youtubescraper.http;
+
+import com.ctzn.youtubescraper.exception.ScraperHttpException;
+import com.ctzn.youtubescraper.exception.ScraperParserException;
+import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
+import com.ctzn.youtubescraper.model.browsev1.ClientContext;
+import com.ctzn.youtubescraper.model.browsev1.MainAppWebInfo;
+import lombok.extern.java.Log;
+
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.util.ArrayList;
+
+@Log
+abstract class AbstractYoutubeV1Client<E> extends AbstractYoutubeClient<E> {
+
+    final ClientContext clientCtx;
+
+    AbstractYoutubeV1Client(UserAgentCfg userAgentCfg, String pageUri, YoutubeInitialDataHandler<E> youtubeInitialDataHandler) throws ScraperHttpException, ScraperParserException, ScrapperInterruptedException {
+        super(userAgentCfg, pageUri, youtubeInitialDataHandler);
+        clientCtx = videoPageBodyParser.parseClientContext(youtubeCfgJson);
+        clientCtx.client.screenWidthPoints = 1536;
+        clientCtx.client.screenHeightPoints = 768;
+        clientCtx.client.screenPixelDensity = 1;
+        clientCtx.client.screenDensityFloat = 1.25;
+        clientCtx.client.utcOffsetMinutes = 180;
+        clientCtx.client.userInterfaceTheme = "USER_INTERFACE_THEME_LIGHT";
+        clientCtx.client.mainAppWebInfo = new MainAppWebInfo();
+        clientCtx.client.mainAppWebInfo.graftUrl = pageUri;
+        clientCtx.client.timeZone = "Europe/Minsk";
+        // clientCtx.clientScreenNonce = ???
+        clientCtx.request.consistencyTokenJars = new ArrayList<>();
+        clientCtx.request.internalExperimentFlags = new ArrayList<>();
+        //clientCtx.adSignalsInfo = ???
+        cookies.put("PREF=f4=4000000&tz=Europe.Minsk");
+    }
+
+    HttpRequest.Builder newBrowseApiV1RequestBuilder(URI requestUri) {
+        return newRequestBuilder(requestUri, "*/*")
+                .headers("Referer", pageUri)
+                .headers("Origin", "https://www.youtube.com")
+                .headers("X-YouTube-Client-Name", youtubeCfg.getClientName())
+                .headers("X-YouTube-Client-Version", youtubeCfg.getClientVersion())
+                .header("X-Goog-Visitor-Id", youtubeCfg.getVisitorData())
+                .headers("Cookie", cookies.getHeader());
+    }
+}

@@ -1,13 +1,14 @@
 package com.ctzn.youtubescraper.parser;
 
 import com.ctzn.youtubescraper.exception.ScraperParserException;
-import com.ctzn.youtubescraper.model.comments.CommentItemSection;
 import com.ctzn.youtubescraper.model.YoutubeCfgDTO;
+import com.ctzn.youtubescraper.model.browsev1.ClientContext;
 import com.ctzn.youtubescraper.model.channelmetadata.ChannelMetadata;
 import com.ctzn.youtubescraper.model.channelvideos.VideosGrid;
+import com.ctzn.youtubescraper.model.comments.CommentItemSection;
 
-import static com.ctzn.youtubescraper.parser.json.JsonMapper.parse;
 import static com.ctzn.youtubescraper.parser.ParserUtil.*;
+import static com.ctzn.youtubescraper.parser.json.JsonMapper.parse;
 
 public class VideoPageBodyParser {
 
@@ -15,8 +16,16 @@ public class VideoPageBodyParser {
     private static final String INITIAL_DATA_MARKER = "var ytInitialData\\s*=\\s*";
     private static final String COMMENT_ITEM_SECTION_ENTRY_REGEX = "\"sectionIdentifier\"\\s*:\\s*\"comment-item-section\"";
 
-    public YoutubeCfgDTO scrapeYoutubeConfig(String body) throws ScraperParserException {
-        return parse(parseMarkedJsonObject(CONFIG_MARKER, body), YoutubeCfgDTO.class);
+    public String scrapeYoutubeConfigJson(String body) throws ScraperParserException {
+        return parseMarkedJsonObject(CONFIG_MARKER, body);
+    }
+
+    public YoutubeCfgDTO parseYoutubeConfig(String ytCfgJson) throws ScraperParserException {
+        return parse(ytCfgJson, YoutubeCfgDTO.class);
+    }
+
+    public ClientContext parseClientContext(String ytCfgJson) throws ScraperParserException {
+        return parse(parseNestedJsonObject("INNERTUBE_CONTEXT", ytCfgJson), ClientContext.class);
     }
 
     public String scrapeYtInitialDataJson(String body) throws ScraperParserException {
@@ -38,7 +47,7 @@ public class VideoPageBodyParser {
             videosGridJson = parseMarkedJsonObject("\"gridRenderer\":", ytInitialDataJson);
         } catch (ScraperParserException e) {
             // it seems the channel hasn't any videos yet
-            return new VideosGrid();
+            return new VideosGrid(null, null);
         }
         return parse(videosGridJson, VideosGrid.class);
     }

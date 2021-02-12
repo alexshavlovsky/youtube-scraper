@@ -20,6 +20,14 @@ public class JsonMapper {
         }
     }
 
+    public static String asJson(Object object) throws ScraperParserException {
+        try {
+            return objectMapper.writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            throw new ScraperParserException(e.getMessage(), e);
+        }
+    }
+
     public static <T> T parse(String json, Class<T> valueType) throws ScraperParserException {
         try {
             return objectMapper.readValue(json, valueType);

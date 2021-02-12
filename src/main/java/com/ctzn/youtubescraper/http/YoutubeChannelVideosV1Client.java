@@ -3,10 +3,12 @@ package com.ctzn.youtubescraper.http;
 import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.exception.ScraperParserException;
 import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
-import com.ctzn.youtubescraper.model.channelvideos.BrowseApiResponse;
+import com.ctzn.youtubescraper.model.browsev1.BrowseV1Request;
+import com.ctzn.youtubescraper.model.browsev1.BrowseV1Response;
 import com.ctzn.youtubescraper.model.channelvideos.VideosGrid;
 import com.ctzn.youtubescraper.model.commons.NextContinuationData;
 import com.ctzn.youtubescraper.parser.BrowseApiResponseParser;
+import com.ctzn.youtubescraper.parser.json.JsonMapper;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -15,15 +17,14 @@ import java.net.http.HttpResponse;
 
 import static com.ctzn.youtubescraper.http.IoUtil.*;
 
-@Deprecated
-public class YoutubeChannelVideosClient extends AbstractYoutubeClient<VideosGrid> implements IterableHttpClient<VideosGrid> {
+public class YoutubeChannelVideosV1Client extends AbstractYoutubeV1Client<VideosGrid> implements IterableHttpClient<VideosGrid> {
 
     private static final BrowseApiResponseParser browseApiResponseParser = new BrowseApiResponseParser();
 
     private final String channelId;
     private final String channelVanityName;
 
-    public YoutubeChannelVideosClient(UserAgentCfg userAgentCfg, String channelId, String channelVanityName) throws ScraperHttpException, ScraperParserException, ScrapperInterruptedException {
+    public YoutubeChannelVideosV1Client(UserAgentCfg userAgentCfg, String channelId, String channelVanityName) throws ScraperHttpException, ScraperParserException, ScrapperInterruptedException {
         super(userAgentCfg, uriFactory.newChannelVideosPageUri(channelVanityName), videoPageBodyParser::parseVideosGrid);
         this.channelId = channelId;
         this.channelVanityName = channelVanityName;
@@ -44,18 +45,22 @@ public class YoutubeChannelVideosClient extends AbstractYoutubeClient<VideosGrid
     }
 
     @Override
-    public VideosGrid requestNext(NextContinuationData continuation) throws ScrapperInterruptedException, ScraperHttpException, ScraperParserException {
-        URI requestUri = uriFactory.newBrowseApiRequestUri(continuation);
+    public VideosGrid requestNext(NextContinuationData continuation) throws ScraperHttpException, ScraperParserException, ScrapperInterruptedException {
+        URI requestUri = uriFactory.newBrowseApiV1RequestUri(youtubeCfg);
 
-        HttpRequest request = newApiRequestBuilder(requestUri).GET().build();
+        clientCtx.clickTracking.clickTrackingParams = continuation.getClickTrackingParams();
+        BrowseV1Request requestModel = new BrowseV1Request(clientCtx, continuation.getContinuation());
+        String requestBody = JsonMapper.asJson(requestModel);
+
+        HttpRequest request = newBrowseApiV1RequestBuilder(requestUri)
+                .headers("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody)).build();
 
         HttpResponse<InputStream> response = completeRequest(httpClient, request);
 
         String body = readStreamToString(applyBrotliDecoderAndGetBody(response));
-        BrowseApiResponse browseApiResponse = browseApiResponseParser.parseResponseBody(body);
+        BrowseV1Response browseV1Response = browseApiResponseParser.parseResponseV1Body(body);
 
-        currentXsrfToken = browseApiResponse.getToken();
-
-        return browseApiResponse.getVideosGrid();
+        return browseV1Response.getVideosGrid();
     }
 }

@@ -19,4 +19,8 @@ public class YoutubeCfgDTO {
     String clientName;
     @JsonProperty("INNERTUBE_CONTEXT_CLIENT_VERSION")
     String clientVersion;
+    @JsonProperty("INNERTUBE_API_KEY")
+    String apiKey;
+    @JsonProperty("VISITOR_DATA")
+    String visitorData;
 }

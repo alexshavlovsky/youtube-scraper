@@ -24,7 +24,7 @@ public class HibernateH2DBTopCommentsOnlyExample {
                 // in the "top comments first" sorting mode (20 comments per continuation + replies threads)
                 // if you switch to "newest comments first" mode it seems that there are no limitations as for now
                 2000, // request no more than than 2000 comments per video
-                50,  // request no more than than 10 replies per comment
+                10,  // request no more than than 10 replies per comment
                 100 // process 100 most recent videos
         );
         runner.call();

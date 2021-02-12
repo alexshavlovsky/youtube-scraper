@@ -3,14 +3,12 @@ package com.ctzn.youtubescraper.runner;
 import com.ctzn.youtubescraper.exception.ScraperException;
 import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
 import com.ctzn.youtubescraper.handler.VideoCollector;
-import com.ctzn.youtubescraper.http.UserAgentCfg;
-import com.ctzn.youtubescraper.http.UserAgentCfgFactory;
-import com.ctzn.youtubescraper.http.YoutubeChannelMetadataClient;
-import com.ctzn.youtubescraper.http.YoutubeChannelVideosClient;
+import com.ctzn.youtubescraper.http.*;
 import com.ctzn.youtubescraper.iterator.video.IterableVideoContext;
 import com.ctzn.youtubescraper.iterator.video.VideoContext;
 import com.ctzn.youtubescraper.iterator.video.VideoContextIterator;
 import com.ctzn.youtubescraper.model.channelvideos.ChannelDTO;
+import com.ctzn.youtubescraper.model.channelvideos.VideosGrid;
 import lombok.extern.java.Log;
 
 import java.util.List;
@@ -33,7 +31,7 @@ public class ChannelVideosCollector implements Callable<ChannelDTO> {
     public ChannelDTO call() throws ScraperException {
         try {
             YoutubeChannelMetadataClient metadataClient = new YoutubeChannelMetadataClient(userAgentCfg, channelId);
-            YoutubeChannelVideosClient videosClient = new YoutubeChannelVideosClient(userAgentCfg, channelId, metadataClient.getChannelVanityName());
+            IterableHttpClient<VideosGrid> videosClient = new YoutubeChannelVideosV1Client(userAgentCfg, channelId, metadataClient.getChannelVanityName());
             // TODO scrape subscribers count from the page header
             //"header":{
             //      "c4TabbedHeaderRenderer":{

@@ -32,22 +32,16 @@ public class ChannelVideosCollector implements Callable<ChannelDTO> {
         try {
             YoutubeChannelMetadataClient metadataClient = new YoutubeChannelMetadataClient(userAgentCfg, channelId);
             IterableHttpClient<VideosGrid> videosClient = new YoutubeChannelVideosV1Client(userAgentCfg, channelId, metadataClient.getChannelVanityName());
-            // TODO scrape subscribers count from the page header
-            //"header":{
-            //      "c4TabbedHeaderRenderer":{
-            //         "channelId":"...",
-            //         "title":"...",
-            //         "avatar":{...},
-            //         "subscriberCountText":{
-            //            "simpleText":"11 subscribers"
-            //         },
-            //      }
-            //}
             IterableVideoContext videosContext = new VideoContext(videosClient);
             VideoContextIterator iterator = new VideoContextIterator(videosContext, List.of(handler));
             iterator.traverse();
             log.info("DONE " + videosContext.getShortResultStat());
-            return new ChannelDTO(channelId, metadataClient.getChannelVanityName(), handler.getVideos());
+            return new ChannelDTO(channelId,
+                    metadataClient.getChannelVanityName(),
+                    metadataClient.getChannelHeader().getTitle(),
+                    metadataClient.getChannelHeader().getSubscriberCountText().toString(),
+                    handler.getVideos()
+            );
         } catch (ScrapperInterruptedException e) {
             log.info("INTERRUPTED " + channelId + ": " + e.toString());
             throw e;

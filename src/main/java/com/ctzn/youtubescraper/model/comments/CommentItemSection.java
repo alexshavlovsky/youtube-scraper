@@ -79,7 +79,7 @@ public class CommentItemSection {
                     videoId,
                     r.commentId,
                     r.authorText == null ? "" : r.authorText.toString(),
-                    r.authorEndpoint == null ? "" : r.authorEndpoint.browseEndpoint.canonicalBaseUrl,
+                    r.authorEndpoint == null ? "" : r.authorEndpoint.browseEndpoint.browseId,
                     r.publishedTimeText.toString(),
                     r.contentText.toString(),
                     r.likeCount,

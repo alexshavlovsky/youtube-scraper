@@ -22,7 +22,7 @@ public class ChannelEntity implements TimeStamped {
     public String channelId;
     public String channelVanityName;
     public String title;
-    public String subscriberCountText;
+    public Long subscriberCount;
     @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL)
     public List<VideoEntity> videos;
     public Date createdDate;
@@ -33,7 +33,7 @@ public class ChannelEntity implements TimeStamped {
                 dto.getChannelId(),
                 dto.getChannelVanityName(),
                 dto.getTitle(),
-                dto.getSubscriberCountText(),
+                dto.getSubscriberCount(),
                 Collections.emptyList(),
                 null,
                 null

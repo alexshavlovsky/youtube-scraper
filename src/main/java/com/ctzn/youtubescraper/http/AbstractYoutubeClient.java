@@ -46,7 +46,7 @@ abstract class AbstractYoutubeClient<E> {
     }
 
     HttpRequest.Builder newRequestBuilder(URI requestUri, String acceptHeader) {
-        return HttpRequest.newBuilder(requestUri).timeout(Duration.ofSeconds(5))
+        return HttpRequest.newBuilder(requestUri).timeout(Duration.ofSeconds(10))
                 .headers("User-Agent", userAgentCfg.getUserAgent())
                 .headers("Accept", acceptHeader)
                 .headers("Accept-Language", userAgentCfg.getAcceptLanguage())

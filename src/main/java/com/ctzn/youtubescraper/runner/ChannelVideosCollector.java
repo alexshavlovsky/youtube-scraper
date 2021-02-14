@@ -9,6 +9,7 @@ import com.ctzn.youtubescraper.iterator.video.VideoContext;
 import com.ctzn.youtubescraper.iterator.video.VideoContextIterator;
 import com.ctzn.youtubescraper.model.channelvideos.ChannelDTO;
 import com.ctzn.youtubescraper.model.channelvideos.VideosGrid;
+import com.ctzn.youtubescraper.parser.ParserUtil;
 import lombok.extern.java.Log;
 
 import java.util.List;
@@ -39,7 +40,7 @@ public class ChannelVideosCollector implements Callable<ChannelDTO> {
             return new ChannelDTO(channelId,
                     metadataClient.getChannelVanityName(),
                     metadataClient.getChannelHeader().getTitle(),
-                    metadataClient.getChannelHeader().getSubscriberCountText().toString(),
+                    ParserUtil.parseSubCount(metadataClient.getChannelHeader().getSubscriberCountText().toString()),
                     handler.getVideos()
             );
         } catch (ScrapperInterruptedException e) {

@@ -49,7 +49,7 @@ public class CommentHumanReadableFormatter extends CommentFormatter {
         boolean isReply = comment.parentCommentId != null;
         String offs = isReply ? "\t" : "";
         String link = String.format("/watch?v=%s&lc=%s", comment.videoId, comment.commentId);
-        String author = String.format("%s %s", comment.authorText, comment.authorUrl);
+        String author = String.format("%s %s", comment.authorText, comment.channelId);
         int lineLength = Math.max(link.length(), author.length());
         String header = (isReply ? "-" : "=").repeat(lineLength + 8);
         String text = multiLine(comment.text, " ", lineLength).replaceAll("\n", "\n        " + offs);

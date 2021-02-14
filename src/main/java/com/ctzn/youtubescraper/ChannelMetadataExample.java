@@ -16,7 +16,9 @@ public class ChannelMetadataExample {
                 new YoutubeChannelMetadataClient(UserAgentCfgFactory.getDefaultUserAgentCfg(), channelId);
         System.out.println(channelHttpClient.getChannelMetadata());
         System.out.println(channelHttpClient.getChannelMicroformat());
+        System.out.println(channelHttpClient.getChannelHeader());
         System.out.println(channelHttpClient.getChannelMetadata().getVanityChannelUrl());
+        System.out.println(channelHttpClient.getChannelHeader().getSubscriberCountText());
         System.out.println(channelHttpClient.getChannelVanityName());
     }
 }

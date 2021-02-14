@@ -3,6 +3,7 @@ package com.ctzn.youtubescraper.http;
 import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.exception.ScraperParserException;
 import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
+import com.ctzn.youtubescraper.model.channelmetadata.ChannelHeaderDTO;
 import com.ctzn.youtubescraper.model.channelmetadata.ChannelMetadata;
 import com.ctzn.youtubescraper.model.channelmetadata.ChannelMetadataDTO;
 import com.ctzn.youtubescraper.model.channelmetadata.ChannelMicroformatDTO;
@@ -39,5 +40,9 @@ public class YoutubeChannelMetadataClient extends AbstractYoutubeClient<ChannelM
 
     public ChannelMicroformatDTO getChannelMicroformat() {
         return initialData.microformat.microformatDataRenderer;
+    }
+
+    public ChannelHeaderDTO getChannelHeader() {
+        return initialData.header.c4TabbedHeaderRenderer;
     }
 }

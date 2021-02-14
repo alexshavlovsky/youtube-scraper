@@ -8,5 +8,7 @@ import java.util.List;
 public class ChannelDTO {
     public String channelId;
     public String channelVanityName;
+    public String title;
+    public String subscriberCountText;
     public List<VideoDTO> videos;
 }

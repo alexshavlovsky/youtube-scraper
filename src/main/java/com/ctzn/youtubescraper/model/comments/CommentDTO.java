@@ -7,7 +7,7 @@ public class CommentDTO {
     public String videoId;
     public String commentId;
     public String authorText;
-    public String authorUrl;
+    public String channelId;
     public String publishedTimeText;
     public String text;
     public int likeCount;

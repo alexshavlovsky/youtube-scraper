@@ -25,7 +25,7 @@ public class CommentEntity implements TimeStamped {
     @JoinColumn(name = "video_id")
     public VideoEntity video;
     public String authorText;
-    public String authorUrl;
+    public String channelId;
     public String publishedTimeText;
     @Lob
     public String text;
@@ -44,7 +44,7 @@ public class CommentEntity implements TimeStamped {
                 dto.getCommentId(),
                 videoEntityMap.get(dto.getVideoId()),
                 dto.getAuthorText(),
-                dto.getAuthorUrl(),
+                dto.getChannelId(),
                 dto.getPublishedTimeText(),
                 dto.getText(),
                 dto.getLikeCount(),

@@ -6,13 +6,13 @@ import com.ctzn.youtubescraper.model.channelvideos.ChannelDTO;
 import com.ctzn.youtubescraper.persistence.PersistenceContext;
 import com.ctzn.youtubescraper.persistence.entity.ChannelEntity;
 import com.ctzn.youtubescraper.persistence.entity.VideoEntity;
+import com.ctzn.youtubescraper.persistence.entity.WorkerLogEntity;
 import com.ctzn.youtubescraper.persistence.repository.ChannelRepository;
 import com.ctzn.youtubescraper.persistence.repository.VideoRepository;
+import com.ctzn.youtubescraper.persistence.repository.WorkerLogRepository;
 import com.ctzn.youtubescraper.runner.ChannelVideosCollector;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -75,7 +75,33 @@ public class PersistenceChannelRunner implements Callable<Void> {
 
     @Override
     public Void call() throws Exception {
-        grabComments(grabChannelData(channelId));
+        WorkerLogEntity logEntry = new WorkerLogEntity(null, channelId, new Date(), null, "STARTED", toString());
+        persistenceContext.commitTransaction(session -> WorkerLogRepository.save(logEntry, session));
+        try {
+            Map<String, VideoEntity> videoEntityMap = grabChannelData(channelId);
+            grabComments(videoEntityMap);
+            logEntry.setFinishedDate(new Date());
+            logEntry.setStatus("DONE: videoCount=" + videoEntityMap.size());
+            persistenceContext.commitTransaction(session -> WorkerLogRepository.saveOrUpdate(logEntry, session));
+        } catch (Exception e) {
+            logEntry.setFinishedDate(new Date());
+            logEntry.setStatus("EXCEPTION: " + e.getMessage());
+            persistenceContext.commitTransaction(session -> WorkerLogRepository.saveOrUpdate(logEntry, session));
+            throw e;
+        }
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", PersistenceChannelRunner.class.getSimpleName() + "[", "]")
+                .add("nThreads=" + nThreads)
+                .add("timeout=" + timeout)
+                .add("timeUnit=" + timeUnit)
+                .add("sortNewestCommentsFirst=" + sortNewestCommentsFirst)
+                .add("videoCountLimit=" + videoCountLimit)
+                .add("commentCountPerVideoLimit=" + commentCountPerVideoLimit)
+                .add("replyThreadCountLimit=" + replyThreadCountLimit)
+                .toString();
     }
 }

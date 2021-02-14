@@ -5,9 +5,12 @@ import com.ctzn.youtubescraper.model.comments.CommentDTO;
 import com.ctzn.youtubescraper.persistence.PersistenceContext;
 import com.ctzn.youtubescraper.persistence.entity.CommentEntity;
 import com.ctzn.youtubescraper.persistence.entity.VideoEntity;
+import com.ctzn.youtubescraper.persistence.entity.WorkerLogEntity;
 import com.ctzn.youtubescraper.persistence.repository.CommentRepository;
+import com.ctzn.youtubescraper.persistence.repository.WorkerLogRepository;
 import com.ctzn.youtubescraper.runner.CommentRunnerFactory;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,6 +36,8 @@ class PersistenceCommentRunner implements Runnable {
 
     @Override
     public void run() {
+        WorkerLogEntity logEntry = new WorkerLogEntity(null, videoId, new Date(), null, "STARTED", toString());
+        persistenceContext.commitTransaction(session -> WorkerLogRepository.save(logEntry, session));
         CommentCollector commentCollector = new CommentCollector();
         CommentRunnerFactory.newInstance(videoId, List.of(commentCollector), sortNewestCommentsFirst, totalCommentCountLimit, replyThreadCountLimit).run();
         List<CommentDTO> comments = commentCollector.getComments();
@@ -47,5 +52,18 @@ class PersistenceCommentRunner implements Runnable {
             commentEntities.forEach(comment -> CommentRepository.saveOrUpdate(comment, session));
             replyEntities.forEach(comment -> CommentRepository.saveOrUpdate(comment, session));
         });
+
+        logEntry.setFinishedDate(new Date());
+        logEntry.setStatus("FINISHED: commentCount=" + comments.size());
+        persistenceContext.commitTransaction(session -> WorkerLogRepository.saveOrUpdate(logEntry, session));
+    }
+
+    @Override
+    public String toString() {
+        return "PersistenceCommentRunner{" +
+                "sortNewestCommentsFirst=" + sortNewestCommentsFirst +
+                ", totalCommentCountLimit=" + totalCommentCountLimit +
+                ", replyThreadCountLimit=" + replyThreadCountLimit +
+                '}';
     }
 }

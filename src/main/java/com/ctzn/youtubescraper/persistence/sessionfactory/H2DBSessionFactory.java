@@ -3,6 +3,7 @@ package com.ctzn.youtubescraper.persistence.sessionfactory;
 import com.ctzn.youtubescraper.persistence.entity.ChannelEntity;
 import com.ctzn.youtubescraper.persistence.entity.CommentEntity;
 import com.ctzn.youtubescraper.persistence.entity.VideoEntity;
+import com.ctzn.youtubescraper.persistence.entity.WorkerLogEntity;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
@@ -22,6 +23,7 @@ public class H2DBSessionFactory {
                 .addAnnotatedClass(ChannelEntity.class)
                 .addAnnotatedClass(VideoEntity.class)
                 .addAnnotatedClass(CommentEntity.class)
+                .addAnnotatedClass(WorkerLogEntity.class)
                 .getMetadataBuilder()
                 .applyPhysicalNamingStrategy(new CustomPhysicalNamingStrategy())
                 .build();

@@ -9,6 +9,7 @@ public class ChannelDTO {
     public String channelId;
     public String channelVanityName;
     public String title;
+    public Integer videoCount;
     public Long subscriberCount;
     public List<VideoDTO> videos;
 }

@@ -40,6 +40,7 @@ public class ChannelVideosCollector implements Callable<ChannelDTO> {
             return new ChannelDTO(channelId,
                     metadataClient.getChannelVanityName(),
                     metadataClient.getChannelHeader().getTitle(),
+                    handler.getVideos().size(),
                     ParserUtil.parseSubCount(metadataClient.getChannelHeader().getSubscriberCountText().toString()),
                     handler.getVideos()
             );

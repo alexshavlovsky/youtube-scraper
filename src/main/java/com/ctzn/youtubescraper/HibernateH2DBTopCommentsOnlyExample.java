@@ -17,7 +17,7 @@ public class HibernateH2DBTopCommentsOnlyExample {
         Callable<Void> runner = new PersistenceChannelRunner(
                 channelId,
                 new DefaultPersistenceContext(),
-                50, // create 50 worker threads
+                30, // create 30 worker threads
                 1, TimeUnit.HOURS, // forcibly interrupt the runner if it lasts more than 1 hour
                 false, // request top comments (default youtube behaviour when you scroll down a page)
                 // youtube comment API has a limitation: you can't request more than approximately 80 continuations

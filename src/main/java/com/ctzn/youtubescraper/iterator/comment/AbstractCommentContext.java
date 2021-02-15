@@ -44,6 +44,8 @@ abstract class AbstractCommentContext implements IterableCommentContext {
             // The case when API returns an empty section
             // For example if comment has 10 replies and size of reply continuation section is 10 then
             // First continuation section contains 10 replies and the second continuation section is empty so shouldn't we just ignore it
+            // TODO: sometimes API returns comment continuation in response to a reply continuation request. Maybe it's a youtube bug
+            // it also results with a section == null
             if (section == null) return;
             // update meters
             int itemsCount = section.countContentPieces();

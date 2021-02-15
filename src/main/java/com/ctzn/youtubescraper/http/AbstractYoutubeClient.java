@@ -20,7 +20,7 @@ import static com.ctzn.youtubescraper.http.IoUtil.*;
 abstract class AbstractYoutubeClient<E> {
     static final YoutubeUriFactory uriFactory = new YoutubeUriFactory();
     static final VideoPageBodyParser videoPageBodyParser = new VideoPageBodyParser();
-    final HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).build();
+    final static HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).build();
     final CustomCookieManager cookies = new CustomCookieManager("youtube.com");
     private final UserAgentCfg userAgentCfg;
     final String pageUri;

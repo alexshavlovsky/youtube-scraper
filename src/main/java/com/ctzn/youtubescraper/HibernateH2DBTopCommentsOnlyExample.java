@@ -31,7 +31,7 @@ public class HibernateH2DBTopCommentsOnlyExample {
     }
 
     // top commentators:
-    // select distinct(author_url), author_text, count(comment_id) as cnt from comments group by author_url, author_text order by cnt desc
+    // select distinct(channel_id), author_text, count(comment_id) as cnt from comments group by channel_id, author_text order by cnt desc
 
     // most liked comments:
     // select * from (((select * from comments where like_count > 1000) order by like_count desc) limit 100) as liked inner join videos on liked.video_id=videos.video_id

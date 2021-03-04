@@ -29,6 +29,17 @@ class YoutubeUriFactory {
         );
     }
 
+    private static String buildReplyQueryParams(NextContinuationData continuationData) {
+        return joinQueryParamsOrdered(
+                "action_get_comment_replies", "1",
+                "pbj", "1",
+                "ctoken", continuationData.getContinuation(),
+                "continuation", continuationData.getContinuation(),
+                "type", "next",
+                "itct", continuationData.getClickTrackingParams()
+        );
+    }
+
     private static String buildBrowseQueryParams(NextContinuationData continuationData) {
         return joinQueryParamsOrdered(
                 "ctoken", continuationData.getContinuation(),
@@ -41,8 +52,8 @@ class YoutubeUriFactory {
         return joinQueryParamsOrdered("key", youtubeCfgDTO.getApiKey());
     }
 
-    URI newCommentApiRequestUri(NextContinuationData continuationData) {
-        return URI.create(String.format(COMMENT_API_URI_TEMPLATE, buildQueryParams(continuationData)));
+    URI newCommentApiRequestUri(NextContinuationData continuationData, boolean isReplyContinuation) {
+        return URI.create(String.format(COMMENT_API_URI_TEMPLATE, isReplyContinuation ? buildReplyQueryParams(continuationData) : buildQueryParams(continuationData)));
     }
 
     URI newBrowseApiRequestUri(NextContinuationData continuationData) {

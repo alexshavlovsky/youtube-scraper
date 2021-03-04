@@ -31,7 +31,7 @@ public class YoutubeVideoCommentsClient extends AbstractYoutubeClient<CommentIte
     }
 
     public <T extends ApiResponse> CommentItemSection requestNextSection(NextContinuationData continuationData, RequestUriLengthLimiter limiter, Class<T> valueType) throws ScraperHttpException, ScraperParserException, ScrapperInterruptedException {
-        URI requestUri = uriFactory.newCommentApiRequestUri(continuationData);
+        URI requestUri = uriFactory.newCommentApiRequestUri(continuationData, "ReplyApiResponse".equals(valueType.getSimpleName()));
         limiter.setUriLength(requestUri.toString().length());
         if (limiter.getUriLengthLimitUsagePercent() > 100)
             throw new ScraperHttpException("Request entity size limit is exceeded: no further processing of the section is possible");

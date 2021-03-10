@@ -16,7 +16,7 @@ public class H2DBSessionFactory {
 
     private static SessionFactory newInstance() {
         StandardServiceRegistry standardRegistry = new StandardServiceRegistryBuilder()
-                .configure("h2db.cfg.xml")
+                .configure("hibernate-postgres.cfg.xml")
                 .build();
 
         Metadata metadata = new MetadataSources(standardRegistry)

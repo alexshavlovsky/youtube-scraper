@@ -3,7 +3,7 @@ package com.ctzn.youtubescraper.iterator.comment;
 import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.exception.ScraperParserException;
 import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
-import com.ctzn.youtubescraper.http.YoutubeVideoCommentsClient;
+import com.ctzn.youtubescraper.http.YoutubeVideoCommentApiClient;
 import com.ctzn.youtubescraper.model.comments.CommentItemSection;
 import com.ctzn.youtubescraper.model.commons.NextContinuationData;
 import lombok.extern.java.Log;
@@ -13,10 +13,10 @@ abstract class AbstractCommentContext implements IterableCommentContext {
 
     private final CommentContextMeter meter = new CommentContextMeter();
     private final CommentContextMeter replyMeter = new CommentContextMeter();
-    private final YoutubeVideoCommentsClient youtubeHttpClient;
+    private final YoutubeVideoCommentApiClient youtubeHttpClient;
     private CommentItemSection section;
 
-    AbstractCommentContext(YoutubeVideoCommentsClient youtubeHttpClient) {
+    AbstractCommentContext(YoutubeVideoCommentApiClient youtubeHttpClient) {
         this.youtubeHttpClient = youtubeHttpClient;
     }
 
@@ -35,7 +35,7 @@ abstract class AbstractCommentContext implements IterableCommentContext {
         return section.getContinuation();
     }
 
-    abstract CommentItemSection fetchNextSection(YoutubeVideoCommentsClient youtubeHttpClient, NextContinuationData continuationData) throws ScraperParserException, ScraperHttpException, ScrapperInterruptedException;
+    abstract CommentItemSection fetchNextSection(YoutubeVideoCommentApiClient youtubeHttpClient, NextContinuationData continuationData) throws ScraperParserException, ScraperHttpException, ScrapperInterruptedException;
 
     @Override
     public void nextSection(NextContinuationData continuationData) {
@@ -44,8 +44,6 @@ abstract class AbstractCommentContext implements IterableCommentContext {
             // The case when API returns an empty section
             // For example if comment has 10 replies and size of reply continuation section is 10 then
             // First continuation section contains 10 replies and the second continuation section is empty so shouldn't we just ignore it
-            // TODO: sometimes API returns comment continuation in response to a reply continuation request. Maybe it's a youtube bug
-            // it also results with a section == null
             if (section == null) return;
             // update meters
             int itemsCount = section.countContentPieces();

@@ -1,6 +1,7 @@
 package com.ctzn.youtubescraper.persistence.entity;
 
 import lombok.*;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -24,5 +25,6 @@ public class WorkerLogEntity {
     private String status;
 
     @Lob
+    @Type(type = "org.hibernate.type.TextType")
     private String message;
 }

@@ -3,6 +3,7 @@ package com.ctzn.youtubescraper.persistence.entity;
 import com.ctzn.youtubescraper.model.comments.CommentDTO;
 import com.ctzn.youtubescraper.persistence.sessionfactory.TimeStamped;
 import lombok.*;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.Collections;
@@ -28,6 +29,7 @@ public class CommentEntity implements TimeStamped {
     public String channelId;
     public String publishedTimeText;
     @Lob
+    @Type(type = "org.hibernate.type.TextType")
     public String text;
     public int likeCount;
     public int replyCount;

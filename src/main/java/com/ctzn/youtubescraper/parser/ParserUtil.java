@@ -12,17 +12,38 @@ public class ParserUtil {
     private static final String JSON_NESTED_OBJECT_REGEX_TEMPLATE = "\"%s\"\\s*:\\s*\\{";  // ["key":{]
     private static final String JSON_MARKED_OBJECT_REGEX_TEMPLATE = "%s\\{";  // [marker{]
 
-    private static int nextParenPos(String s, int i, char p1, char p2) throws ScraperParserException {
-        int counter = 0;
+    // TODO refactor this to make it error-prone
+    // maybe use json parser library
+    static int nextParenPos(String s, int i0, char p1, char p2) throws ScraperParserException {
+        int counter = 0, i = i0;
         while (i < s.length()) {
+            if (s.charAt(i) == '"') {
+                i = skipJsonString(s, i);
+                if (i == -1) break;
+                else continue;
+            }
             if (s.charAt(i) == p1) counter++;
             if (s.charAt(i) == p2 && --counter == 0) return i;
             i++;
         }
-        throw new ScraperParserException("Next paren not found");
+        throw new ScraperParserException(String.format("Next paren not found from pos (%d): %s", i0, s));
+    }
+
+    private static int skipJsonString(String s, int i) {
+        i++;
+        while (i < s.length()) {
+            if (i < s.length() - 1 && s.charAt(i) == '\\') {
+                i += 2;
+                continue;
+            }
+            if (s.charAt(i) == '"') return i + 1;
+            i++;
+        }
+        return -1;
     }
 
     private static int enclosingParenPos(String s, int i, char p1, char p2) throws ScraperParserException {
+        // TODO fix this to handle json strings
         int counter = 1;
         while (i >= 0) {
             if (s.charAt(i) == p1 && --counter == 0) return i;
@@ -32,7 +53,7 @@ public class ParserUtil {
         throw new ScraperParserException("Enclosing paren not found");
     }
 
-    private static int regexPos(String regex, String input) throws ScraperParserException {
+    static int regexPos(String regex, String input) throws ScraperParserException {
         Matcher matcher = Pattern.compile(regex).matcher(input);
         if (matcher.find()) return matcher.start();
         throw new ScraperParserException("Token not found: regex = [%s], input = [%s]", regex, input);

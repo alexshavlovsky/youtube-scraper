@@ -16,7 +16,7 @@ class YoutubeUriFactory {
     private final static String BROWSE_API_URI_TEMPLATE = "https://www.youtube.com/browse_ajax?%s";
     private final static String BROWSE_API_V1_URI_TEMPLATE = "https://www.youtube.com/youtubei/v1/browse?%s";
 
-    private static String buildQueryParams(NextContinuationData continuationData) {
+    private static String buildCommentApiQueryParams(NextContinuationData continuationData) {
         return joinQueryParamsOrdered(
                 "action_get_comments", "1",
                 "pbj", "1",
@@ -29,7 +29,7 @@ class YoutubeUriFactory {
         );
     }
 
-    private static String buildReplyQueryParams(NextContinuationData continuationData) {
+    private static String buildReplyApiQueryParams(NextContinuationData continuationData) {
         return joinQueryParamsOrdered(
                 "action_get_comment_replies", "1",
                 "pbj", "1",
@@ -52,8 +52,12 @@ class YoutubeUriFactory {
         return joinQueryParamsOrdered("key", youtubeCfgDTO.getApiKey());
     }
 
-    URI newCommentApiRequestUri(NextContinuationData continuationData, boolean isReplyContinuation) {
-        return URI.create(String.format(COMMENT_API_URI_TEMPLATE, isReplyContinuation ? buildReplyQueryParams(continuationData) : buildQueryParams(continuationData)));
+    URI newCommentApiRequestUri(NextContinuationData continuationData) {
+        return URI.create(String.format(COMMENT_API_URI_TEMPLATE, buildCommentApiQueryParams(continuationData)));
+    }
+
+    URI newReplyApiRequestUri(NextContinuationData continuationData) {
+        return URI.create(String.format(COMMENT_API_URI_TEMPLATE,  buildReplyApiQueryParams(continuationData) ));
     }
 
     URI newBrowseApiRequestUri(NextContinuationData continuationData) {

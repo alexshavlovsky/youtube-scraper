@@ -4,7 +4,9 @@ import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.exception.ScraperParserException;
 import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
 import com.ctzn.youtubescraper.model.comments.ApiResponse;
+import com.ctzn.youtubescraper.model.comments.CommentApiResponse;
 import com.ctzn.youtubescraper.model.comments.CommentItemSection;
+import com.ctzn.youtubescraper.model.comments.ReplyApiResponse;
 import com.ctzn.youtubescraper.model.commons.NextContinuationData;
 import com.ctzn.youtubescraper.parser.CommentApiResponseParser;
 import lombok.extern.java.Log;
@@ -18,20 +20,29 @@ import java.util.Map;
 import static com.ctzn.youtubescraper.http.IoUtil.*;
 
 @Log
-public class YoutubeVideoCommentsClient extends AbstractYoutubeClient<CommentItemSection> {
+public class YoutubeVideoCommentApiClient extends AbstractYoutubeClient<CommentItemSection> {
 
     private static final CommentApiResponseParser commentApiResponseParser = new CommentApiResponseParser();
 
     private final String videoId;
 
-    public YoutubeVideoCommentsClient(UserAgentCfg userAgentCfg, String videoId) throws ScraperParserException, ScraperHttpException, ScrapperInterruptedException {
+    public YoutubeVideoCommentApiClient(UserAgentCfg userAgentCfg, String videoId) throws ScraperParserException, ScraperHttpException, ScrapperInterruptedException {
         super(userAgentCfg, uriFactory.newVideoPageUri(videoId), videoPageBodyParser::scrapeInitialCommentItemSection);
         this.videoId = videoId;
         if (!initialData.hasContinuation()) throw new ScraperParserException("Initial comment continuation not found");
     }
 
-    public <T extends ApiResponse> CommentItemSection requestNextSection(NextContinuationData continuationData, RequestUriLengthLimiter limiter, Class<T> valueType) throws ScraperHttpException, ScraperParserException, ScrapperInterruptedException {
-        URI requestUri = uriFactory.newCommentApiRequestUri(continuationData, "ReplyApiResponse".equals(valueType.getSimpleName()));
+    public CommentItemSection requestNextCommentSection(NextContinuationData continuationData, RequestUriLengthLimiter limiter) throws ScraperHttpException, ScraperParserException, ScrapperInterruptedException {
+        URI requestUri = uriFactory.newCommentApiRequestUri(continuationData);
+        return requestNextSection(requestUri, limiter, CommentApiResponse.class);
+    }
+
+    public CommentItemSection requestNextReplySection(NextContinuationData continuationData, RequestUriLengthLimiter limiter) throws ScraperHttpException, ScraperParserException, ScrapperInterruptedException {
+        URI requestUri = uriFactory.newReplyApiRequestUri(continuationData);
+        return requestNextSection(requestUri, limiter, ReplyApiResponse.class);
+    }
+
+    private <T extends ApiResponse> CommentItemSection requestNextSection(URI requestUri, RequestUriLengthLimiter limiter, Class<T> valueType) throws ScraperHttpException, ScraperParserException, ScrapperInterruptedException {
         limiter.setUriLength(requestUri.toString().length());
         if (limiter.getUriLengthLimitUsagePercent() > 100)
             throw new ScraperHttpException("Request entity size limit is exceeded: no further processing of the section is possible");

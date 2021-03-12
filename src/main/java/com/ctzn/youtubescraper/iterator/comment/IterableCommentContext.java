@@ -28,4 +28,6 @@ public interface IterableCommentContext {
     IterableCommentContext newReplyThread(CommentDTO comment, NextContinuationData replyThreadContinuation);
 
     String getShortResultStat();
+
+    boolean doInfoLog();
 }

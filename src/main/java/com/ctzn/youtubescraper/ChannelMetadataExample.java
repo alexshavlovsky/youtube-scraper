@@ -1,7 +1,6 @@
 package com.ctzn.youtubescraper;
 
 import com.ctzn.youtubescraper.exception.ScraperException;
-import com.ctzn.youtubescraper.http.UserAgentCfgFactory;
 import com.ctzn.youtubescraper.http.YoutubeChannelMetadataClient;
 
 public class ChannelMetadataExample {
@@ -12,8 +11,7 @@ public class ChannelMetadataExample {
 
     public static void main(String[] args) throws ScraperException {
         String channelId = "UCksTNgiRyQGwi2ODBie8HdA";
-        YoutubeChannelMetadataClient channelHttpClient =
-                new YoutubeChannelMetadataClient(UserAgentCfgFactory.getDefaultUserAgentCfg(), channelId);
+        YoutubeChannelMetadataClient channelHttpClient = new YoutubeChannelMetadataClient(channelId);
         System.out.println(channelHttpClient.getChannelMetadata());
         System.out.println(channelHttpClient.getChannelMicroformat());
         System.out.println(channelHttpClient.getChannelHeader());

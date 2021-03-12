@@ -46,7 +46,7 @@ public class CommentContextIterator {
                 throw new ScrapperInterruptedException("Thread has been interrupted");
             if (context.hasContinuation()) context.nextSection(context.getContinuationData());
             else return;
-            if (log.getLevel() == INFO && context instanceof CommentContext && ++iterationCounter >= LOG_PERIOD) {
+            if (log.isLoggable(INFO) && context.doInfoLog() && ++iterationCounter >= LOG_PERIOD) {
                 iterationCounter -= LOG_PERIOD;
                 log.info(context::getShortResultStat);
             }
@@ -59,14 +59,6 @@ public class CommentContextIterator {
         boolean doLog = true;
         if (context instanceof CommentReplyContext) handlers.forEach(handler -> handler.handle(comments));
         else {
-//            if (context.getMeter().getCounter()>100 && context.getReplyMeter().getCounter() == 0) {
-//                // Sometimes youtube does not response appropriately to a reply continuation request
-//                // It returns a comment continuation in response to a reply continuation request
-//                // This behaviour is consistent throughout all comments of a specific video
-//                // "Broken" videos occurrence rate is approximately as 1 per 20
-//                // This is probably an youtube api bug
-//                System.out.println("!!! " + context.getShortResultStat());
-//            }
             Map<String, NextContinuationData> replyContinuationsMap = commentItemSection.getReplyContinuationsMap();
             for (CommentDTO comment : comments) {
                 handlers.forEach(handler -> handler.handle(List.of(comment)));

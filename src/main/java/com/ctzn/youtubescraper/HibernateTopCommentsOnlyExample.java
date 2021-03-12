@@ -6,7 +6,7 @@ import com.ctzn.youtubescraper.persistence.runner.PersistenceChannelRunner;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-public class HibernateH2DBTopCommentsOnlyExample {
+public class HibernateTopCommentsOnlyExample {
 
     static {
         System.setProperty("java.util.logging.config.file", "logging-info.properties");

@@ -1,13 +1,13 @@
 package com.ctzn.youtubescraper.iterator.comment;
 
 import com.ctzn.youtubescraper.exception.ScraperException;
-import com.ctzn.youtubescraper.http.UserAgentCfgFactory;
-import com.ctzn.youtubescraper.http.YoutubeVideoCommentApiClient;
+import com.ctzn.youtubescraper.http.useragent.UserAgentAbstractFactory;
+import com.ctzn.youtubescraper.http.YoutubeVideoCommentsClient;
 
 class IterableCommentContextFactory {
 
     private static CommentContext newYoutubeDefaultCommentContext(String videoId) throws ScraperException {
-        YoutubeVideoCommentApiClient youtubeHttpClient = new YoutubeVideoCommentApiClient(UserAgentCfgFactory.getDefaultUserAgentCfg(), videoId);
+        YoutubeVideoCommentsClient youtubeHttpClient = new YoutubeVideoCommentsClient(UserAgentAbstractFactory.getRandomAgentFactory(), videoId);
         return new CommentContext(youtubeHttpClient);
     }
 

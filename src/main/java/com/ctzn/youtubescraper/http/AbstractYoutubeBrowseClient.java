@@ -3,6 +3,7 @@ package com.ctzn.youtubescraper.http;
 import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.exception.ScraperParserException;
 import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
+import com.ctzn.youtubescraper.http.useragent.UserAgentFactory;
 import com.ctzn.youtubescraper.model.browsev1.ClientContext;
 import com.ctzn.youtubescraper.model.browsev1.MainAppWebInfo;
 import lombok.extern.java.Log;
@@ -12,12 +13,12 @@ import java.net.http.HttpRequest;
 import java.util.ArrayList;
 
 @Log
-abstract class AbstractYoutubeV1Client<E> extends AbstractYoutubeClient<E> {
+abstract class AbstractYoutubeBrowseClient<E> extends AbstractYoutubeClient<E> {
 
     final ClientContext clientCtx;
 
-    AbstractYoutubeV1Client(UserAgentCfg userAgentCfg, String pageUri, YoutubeInitialDataHandler<E> youtubeInitialDataHandler) throws ScraperHttpException, ScraperParserException, ScrapperInterruptedException {
-        super(userAgentCfg, pageUri, youtubeInitialDataHandler);
+    AbstractYoutubeBrowseClient(UserAgentFactory userAgentFactory, String pageUri, YoutubeInitialDataHandler<E> youtubeInitialDataHandler) throws ScraperHttpException, ScraperParserException, ScrapperInterruptedException {
+        super(userAgentFactory, pageUri, youtubeInitialDataHandler);
         clientCtx = videoPageBodyParser.parseClientContext(youtubeCfgJson);
         clientCtx.client.screenWidthPoints = 1536;
         clientCtx.client.screenHeightPoints = 768;

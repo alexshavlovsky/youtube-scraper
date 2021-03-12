@@ -3,7 +3,7 @@ package com.ctzn.youtubescraper.iterator.comment;
 import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.exception.ScraperParserException;
 import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
-import com.ctzn.youtubescraper.http.YoutubeVideoCommentApiClient;
+import com.ctzn.youtubescraper.http.YoutubeVideoCommentsClient;
 import com.ctzn.youtubescraper.model.comments.CommentDTO;
 import com.ctzn.youtubescraper.model.comments.CommentItemSection;
 import com.ctzn.youtubescraper.model.comments.SectionHeaderDTO;
@@ -17,7 +17,7 @@ class CommentContext extends AbstractCommentContext {
 
     private SectionHeaderDTO commentThreadHeader;
 
-    CommentContext(YoutubeVideoCommentApiClient youtubeHttpClient) {
+    CommentContext(YoutubeVideoCommentsClient youtubeHttpClient) {
         super(youtubeHttpClient);
         reset(youtubeHttpClient.getInitialCommentSectionContinuation());
         log.fine(() -> youtubeHttpClient.getVideoId() + " total comments count: " + getMeter().getTargetCount());
@@ -39,7 +39,7 @@ class CommentContext extends AbstractCommentContext {
     }
 
     @Override
-    CommentItemSection fetchNextSection(YoutubeVideoCommentApiClient youtubeHttpClient, NextContinuationData continuationData) throws ScraperParserException, ScraperHttpException, ScrapperInterruptedException {
+    CommentItemSection fetchNextSection(YoutubeVideoCommentsClient youtubeHttpClient, NextContinuationData continuationData) throws ScraperParserException, ScraperHttpException, ScrapperInterruptedException {
         return youtubeHttpClient.requestNextCommentSection(continuationData, getMeter());
     }
 
@@ -56,5 +56,10 @@ class CommentContext extends AbstractCommentContext {
     @Override
     public IterableCommentContext newReplyThread(CommentDTO comment, NextContinuationData replyThreadContinuation) {
         return new CommentReplyContext(this, comment, replyThreadContinuation);
+    }
+
+    @Override
+    public boolean doInfoLog() {
+        return true;
     }
 }

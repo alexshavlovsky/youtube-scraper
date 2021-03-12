@@ -13,7 +13,9 @@ class ParserUtilTest {
     final private static String RESPONSE_ARRAY_ENTRY_REGEX = "\"xsrf_token\"\\s*:\\s*\"";
 
     private static String loadSample(int n) throws IOException {
-        return new String(Files.readAllBytes(Paths.get(String.format("test_data/raw_comment_api_response%d.txt", n))));
+        return new String(
+                Files.readAllBytes(Paths.get(String.format("src/test/resources/test_data/raw_comment_api_response%d.txt", n)))
+        );
     }
 
     private static void doAssert(String input, int expected) throws ScraperParserException {

@@ -1,4 +1,4 @@
-package com.ctzn.youtubescraper.http;
+package com.ctzn.youtubescraper.http.useragent;
 
 import lombok.Value;
 

@@ -3,6 +3,8 @@ package com.ctzn.youtubescraper.http;
 import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.exception.ScraperParserException;
 import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
+import com.ctzn.youtubescraper.http.useragent.UserAgentCfg;
+import com.ctzn.youtubescraper.http.useragent.UserAgentFactory;
 import com.ctzn.youtubescraper.model.YoutubeCfgDTO;
 import com.ctzn.youtubescraper.parser.VideoPageBodyParser;
 import lombok.extern.java.Log;
@@ -29,8 +31,8 @@ abstract class AbstractYoutubeClient<E> {
     final String youtubeCfgJson;
     final YoutubeCfgDTO youtubeCfg;
 
-    AbstractYoutubeClient(UserAgentCfg userAgentCfg, String pageUri, YoutubeInitialDataHandler<E> youtubeInitialDataHandler) throws ScraperHttpException, ScraperParserException, ScrapperInterruptedException {
-        this.userAgentCfg = userAgentCfg;
+    AbstractYoutubeClient(UserAgentFactory userAgentFactory, String pageUri, YoutubeInitialDataHandler<E> youtubeInitialDataHandler) throws ScraperHttpException, ScraperParserException, ScrapperInterruptedException {
+        this.userAgentCfg = userAgentFactory.getUserAgentCfg();
         this.pageUri = pageUri;
         log.info(String.format("Fetch page: [%s]", pageUri));
         String body = fetchPage();

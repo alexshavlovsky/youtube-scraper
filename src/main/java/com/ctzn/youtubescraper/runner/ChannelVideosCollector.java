@@ -3,7 +3,11 @@ package com.ctzn.youtubescraper.runner;
 import com.ctzn.youtubescraper.exception.ScraperException;
 import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
 import com.ctzn.youtubescraper.handler.VideoCollector;
-import com.ctzn.youtubescraper.http.*;
+import com.ctzn.youtubescraper.http.IterableHttpClient;
+import com.ctzn.youtubescraper.http.YoutubeChannelMetadataClient;
+import com.ctzn.youtubescraper.http.YoutubeChannelVideosClient;
+import com.ctzn.youtubescraper.http.useragent.UserAgentAbstractFactory;
+import com.ctzn.youtubescraper.http.useragent.UserAgentFactory;
 import com.ctzn.youtubescraper.iterator.video.IterableVideoContext;
 import com.ctzn.youtubescraper.iterator.video.VideoContext;
 import com.ctzn.youtubescraper.iterator.video.VideoContextIterator;
@@ -20,19 +24,19 @@ public class ChannelVideosCollector implements Callable<ChannelDTO> {
 
     private final String channelId;
     private final VideoCollector handler;
-    private final UserAgentCfg userAgentCfg;
+    private final UserAgentFactory userAgentFactory;
 
     public ChannelVideosCollector(String channelId) {
         this.channelId = channelId;
         this.handler = new VideoCollector();
-        userAgentCfg = UserAgentCfgFactory.getDefaultUserAgentCfg();
+        userAgentFactory = UserAgentAbstractFactory.getRandomAgentFactory();
     }
 
     @Override
     public ChannelDTO call() throws ScraperException {
         try {
-            YoutubeChannelMetadataClient metadataClient = new YoutubeChannelMetadataClient(userAgentCfg, channelId);
-            IterableHttpClient<VideosGrid> videosClient = new YoutubeChannelVideosV1Client(userAgentCfg, channelId, metadataClient.getChannelVanityName());
+            YoutubeChannelMetadataClient metadataClient = new YoutubeChannelMetadataClient(userAgentFactory, channelId);
+            IterableHttpClient<VideosGrid> videosClient = new YoutubeChannelVideosClient(userAgentFactory, channelId, metadataClient.getChannelVanityName());
             IterableVideoContext videosContext = new VideoContext(videosClient);
             VideoContextIterator iterator = new VideoContextIterator(videosContext, List.of(handler));
             iterator.traverse();

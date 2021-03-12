@@ -3,6 +3,8 @@ package com.ctzn.youtubescraper.http;
 import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.exception.ScraperParserException;
 import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
+import com.ctzn.youtubescraper.http.useragent.UserAgentAbstractFactory;
+import com.ctzn.youtubescraper.http.useragent.UserAgentFactory;
 import com.ctzn.youtubescraper.model.channelmetadata.ChannelHeaderDTO;
 import com.ctzn.youtubescraper.model.channelmetadata.ChannelMetadata;
 import com.ctzn.youtubescraper.model.channelmetadata.ChannelMetadataDTO;
@@ -16,14 +18,18 @@ public class YoutubeChannelMetadataClient extends AbstractYoutubeClient<ChannelM
     private final String channelId;
     private final String channelVanityName;
 
-    public YoutubeChannelMetadataClient(UserAgentCfg userAgentCfg, String channelId) throws ScraperHttpException, ScraperParserException, ScrapperInterruptedException {
-        super(userAgentCfg, uriFactory.newChanelPageUri(channelId), videoPageBodyParser::parseChannelMetadata);
+    public YoutubeChannelMetadataClient(UserAgentFactory userAgentFactory, String channelId) throws ScraperHttpException, ScraperParserException, ScrapperInterruptedException {
+        super(userAgentFactory, uriFactory.newChanelPageUri(channelId), videoPageBodyParser::parseChannelMetadata);
         this.channelId = channelId;
         ParserUtil.assertNotNull("Channel metadata not found",
                 initialData.metadata.channelMetadataRenderer,
                 initialData.microformat.microformatDataRenderer
         );
         channelVanityName = videoPageBodyParser.parseChannelVanityName(getChannelMetadata().getVanityChannelUrl());
+    }
+
+    public YoutubeChannelMetadataClient(String channelId) throws ScraperHttpException, ScraperParserException, ScrapperInterruptedException {
+        this(UserAgentAbstractFactory.getRandomAgentFactory(), channelId);
     }
 
     public String getChannelId() {

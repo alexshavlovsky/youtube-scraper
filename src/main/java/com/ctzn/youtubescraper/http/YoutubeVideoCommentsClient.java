@@ -3,6 +3,7 @@ package com.ctzn.youtubescraper.http;
 import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.exception.ScraperParserException;
 import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
+import com.ctzn.youtubescraper.http.useragent.UserAgentFactory;
 import com.ctzn.youtubescraper.model.comments.ApiResponse;
 import com.ctzn.youtubescraper.model.comments.CommentApiResponse;
 import com.ctzn.youtubescraper.model.comments.CommentItemSection;
@@ -20,14 +21,14 @@ import java.util.Map;
 import static com.ctzn.youtubescraper.http.IoUtil.*;
 
 @Log
-public class YoutubeVideoCommentApiClient extends AbstractYoutubeClient<CommentItemSection> {
+public class YoutubeVideoCommentsClient extends AbstractYoutubeClient<CommentItemSection> {
 
     private static final CommentApiResponseParser commentApiResponseParser = new CommentApiResponseParser();
 
     private final String videoId;
 
-    public YoutubeVideoCommentApiClient(UserAgentCfg userAgentCfg, String videoId) throws ScraperParserException, ScraperHttpException, ScrapperInterruptedException {
-        super(userAgentCfg, uriFactory.newVideoPageUri(videoId), videoPageBodyParser::scrapeInitialCommentItemSection);
+    public YoutubeVideoCommentsClient(UserAgentFactory userAgentFactory, String videoId) throws ScraperParserException, ScraperHttpException, ScrapperInterruptedException {
+        super(userAgentFactory, uriFactory.newVideoPageUri(videoId), videoPageBodyParser::scrapeInitialCommentItemSection);
         this.videoId = videoId;
         if (!initialData.hasContinuation()) throw new ScraperParserException("Initial comment continuation not found");
     }

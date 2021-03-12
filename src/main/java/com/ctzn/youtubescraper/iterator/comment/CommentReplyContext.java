@@ -3,7 +3,7 @@ package com.ctzn.youtubescraper.iterator.comment;
 import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.exception.ScraperParserException;
 import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
-import com.ctzn.youtubescraper.http.YoutubeVideoCommentApiClient;
+import com.ctzn.youtubescraper.http.YoutubeVideoCommentsClient;
 import com.ctzn.youtubescraper.model.comments.CommentDTO;
 import com.ctzn.youtubescraper.model.comments.CommentItemSection;
 import com.ctzn.youtubescraper.model.commons.NextContinuationData;
@@ -24,7 +24,7 @@ class CommentReplyContext extends AbstractCommentContext {
     }
 
     @Override
-    CommentItemSection fetchNextSection(YoutubeVideoCommentApiClient youtubeHttpClient, NextContinuationData continuationData) throws ScraperParserException, ScraperHttpException, ScrapperInterruptedException {
+    CommentItemSection fetchNextSection(YoutubeVideoCommentsClient youtubeHttpClient, NextContinuationData continuationData) throws ScraperParserException, ScraperHttpException, ScrapperInterruptedException {
         return youtubeHttpClient.requestNextReplySection(continuationData, getMeter());
     }
 
@@ -47,5 +47,10 @@ class CommentReplyContext extends AbstractCommentContext {
     public String getShortResultStat() {
         CommentContextMeter m = getMeter();
         return getParentContext().getShortResultStat() + String.format(" > %s replies %s of %s%s", getParentId(), m.getCounter(), m.getTargetCount(), m.formatCompletionPercent(" (%.1f%%)"));
+    }
+
+    @Override
+    public boolean doInfoLog() {
+        return false;
     }
 }

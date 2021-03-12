@@ -5,7 +5,7 @@ import com.ctzn.youtubescraper.model.comments.CommentDTO;
 
 import java.util.List;
 
-public class CommentConsolePrinter implements CommentHandler {
+public class CommentConsolePrinter implements DataHandler<CommentDTO> {
     private final CommentFormatter commentFormatter;
 
     public CommentConsolePrinter(CommentFormatter commentFormatter) {

@@ -10,7 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-public class CommentFileAppender implements CommentHandler {
+public class CommentFileAppender implements DataHandler<CommentDTO> {
     private final String file;
     private final CommentFormatter commentFormatter;
 

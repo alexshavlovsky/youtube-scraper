@@ -1,6 +1,6 @@
 package com.ctzn.youtubescraper.persistence.runner;
 
-import com.ctzn.youtubescraper.handler.CommentCollector;
+import com.ctzn.youtubescraper.handler.DataCollector;
 import com.ctzn.youtubescraper.model.comments.CommentDTO;
 import com.ctzn.youtubescraper.persistence.PersistenceContext;
 import com.ctzn.youtubescraper.persistence.entity.CommentEntity;
@@ -38,14 +38,13 @@ class PersistenceCommentRunner implements Runnable {
     public void run() {
         WorkerLogEntity logEntry = new WorkerLogEntity(null, videoId, new Date(), null, "STARTED", toString());
         persistenceContext.commitTransaction(session -> WorkerLogRepository.save(logEntry, session));
-        CommentCollector commentCollector = new CommentCollector();
-        CommentRunnerFactory.newInstance(videoId, List.of(commentCollector), sortNewestCommentsFirst, totalCommentCountLimit, replyThreadCountLimit).run();
-        List<CommentDTO> comments = commentCollector.getComments();
+        DataCollector<CommentDTO> collector = new DataCollector<>();
+        CommentRunnerFactory.newInstance(videoId, List.of(collector), sortNewestCommentsFirst, totalCommentCountLimit, replyThreadCountLimit).run();
 
-        List<CommentEntity> commentEntities = comments.stream().filter(c -> c.getParentCommentId() == null)
+        List<CommentEntity> commentEntities = collector.stream().filter(c -> c.getParentCommentId() == null)
                 .map(c -> CommentEntity.fromCommentDTO(c, videoEntityMap, null)).collect(Collectors.toList());
         Map<String, CommentEntity> commentEntityMap = commentEntities.stream().collect(Collectors.toMap(CommentEntity::getCommentId, e -> e));
-        List<CommentEntity> replyEntities = comments.stream().filter(c -> c.getParentCommentId() != null)
+        List<CommentEntity> replyEntities = collector.stream().filter(c -> c.getParentCommentId() != null)
                 .map(c -> CommentEntity.fromCommentDTO(c, videoEntityMap, commentEntityMap)).collect(Collectors.toList());
 
         persistenceContext.commitTransaction(session -> {
@@ -54,7 +53,7 @@ class PersistenceCommentRunner implements Runnable {
         });
 
         logEntry.setFinishedDate(new Date());
-        logEntry.setStatus("FINISHED: commentCount=" + comments.size());
+        logEntry.setStatus("FINISHED: commentCount=" + collector.size());
         persistenceContext.commitTransaction(session -> WorkerLogRepository.saveOrUpdate(logEntry, session));
     }
 

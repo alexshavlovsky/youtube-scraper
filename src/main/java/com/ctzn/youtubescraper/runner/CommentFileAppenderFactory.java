@@ -1,8 +1,9 @@
 package com.ctzn.youtubescraper.runner;
 
 import com.ctzn.youtubescraper.commentformatter.CommentHumanReadableFormatter;
+import com.ctzn.youtubescraper.handler.DataHandler;
 import com.ctzn.youtubescraper.handler.CommentFileAppender;
-import com.ctzn.youtubescraper.handler.CommentHandler;
+import com.ctzn.youtubescraper.model.comments.CommentDTO;
 import lombok.extern.java.Log;
 
 import java.io.File;
@@ -28,7 +29,7 @@ public class CommentFileAppenderFactory {
         }
     }
 
-    public CommentHandler newInstance(String videoId) {
+    public DataHandler<CommentDTO> newInstance(String videoId) {
         return new CommentFileAppender(
                 RESULT_FOLDER + videoId + "_" + System.currentTimeMillis() + ".txt",
                 new CommentHumanReadableFormatter()

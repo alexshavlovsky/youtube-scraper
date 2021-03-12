@@ -1,7 +1,7 @@
 package com.ctzn.youtubescraper.iterator.video;
 
 import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
-import com.ctzn.youtubescraper.handler.VideoHandler;
+import com.ctzn.youtubescraper.handler.DataHandler;
 import com.ctzn.youtubescraper.model.channelvideos.VideoDTO;
 import com.ctzn.youtubescraper.model.channelvideos.VideosGrid;
 import lombok.extern.java.Log;
@@ -12,9 +12,9 @@ import java.util.List;
 public class VideoContextIterator {
 
     private final IterableVideoContext context;
-    private final List<VideoHandler> handlers;
+    private final List<DataHandler<VideoDTO>> handlers;
 
-    public VideoContextIterator(IterableVideoContext context, List<VideoHandler> handlers) {
+    public VideoContextIterator(IterableVideoContext context, List<DataHandler<VideoDTO>> handlers) {
         this.context = context;
         this.handlers = handlers;
     }

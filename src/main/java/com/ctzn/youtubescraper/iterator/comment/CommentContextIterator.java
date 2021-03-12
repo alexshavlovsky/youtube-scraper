@@ -1,7 +1,7 @@
 package com.ctzn.youtubescraper.iterator.comment;
 
 import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
-import com.ctzn.youtubescraper.handler.CommentHandler;
+import com.ctzn.youtubescraper.handler.DataHandler;
 import com.ctzn.youtubescraper.model.comments.CommentDTO;
 import com.ctzn.youtubescraper.model.comments.CommentItemSection;
 import com.ctzn.youtubescraper.model.commons.NextContinuationData;
@@ -15,17 +15,17 @@ import static java.util.logging.Level.INFO;
 @Log
 public class CommentContextIterator {
 
-    private final List<CommentHandler> handlers;
+    private final List<DataHandler<CommentDTO>> handlers;
     private final int commentCountLimit;
     private final int replyThreadCountLimit;
 
-    public CommentContextIterator(List<CommentHandler> handlers) {
+    public CommentContextIterator(List<DataHandler<CommentDTO>> handlers) {
         this.handlers = handlers;
         this.commentCountLimit = 0;
         this.replyThreadCountLimit = 0;
     }
 
-    public CommentContextIterator(List<CommentHandler> handlers, int commentCountLimit, int replyThreadCountLimit) {
+    public CommentContextIterator(List<DataHandler<CommentDTO>> handlers, int commentCountLimit, int replyThreadCountLimit) {
         this.handlers = handlers;
         this.commentCountLimit = commentCountLimit;
         this.replyThreadCountLimit = replyThreadCountLimit;

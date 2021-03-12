@@ -61,3 +61,18 @@ Runtime            | Java 11
 Http client        | java.net.http.HttpClient, [Brotli decoder](https://github.com/google/brotli)
 Data mapping       | Jackson, [ModelMapper](https://github.com/modelmapper/modelmapper)
 Data persistence   | Hibernate 5, H2 database, PostgresSQL
+
+## Class responsibility assignment summary
+
+```
+1. YoutubeChannelMetadataClient resolves channelVanityName by channelId
+
+2. YoutubeChannelVideosClient <-- VideoContext <-- VideoContextIterator fetches list of videos
+
+3. For each video:
+   YoutubeVideoCommentsClient <-- CommentContext      <----- CommentContextIterator fetches comments
+                                   |                      /
+4. For each comment:            + CommentReplyContext <---                          fetches replies
+
+5. Comments and replies are mapped to DTO objects and passed to DataHandlers
+```

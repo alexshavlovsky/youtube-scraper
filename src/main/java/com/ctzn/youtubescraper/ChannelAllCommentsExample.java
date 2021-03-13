@@ -21,11 +21,13 @@ public class ChannelAllCommentsExample {
         ChannelVideosCollector collector = new ChannelVideosCollector(channelId);
         ChannelDTO channel = collector.call();
 
-        CustomExecutorService executor = new CustomExecutorService("CommentWorker",
-                10, 10, TimeUnit.MINUTES);
+        CustomExecutorService executor =
+                new CustomExecutorService("CommentWorker", 10, 10, TimeUnit.MINUTES);
+
         channel.videos.stream().map(
                 v -> newDefaultFileAppender(v.getVideoId(), true)
         ).forEach(executor::submit);
+
         executor.awaitAndTerminate();
     }
 }

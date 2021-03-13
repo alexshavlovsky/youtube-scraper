@@ -8,26 +8,16 @@ class CommentContextMeter implements RequestUriLengthLimiter {
     private int continuationCounter;
     private int targetCount;
     private int uriLength;
-
-    CommentContextMeter() {
-    }
-
-    void add(int value) {
-        counter += value;
-    }
-
-    void add(CommentContextMeter meter) {
-        counter += meter.counter;
-        continuationCounter += meter.continuationCounter;
-    }
+    private CompletionPredictor completionPredictor = new CompletionPredictor(100);
 
     void update(int count) {
-        incContinuation();
-        add(count);
+        continuationCounter++;
+        counter += count;
+        runPredictor();
     }
 
-    void incContinuation() {
-        continuationCounter++;
+    private void runPredictor() {
+        if (targetCount != 0) completionPredictor.predict(getCompletionPercent());
     }
 
     int getCounter() {
@@ -50,8 +40,10 @@ class CommentContextMeter implements RequestUriLengthLimiter {
         return percent(counter, targetCount);
     }
 
-    String formatCompletionPercent(String format) {
-        return targetCount == 0 ? "" : String.format(format, percent(counter, targetCount));
+    String formatCompletionString() {
+        if (targetCount == 0) return "";
+        runPredictor();
+        return String.format(" (%s%.1f%%)", completionPredictor.format(), getCompletionPercent());
     }
 
     @Override
@@ -83,7 +75,7 @@ class CommentContextMeter implements RequestUriLengthLimiter {
     @Override
     public String toString() {
         return String.format("cont/limit: %s/%.0f%%, counter/completion: %s/%.1f%%",
-                getContinuationCounter(), getUriLengthLimitUsagePercent(),
-                getCounter(), getCompletionPercent());
+                continuationCounter, getUriLengthLimitUsagePercent(),
+                counter, getCompletionPercent());
     }
 }

@@ -53,6 +53,22 @@ Get comments by list of video IDs:
     executor.awaitAndTerminate();
 ```
 
+Get all channel comments by channel ID:
+``` JAVA
+    String channelId = "UCksTNgiRyQGwi2ODBie8HdA";
+    ChannelVideosCollector collector = new ChannelVideosCollector(channelId);
+    ChannelDTO channel = collector.call();
+
+    CustomExecutorService executor =
+            new CustomExecutorService("CommentWorker", 10, 10, TimeUnit.MINUTES);
+
+    channel.videos.stream().map(
+            v -> newDefaultFileAppender(v.getVideoId(), true)
+    ).forEach(executor::submit);
+        
+    executor.awaitAndTerminate();
+```
+
 ## Technology Stack
 
 Component          | Technology

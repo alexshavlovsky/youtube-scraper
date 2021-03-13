@@ -6,6 +6,7 @@ import com.ctzn.youtubescraper.model.comments.CommentDTO;
 import java.util.List;
 
 public class CommentConsolePrinter implements DataHandler<CommentDTO> {
+
     private final CommentFormatter commentFormatter;
 
     public CommentConsolePrinter(CommentFormatter commentFormatter) {
@@ -13,7 +14,8 @@ public class CommentConsolePrinter implements DataHandler<CommentDTO> {
     }
 
     @Override
-    public void handle(List<CommentDTO> comments) {
+    public void accept(List<CommentDTO> comments) {
         commentFormatter.printAll(comments);
     }
+
 }

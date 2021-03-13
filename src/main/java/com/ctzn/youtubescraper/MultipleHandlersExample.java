@@ -2,10 +2,9 @@ package com.ctzn.youtubescraper;
 
 import com.ctzn.youtubescraper.commentformatter.CommentHumanReadableFormatter;
 import com.ctzn.youtubescraper.handler.CommentConsolePrinter;
+import com.ctzn.youtubescraper.handler.DataHandler;
 import com.ctzn.youtubescraper.runner.CommentFileAppenderFactory;
 import com.ctzn.youtubescraper.runner.CommentRunnerFactory;
-
-import java.util.List;
 
 public class MultipleHandlersExample {
 
@@ -13,7 +12,7 @@ public class MultipleHandlersExample {
         String videoId = "ipAnwilMncI";
         Runnable runner = CommentRunnerFactory.newInstance(
                 videoId,
-                List.of(
+                DataHandler.of(
                         new CommentConsolePrinter(new CommentHumanReadableFormatter()),
                         new CommentFileAppenderFactory(".output").newInstance(videoId)
                 ),

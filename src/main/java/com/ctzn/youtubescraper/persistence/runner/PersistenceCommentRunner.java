@@ -39,7 +39,7 @@ class PersistenceCommentRunner implements Runnable {
         WorkerLogEntity logEntry = new WorkerLogEntity(null, videoId, new Date(), null, "STARTED", toString());
         persistenceContext.commitTransaction(session -> WorkerLogRepository.save(logEntry, session));
         DataCollector<CommentDTO> collector = new DataCollector<>();
-        CommentRunnerFactory.newInstance(videoId, List.of(collector), sortNewestCommentsFirst, totalCommentCountLimit, replyThreadCountLimit).run();
+        CommentRunnerFactory.newInstance(videoId, collector, sortNewestCommentsFirst, totalCommentCountLimit, replyThreadCountLimit).run();
 
         List<CommentEntity> commentEntities = collector.stream().filter(c -> c.getParentCommentId() == null)
                 .map(c -> CommentEntity.fromCommentDTO(c, videoEntityMap, null)).collect(Collectors.toList());

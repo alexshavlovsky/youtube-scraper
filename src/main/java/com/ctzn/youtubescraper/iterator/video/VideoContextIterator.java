@@ -3,20 +3,17 @@ package com.ctzn.youtubescraper.iterator.video;
 import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
 import com.ctzn.youtubescraper.handler.DataHandler;
 import com.ctzn.youtubescraper.model.channelvideos.VideoDTO;
-import com.ctzn.youtubescraper.model.channelvideos.VideosGrid;
 import lombok.extern.java.Log;
-
-import java.util.List;
 
 @Log
 public class VideoContextIterator {
 
     private final IterableVideoContext context;
-    private final List<DataHandler<VideoDTO>> handlers;
+    private final DataHandler<VideoDTO> handler;
 
-    public VideoContextIterator(IterableVideoContext context, List<DataHandler<VideoDTO>> handlers) {
+    public VideoContextIterator(IterableVideoContext context, DataHandler<VideoDTO> handler) {
         this.context = context;
-        this.handlers = handlers;
+        this.handler = handler;
     }
 
     public void traverse() throws ScrapperInterruptedException {
@@ -25,7 +22,10 @@ public class VideoContextIterator {
 
     private void traverse(IterableVideoContext context) throws ScrapperInterruptedException {
         while (true) {
-            if (context.hasGrid()) handle(context);
+            if (context.hasGrid()) {
+                handler.accept(context.getVideos());
+                log.fine(context::getShortResultStat);
+            }
             if (Thread.currentThread().isInterrupted())
                 throw new ScrapperInterruptedException("Thread has been interrupted");
             if (context.hasContinuation()) context.nextGrid(context.getContinuationData());
@@ -33,10 +33,4 @@ public class VideoContextIterator {
         }
     }
 
-    private void handle(IterableVideoContext context) {
-        VideosGrid grid = context.getGrid();
-        List<VideoDTO> videos = grid.getVideos(context.getChannelId());
-        handlers.forEach(handler -> handler.handle(videos));
-        log.fine(context::getShortResultStat);
-    }
 }

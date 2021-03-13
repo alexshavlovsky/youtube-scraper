@@ -68,6 +68,6 @@ public class VideoContext implements IterableVideoContext {
 
     @Override
     public String getShortResultStat() {
-        return String.format("%s %s videos", getChannelId(), meter.getCounter());
+        return String.format("%s #%s %s videos", getChannelId(), meter.getContinuationCounter(), meter.getCounter());
     }
 }

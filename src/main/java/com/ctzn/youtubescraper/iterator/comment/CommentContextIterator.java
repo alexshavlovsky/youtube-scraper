@@ -15,18 +15,18 @@ import static java.util.logging.Level.INFO;
 @Log
 public class CommentContextIterator {
 
-    private final List<DataHandler<CommentDTO>> handlers;
+    private final DataHandler<CommentDTO> handler;
     private final int commentCountLimit;
     private final int replyThreadCountLimit;
 
-    public CommentContextIterator(List<DataHandler<CommentDTO>> handlers) {
-        this.handlers = handlers;
+    public CommentContextIterator(DataHandler<CommentDTO> handler) {
+        this.handler = handler;
         this.commentCountLimit = 0;
         this.replyThreadCountLimit = 0;
     }
 
-    public CommentContextIterator(List<DataHandler<CommentDTO>> handlers, int commentCountLimit, int replyThreadCountLimit) {
-        this.handlers = handlers;
+    public CommentContextIterator(DataHandler<CommentDTO> handler, int commentCountLimit, int replyThreadCountLimit) {
+        this.handler = handler;
         this.commentCountLimit = commentCountLimit;
         this.replyThreadCountLimit = replyThreadCountLimit;
     }
@@ -54,14 +54,13 @@ public class CommentContextIterator {
     }
 
     private void handle(IterableCommentContext context) throws ScrapperInterruptedException {
-        CommentItemSection commentItemSection = context.getSection();
-        List<CommentDTO> comments = commentItemSection.getComments(context.getVideoId(), context.getParentId());
+        List<CommentDTO> comments = context.getComments();
         boolean doLog = true;
-        if (context instanceof CommentReplyContext) handlers.forEach(handler -> handler.handle(comments));
+        if (context instanceof CommentReplyContext) handler.accept(comments);
         else {
-            Map<String, NextContinuationData> replyContinuationsMap = commentItemSection.getReplyContinuationsMap();
+            Map<String, NextContinuationData> replyContinuationsMap = context.getSection().getReplyContinuationsMap();
             for (CommentDTO comment : comments) {
-                handlers.forEach(handler -> handler.handle(List.of(comment)));
+                handler.accept(List.of(comment));
                 NextContinuationData replyThreadContinuation = replyContinuationsMap.get(comment.commentId);
                 if (Thread.currentThread().isInterrupted()) break;
                 if (replyThreadContinuation != null) {

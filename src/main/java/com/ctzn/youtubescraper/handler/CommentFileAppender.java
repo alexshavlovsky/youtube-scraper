@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class CommentFileAppender implements DataHandler<CommentDTO> {
+
     private final String file;
     private final CommentFormatter commentFormatter;
 
@@ -31,7 +32,8 @@ public class CommentFileAppender implements DataHandler<CommentDTO> {
     }
 
     @Override
-    public void handle(List<CommentDTO> comments) {
+    public void accept(List<CommentDTO> comments) {
         commentFormatter.appendAll(file, comments);
     }
+
 }

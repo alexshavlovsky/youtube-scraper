@@ -38,7 +38,7 @@ public class ChannelVideosCollector implements Callable<ChannelDTO> {
             YoutubeChannelMetadataClient metadataClient = new YoutubeChannelMetadataClient(userAgentFactory, channelId);
             IterableHttpClient<VideosGrid> videosClient = new YoutubeChannelVideosClient(userAgentFactory, channelId, metadataClient.getChannelVanityName());
             IterableVideoContext videosContext = new VideoContext(videosClient);
-            VideoContextIterator iterator = new VideoContextIterator(videosContext, List.of(handler));
+            VideoContextIterator iterator = new VideoContextIterator(videosContext, handler);
             iterator.traverse();
             log.info("DONE " + videosContext.getShortResultStat());
             return new ChannelDTO(channelId,

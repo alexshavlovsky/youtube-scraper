@@ -104,12 +104,12 @@ public class ParserUtil {
         return Integer.parseInt(number);
     }
 
-    public static Long parseSubCount(String input) {
+    public static long parseSubCount(String input) {
         Map<String, Integer> multiplier = Map.of("", 1, "K", 1_000, "M", 1_000_000, "B", 1_000_000_000);
         Matcher matcher = Pattern.compile("([\\d.]+)([KM]?+)").matcher(input);
         if (matcher.find() && matcher.groupCount() == 2)
             return Math.round(Double.parseDouble(matcher.group(1)) * multiplier.get(matcher.group(2)));
-        return null;
+        return 0;
     }
 
     public static void assertNotNull(String message, Object... objects) throws ScraperParserException {

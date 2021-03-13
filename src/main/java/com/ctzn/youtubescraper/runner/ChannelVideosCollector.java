@@ -8,16 +8,12 @@ import com.ctzn.youtubescraper.http.YoutubeChannelMetadataClient;
 import com.ctzn.youtubescraper.http.YoutubeChannelVideosClient;
 import com.ctzn.youtubescraper.http.useragent.UserAgentAbstractFactory;
 import com.ctzn.youtubescraper.http.useragent.UserAgentFactory;
-import com.ctzn.youtubescraper.iterator.video.IterableVideoContext;
 import com.ctzn.youtubescraper.iterator.video.VideoContext;
-import com.ctzn.youtubescraper.iterator.video.VideoContextIterator;
 import com.ctzn.youtubescraper.model.channelvideos.ChannelDTO;
 import com.ctzn.youtubescraper.model.channelvideos.VideoDTO;
 import com.ctzn.youtubescraper.model.channelvideos.VideosGrid;
-import com.ctzn.youtubescraper.parser.ParserUtil;
 import lombok.extern.java.Log;
 
-import java.util.List;
 import java.util.concurrent.Callable;
 
 @Log
@@ -37,15 +33,14 @@ public class ChannelVideosCollector implements Callable<ChannelDTO> {
         try {
             YoutubeChannelMetadataClient metadataClient = new YoutubeChannelMetadataClient(userAgentFactory, channelId);
             IterableHttpClient<VideosGrid> videosClient = new YoutubeChannelVideosClient(userAgentFactory, channelId, metadataClient.getChannelVanityName());
-            IterableVideoContext videosContext = new VideoContext(videosClient);
-            VideoContextIterator iterator = new VideoContextIterator(videosContext, handler);
-            iterator.traverse();
+            VideoContext videosContext = new VideoContext(videosClient);
+            videosContext.traverse(handler);
             log.info("DONE " + videosContext.getShortResultStat());
             return new ChannelDTO(channelId,
                     metadataClient.getChannelVanityName(),
                     metadataClient.getChannelHeader().getTitle(),
                     handler.size(),
-                    ParserUtil.parseSubCount(metadataClient.getChannelHeader().getSubscriberCountText().toString()),
+                    metadataClient.getChannelHeader().getSubscriberCount(),
                     handler
             );
         } catch (ScrapperInterruptedException e) {

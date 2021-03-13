@@ -3,71 +3,55 @@ package com.ctzn.youtubescraper.iterator.video;
 import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.exception.ScraperParserException;
 import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
+import com.ctzn.youtubescraper.handler.DataHandler;
 import com.ctzn.youtubescraper.http.IterableHttpClient;
+import com.ctzn.youtubescraper.model.channelvideos.VideoDTO;
 import com.ctzn.youtubescraper.model.channelvideos.VideosGrid;
-import com.ctzn.youtubescraper.model.commons.NextContinuationData;
 import lombok.extern.java.Log;
 
 @Log
-public class VideoContext implements IterableVideoContext {
+public class VideoContext {
 
     private final VideoContextMeter meter = new VideoContextMeter();
     private final IterableHttpClient<VideosGrid> client;
+    private final String channelId;
     private VideosGrid grid;
 
     public VideoContext(IterableHttpClient<VideosGrid> client) {
         this.client = client;
+        this.channelId = client.getParentId();
         this.grid = client.getInitial();
-        if (grid != null) meter.update(grid.countContentPieces());
     }
 
-    @Override
-    public String getChannelId() {
-        return client.getParentId();
+    public void traverse(DataHandler<VideoDTO> handler) throws ScrapperInterruptedException {
+        handleGrid(handler);
+        while (grid != null && grid.hasContinuation()) {
+            if (Thread.currentThread().isInterrupted())
+                throw new ScrapperInterruptedException("Thread has been interrupted");
+            nextGrid();
+            handleGrid(handler);
+        }
     }
 
-    @Override
-    public boolean hasContinuation() {
-        return grid.hasContinuation();
+    private void handleGrid(DataHandler<VideoDTO> handler) {
+        if (grid != null) {
+            handler.accept(grid.getVideos(channelId));
+            meter.update(grid.countContentPieces());
+            log.fine(getShortResultStat());
+        }
     }
 
-    @Override
-    public NextContinuationData getContinuationData() {
-        return grid.getContinuation();
+    public String getShortResultStat() {
+        return String.format("%s #%s %s videos", channelId, meter.getContinuationCounter(), meter.getCounter());
     }
 
-    @Override
-    public void nextGrid(NextContinuationData continuationData) {
+    private void nextGrid() throws ScrapperInterruptedException {
         try {
-            grid = client.requestNext(continuationData);
-            if (grid == null) return;
-            int itemsCount = grid.countContentPieces();
-            meter.update(itemsCount);
+            grid = client.requestNext(grid.getContinuation());
         } catch (ScraperHttpException | ScraperParserException e) {
-            log.warning(client.getParentId() + " " + e.toString());
-            grid = null;
-        } catch (ScrapperInterruptedException e) {
+            log.warning(channelId + " " + e.toString());
             grid = null;
         }
     }
 
-    @Override
-    public boolean hasGrid() {
-        return grid != null;
-    }
-
-    @Override
-    public VideosGrid getGrid() {
-        return grid;
-    }
-
-    @Override
-    public VideoContextMeter getMeter() {
-        return meter;
-    }
-
-    @Override
-    public String getShortResultStat() {
-        return String.format("%s #%s %s videos", getChannelId(), meter.getContinuationCounter(), meter.getCounter());
-    }
 }

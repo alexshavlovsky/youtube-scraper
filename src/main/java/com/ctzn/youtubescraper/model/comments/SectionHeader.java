@@ -26,7 +26,7 @@ public class SectionHeader {
         public Text countText;
         public CreateRenderer createRenderer;
         public SortMenu sortMenu;
-        public String trackingParams;
+//        public String trackingParams;
         public Text titleText;
         public SimpleText commentsCount;
         public boolean showSeparator;
@@ -40,7 +40,7 @@ public class SectionHeader {
         public Thumbnails authorThumbnail;
         public Text placeholderText;
         public PrepareAccountEndpoint prepareAccountEndpoint;
-        public String trackingParams;
+//        public String trackingParams;
         public String avatarSize;
     }
 
@@ -53,7 +53,7 @@ public class SectionHeader {
         public List<SubMenuItem> subMenuItems;
         public String title;
         public String tooltip;
-        public String trackingParams;
+//        public String trackingParams;
     }
 
     static class SortMenu {

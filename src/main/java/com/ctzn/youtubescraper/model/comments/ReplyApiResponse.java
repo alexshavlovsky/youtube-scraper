@@ -20,6 +20,6 @@ public class ReplyApiResponse implements ApiResponse {
 
     static class Response {
         public ContinuationContents continuationContents;
-        public String trackingParams;
+//        public String trackingParams;
     }
 }

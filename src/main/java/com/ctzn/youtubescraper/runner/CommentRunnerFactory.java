@@ -3,7 +3,7 @@ package com.ctzn.youtubescraper.runner;
 import com.ctzn.youtubescraper.commentformatter.CommentHumanReadableFormatter;
 import com.ctzn.youtubescraper.handler.CommentConsolePrinter;
 import com.ctzn.youtubescraper.handler.DataHandler;
-import com.ctzn.youtubescraper.iterator.comment.CommentContextIterator;
+import com.ctzn.youtubescraper.iterator.comment.CommentIteratorSettings;
 import com.ctzn.youtubescraper.iterator.comment.IterableCommentContextBuilder;
 import com.ctzn.youtubescraper.model.comments.CommentDTO;
 
@@ -24,14 +24,14 @@ public class CommentRunnerFactory {
     public static Runnable newInstance(String videoId, DataHandler<CommentDTO> handler, boolean sortNewestCommentsFirst, int totalCommentCountLimit, int replyThreadCountLimit) {
         return new CommentRunner(
                 new IterableCommentContextBuilder(videoId, sortNewestCommentsFirst),
-                new CommentContextIterator(handler, totalCommentCountLimit, replyThreadCountLimit)
+                new CommentIteratorSettings(handler, totalCommentCountLimit, replyThreadCountLimit)
         );
     }
 
     public static Runnable newUnrestrictedInstance(String videoId, DataHandler<CommentDTO> handler) {
         return new CommentRunner(
                 new IterableCommentContextBuilder(videoId, true),
-                new CommentContextIterator(handler, 0, 0)
+                new CommentIteratorSettings(handler, 0, 0)
         );
     }
 }

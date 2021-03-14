@@ -29,28 +29,27 @@ class CommentReplyContext extends AbstractCommentContext {
     }
 
     @Override
-    public String getParentId() {
-        return parentComment.commentId;
-    }
-
-    @Override
-    public AbstractCommentContext getParentContext() {
-        return parentCommentContext;
-    }
-
-    @Override
-    public IterableCommentContext newReplyThread(CommentDTO comment, NextContinuationData replyThreadContinuation) {
-        throw new IllegalStateException("Youtube reply can't have child replies");
+    void updateMeters(int itemsCount) {
+        getMeter().update(itemsCount);
+        parentCommentContext.getMeter().update(itemsCount);
+        parentCommentContext.getReplyMeter().update(itemsCount);
     }
 
     @Override
     public String getShortResultStat() {
         CommentContextMeter m = getMeter();
-        return getParentContext().getShortResultStat() + String.format(" > %s #%s replies %s of %s%s", getParentId(), m.getContinuationCounter(), m.getCounter(), m.getTargetCount(), m.formatCompletionString());
+        return parentCommentContext.getShortResultStat() + String.format(" > %s #%s replies %s of %s%s", parentComment.commentId, m.getContinuationCounter(), m.getCounter(), m.getTargetCount(), m.formatCompletionString());
     }
 
     @Override
-    public boolean doInfoLog() {
-        return false;
+    public void traverse(CommentIteratorSettings iteratorSettings) throws ScrapperInterruptedException {
+        traverse(iteratorSettings, iteratorSettings.getReplyThreadCountLimit());
     }
+
+    @Override
+    public void handle(CommentIteratorSettings iteratorSettings) {
+        iteratorSettings.getHandler().accept(getSection().getComments(getVideoId(), parentComment.commentId));
+        log.fine(this::getShortResultStat);
+    }
+
 }

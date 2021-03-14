@@ -20,7 +20,4 @@ public class IterableCommentContextBuilder extends IterableCommentContextFactory
         return videoId;
     }
 
-    public boolean isSortNewestCommentsFirst() {
-        return sortNewestCommentsFirst;
-    }
 }

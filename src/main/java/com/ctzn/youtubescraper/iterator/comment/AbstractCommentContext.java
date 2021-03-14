@@ -24,6 +24,28 @@ abstract class AbstractCommentContext implements IterableCommentContext {
         this.youtubeHttpClient = commentContext.youtubeHttpClient;
     }
 
+    abstract CommentItemSection fetchNextSection(YoutubeVideoCommentsClient youtubeHttpClient, NextContinuationData continuationData) throws ScraperParserException, ScraperHttpException, ScrapperInterruptedException;
+
+    abstract void updateMeters(int itemsCount);
+
+    @Override
+    public void nextSection(NextContinuationData continuationData) {
+        try {
+            section = fetchNextSection(youtubeHttpClient, continuationData);
+            // The case when API returns an empty section
+            // For example if comment has 10 replies and size of reply continuation section is 10 then
+            // First continuation section contains 10 replies and the second continuation section is empty so shouldn't we just ignore it
+            if (section == null) return;
+            updateMeters(section.countContentPieces());
+            // TODO maybe it would be better to rethrow the exceptions in some use cases
+        } catch (ScraperHttpException | ScraperParserException e) {
+            log.warning(youtubeHttpClient.getVideoId() + " " + e.toString());
+            section = null;
+        } catch (ScrapperInterruptedException e) {
+            section = null;
+        }
+    }
+
     @Override
     public boolean hasContinuation() {
         return hasSection() && section.hasContinuation();
@@ -35,30 +57,9 @@ abstract class AbstractCommentContext implements IterableCommentContext {
         return section.getContinuation();
     }
 
-    abstract CommentItemSection fetchNextSection(YoutubeVideoCommentsClient youtubeHttpClient, NextContinuationData continuationData) throws ScraperParserException, ScraperHttpException, ScrapperInterruptedException;
-
     @Override
-    public void nextSection(NextContinuationData continuationData) {
-        try {
-            section = fetchNextSection(youtubeHttpClient, continuationData);
-            // The case when API returns an empty section
-            // For example if comment has 10 replies and size of reply continuation section is 10 then
-            // First continuation section contains 10 replies and the second continuation section is empty so shouldn't we just ignore it
-            if (section == null) return;
-            // update meters
-            int itemsCount = section.countContentPieces();
-            meter.update(itemsCount);
-            if (getParentContext() != null) {
-                getParentContext().getMeter().update(itemsCount);
-                getParentContext().getReplyMeter().update(itemsCount);
-            }
-            // TODO maybe it would be better to rethrow the exceptions in some use cases
-        } catch (ScraperHttpException | ScraperParserException e) {
-            log.warning(youtubeHttpClient.getVideoId() + " " + e.toString());
-            section = null;
-        } catch (ScrapperInterruptedException e) {
-            section = null;
-        }
+    public String getVideoId() {
+        return youtubeHttpClient.getVideoId();
     }
 
     @Override
@@ -81,13 +82,16 @@ abstract class AbstractCommentContext implements IterableCommentContext {
         return replyMeter;
     }
 
-    @Override
-    public String getVideoId() {
-        return youtubeHttpClient.getVideoId();
+    void traverse(CommentIteratorSettings iteratorContext, int limit) throws ScrapperInterruptedException {
+        while (true) {
+            if (hasSection()) handle(iteratorContext);
+            if (limit > 0 && getMeter().getCounter() >= limit) return;
+            if (Thread.currentThread().isInterrupted())
+                throw new ScrapperInterruptedException("Thread has been interrupted");
+            if (hasContinuation()) nextSection(getContinuationData());
+            else return;
+        }
+
     }
 
-    @Override
-    public String getShortResultStat() {
-        return String.format("%s #%s %s comments, %s replies, total %s of %s%s", getVideoId(), meter.getContinuationCounter(), meter.getCounter() - replyMeter.getCounter(), replyMeter.getCounter(), meter.getCounter(), meter.getTargetCount(), meter.formatCompletionString());
-    }
 }

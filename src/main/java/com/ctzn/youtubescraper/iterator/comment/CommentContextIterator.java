@@ -2,8 +2,8 @@ package com.ctzn.youtubescraper.iterator.comment;
 
 import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
 import com.ctzn.youtubescraper.handler.DataHandler;
+import com.ctzn.youtubescraper.iterator.HeartBeatLogger;
 import com.ctzn.youtubescraper.model.comments.CommentDTO;
-import com.ctzn.youtubescraper.model.comments.CommentItemSection;
 import com.ctzn.youtubescraper.model.commons.NextContinuationData;
 import lombok.extern.java.Log;
 
@@ -35,8 +35,7 @@ public class CommentContextIterator {
         traverse(context, commentCountLimit);
     }
 
-    private final static int LOG_PERIOD = 100;
-    private int iterationCounter;
+    private final HeartBeatLogger heartBeatLogger = new HeartBeatLogger(60000);
 
     private void traverse(IterableCommentContext context, int limit) throws ScrapperInterruptedException {
         while (true) {
@@ -46,10 +45,7 @@ public class CommentContextIterator {
                 throw new ScrapperInterruptedException("Thread has been interrupted");
             if (context.hasContinuation()) context.nextSection(context.getContinuationData());
             else return;
-            if (log.isLoggable(INFO) && context.doInfoLog() && ++iterationCounter >= LOG_PERIOD) {
-                iterationCounter -= LOG_PERIOD;
-                log.info(context::getShortResultStat);
-            }
+            if (context.doInfoLog()) heartBeatLogger.run(log, INFO, context::getShortResultStat);
         }
     }
 

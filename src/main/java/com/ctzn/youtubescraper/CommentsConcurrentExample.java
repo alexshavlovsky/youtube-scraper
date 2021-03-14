@@ -10,7 +10,7 @@ import static com.ctzn.youtubescraper.runner.CommentRunnerFactory.newDefaultFile
 public class CommentsConcurrentExample {
 
     static {
-        System.setProperty("java.util.logging.config.file", "logging.properties");
+        System.setProperty("java.util.logging.config.file", "logging-info.properties");
     }
 
     private static String[] ids = {

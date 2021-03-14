@@ -1,6 +1,7 @@
 package com.ctzn.youtubescraper.iterator.comment;
 
 import com.ctzn.youtubescraper.http.RequestUriLengthLimiter;
+import com.ctzn.youtubescraper.iterator.CompletionPredictor;
 
 class CommentContextMeter implements RequestUriLengthLimiter {
     private final static int REQUEST_URI_LENGTH_LIMIT = 14000;

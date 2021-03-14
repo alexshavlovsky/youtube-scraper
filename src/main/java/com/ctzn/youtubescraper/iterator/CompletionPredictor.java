@@ -1,6 +1,6 @@
-package com.ctzn.youtubescraper.iterator.comment;
+package com.ctzn.youtubescraper.iterator;
 
-class CompletionPredictor {
+public class CompletionPredictor {
 
     private final int T_DIF = 10000; // ms
     private final double EPS = 0.001;
@@ -11,14 +11,14 @@ class CompletionPredictor {
     private double valueRef;
     private boolean doInit = true;
 
-    CompletionPredictor(double targetValue) {
+    public CompletionPredictor(double targetValue) {
         this.targetValue = targetValue;
     }
 
     private long prediction = -1;
     private Double dif = null;
 
-    void predict(double currentValue) {
+    public void predict(double currentValue) {
         double remaining = targetValue - currentValue;
         if (remaining <= EPS) {
             prediction = 0;
@@ -50,7 +50,7 @@ class CompletionPredictor {
         valueRef = currentValue;
     }
 
-    String format() {
+    public String format() {
         if (prediction <= 0) return "";
         long s0 = prediction / 1000, h = s0 / 3600, m = (s0 % 3600) / 60, s = s0 % 60;
         return h == 0 ?

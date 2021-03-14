@@ -56,10 +56,10 @@ public class CommentItemSection {
     // values - reply continuations
     public Map<String, NextContinuationData> getReplyContinuationsMap() {
         if (!hasContent()) return Collections.emptyMap();
-        Map<String, NextContinuationData> map = new LinkedHashMap<>();
+        Map<String, NextContinuationData> map = new HashMap<>();
         for (Content content : contents) {
             if (content.commentThreadRenderer == null)
-                continue; // this is a reply continuation section and reply can't be relied
+                continue; // this is a reply continuation section and reply can't be replied
             CommentThreadRenderer commentContext = content.commentThreadRenderer;
             if (commentContext.replies != null) {
                 CommentRenderer comment = commentContext.comment.commentRenderer;

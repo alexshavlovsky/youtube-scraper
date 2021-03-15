@@ -10,13 +10,21 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
+import java.util.Properties;
+
 public class H2DBSessionFactory {
 
     private final static SessionFactory instance = newInstance();
+    private final static String HIBERNATE_CFG_FILE_KEY = "hibernate.configuration.xml";
 
     private static SessionFactory newInstance() {
+        Properties properties = new PropertiesReader().getProperties();
+        String cfgFile = properties.getProperty(HIBERNATE_CFG_FILE_KEY);
+        if (cfgFile == null) throw new RuntimeException(
+                String.format("Please specify '%s=???' property in 'config.properties' file", HIBERNATE_CFG_FILE_KEY));
+
         StandardServiceRegistry standardRegistry = new StandardServiceRegistryBuilder()
-                .configure("hibernate-h2db.cfg.xml")
+                .configure(cfgFile)
                 .build();
 
         Metadata metadata = new MetadataSources(standardRegistry)

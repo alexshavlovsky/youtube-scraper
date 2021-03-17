@@ -2,6 +2,7 @@ package com.ctzn.youtubescraper.persistence.runner;
 
 import com.ctzn.youtubescraper.exception.ScraperException;
 import com.ctzn.youtubescraper.executor.CustomExecutorService;
+import com.ctzn.youtubescraper.iterator.comment.CommentVisitor;
 import com.ctzn.youtubescraper.model.channelvideos.ChannelDTO;
 import com.ctzn.youtubescraper.persistence.PersistenceContext;
 import com.ctzn.youtubescraper.persistence.entity.ChannelEntity;
@@ -19,6 +20,8 @@ import java.util.stream.Collectors;
 
 public class PersistenceChannelRunner implements Callable<Void> {
 
+    private final static int PROCESS_ALL_VIDEOS = 0;
+
     private final String channelId;
     private final PersistenceContext persistenceContext;
     private final int nThreads;
@@ -30,11 +33,11 @@ public class PersistenceChannelRunner implements Callable<Void> {
     private final int replyThreadCountLimit;
 
     public PersistenceChannelRunner(String channelId, PersistenceContext persistenceContext, int nThreads, long timeout, TimeUnit timeUnit) {
-        this(channelId, persistenceContext, nThreads, timeout, timeUnit, true, 0, 0, 0);
+        this(channelId, persistenceContext, nThreads, timeout, timeUnit, true, CommentVisitor.NO_LIMIT, CommentVisitor.NO_LIMIT, PROCESS_ALL_VIDEOS);
     }
 
     public PersistenceChannelRunner(String channelId, PersistenceContext persistenceContext, int nThreads, long timeout, TimeUnit timeUnit, boolean sortNewestCommentsFirst, int commentCountPerVideoLimit, int replyThreadCountLimit) {
-        this(channelId, persistenceContext, nThreads, timeout, timeUnit, sortNewestCommentsFirst, commentCountPerVideoLimit, replyThreadCountLimit, 0);
+        this(channelId, persistenceContext, nThreads, timeout, timeUnit, sortNewestCommentsFirst, commentCountPerVideoLimit, replyThreadCountLimit, PROCESS_ALL_VIDEOS);
     }
 
     public PersistenceChannelRunner(String channelId, PersistenceContext persistenceContext, int nThreads, long timeout, TimeUnit timeUnit, boolean sortNewestCommentsFirst, int commentCountPerVideoLimit, int replyThreadCountLimit, int videoCountLimit) {
@@ -54,9 +57,9 @@ public class PersistenceChannelRunner implements Callable<Void> {
         ChannelDTO channel = collector.call();
         ChannelEntity channelEntity = ChannelEntity.fromChannelDTO(channel);
         List<VideoEntity> videoEntities =
-                (videoCountLimit > 0 ?
-                        channel.getVideos().stream().limit(videoCountLimit) :
-                        channel.getVideos().stream()
+                (videoCountLimit == PROCESS_ALL_VIDEOS ?
+                        channel.getVideos().stream() :
+                        channel.getVideos().stream().limit(videoCountLimit)
                 ).map(v -> VideoEntity.fromVideoDTO(v, channelEntity)).collect(Collectors.toList());
         persistenceContext.commitTransaction(session -> {
             ChannelRepository.saveOrUpdate(channelEntity, session);
@@ -104,4 +107,5 @@ public class PersistenceChannelRunner implements Callable<Void> {
                 .add("replyThreadCountLimit=" + replyThreadCountLimit)
                 .toString();
     }
+
 }

@@ -86,9 +86,9 @@ Data persistence   | Hibernate 5, H2 database, PostgresSQL
 2. YoutubeChannelVideosClient <-- VideoContext <-- VideoContextIterator fetches list of videos
 
 3. For each video:
-   YoutubeVideoCommentsClient <-- CommentContext      <----- CommentContextIterator fetches comments
+   YoutubeVideoCommentsClient <-- CommentContext      <----- CommentVisitor handles comments
                                    |                      /
-4. For each comment:            + CommentReplyContext <---                          fetches replies
+4. For each comment:            + CommentReplyContext <---                  handles replies
 
 5. Comments and replies are mapped to DTO objects and passed to DataHandlers
 ```

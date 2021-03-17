@@ -4,7 +4,6 @@ import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.exception.ScraperParserException;
 import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
 import com.ctzn.youtubescraper.http.YoutubeVideoCommentsClient;
-import com.ctzn.youtubescraper.iterator.HeartBeatLogger;
 import com.ctzn.youtubescraper.model.comments.CommentDTO;
 import com.ctzn.youtubescraper.model.comments.CommentItemSection;
 import com.ctzn.youtubescraper.model.comments.SectionHeaderDTO;
@@ -15,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.ctzn.youtubescraper.parser.ParserUtil.parseDigitsToInt;
-import static java.util.logging.Level.INFO;
 
 @Log
 class CommentContext extends AbstractCommentContext {
@@ -30,6 +28,7 @@ class CommentContext extends AbstractCommentContext {
 
     private void reset(NextContinuationData continuationData) {
         getMeter().reset();
+        getReplyMeter().reset();
         nextSection(continuationData);
         commentThreadHeader = getSection().getHeader();
         int totalCommentCount = parseDigitsToInt(commentThreadHeader.getCommentsCountText());
@@ -55,34 +54,30 @@ class CommentContext extends AbstractCommentContext {
 
     @Override
     public String getShortResultStat() {
-        CommentContextMeter meter = getMeter();
-        CommentContextMeter replyMeter = getReplyMeter();
-        return String.format("%s #%s %s comments, %s replies, total %s of %s%s", getVideoId(), meter.getContinuationCounter(), meter.getCounter() - replyMeter.getCounter(), replyMeter.getCounter(), meter.getCounter(), meter.getTargetCount(), meter.formatCompletionString());
+        CommentContextMeter m = getMeter();
+        CommentContextMeter rm = getReplyMeter();
+        return String.format("%s #%s %s comments, %s replies, total %s of %s%s", getVideoId(), m.getContinuationCounter(), m.getCounter() - rm.getCounter(), rm.getCounter(), m.getCounter(), m.getTargetCount(), m.formatCompletionString());
     }
 
     @Override
-    public void traverse(CommentIteratorSettings iteratorSettings) throws ScrapperInterruptedException {
-        traverse(iteratorSettings, iteratorSettings.getCommentCountLimit());
+    public void traverse(CommentVisitor commentVisitor) throws ScrapperInterruptedException {
+        traverse(commentVisitor, commentVisitor.getCommentCountLimit());
     }
 
-    private final HeartBeatLogger heartBeatLogger = new HeartBeatLogger(60000);
-
     @Override
-    public void handle(CommentIteratorSettings iteratorSettings) throws ScrapperInterruptedException {
+    public void handle(CommentVisitor commentVisitor) throws ScrapperInterruptedException {
         List<CommentDTO> comments = getSection().getComments(getVideoId(), null);
-        Map<String, NextContinuationData> replyContinuationsMap = getSection().getReplyContinuationsMap();
-        boolean doLog = true;
-        for (CommentDTO comment : comments) {
-            iteratorSettings.getHandler().accept(List.of(comment));
-            NextContinuationData replyThreadContinuation = replyContinuationsMap.get(comment.commentId);
-            if (Thread.currentThread().isInterrupted()) break;
-            if (replyThreadContinuation != null) {
-                new CommentReplyContext(this, comment, replyThreadContinuation).traverse(iteratorSettings);
-                doLog = false;
-            }
+        if (commentVisitor.getReplyThreadCountLimit() == 0) commentVisitor.visitAll(comments);
+        else {
+            Map<String, NextContinuationData> replyContinuationMap = getSection().getReplyContinuationMap();
+            for (CommentDTO comment : comments)
+                if (!Thread.currentThread().isInterrupted()) {
+                    commentVisitor.visit(comment);
+                    NextContinuationData replyThreadContinuation = replyContinuationMap.get(comment.commentId);
+                    if (replyThreadContinuation != null)
+                        new CommentReplyContext(this, comment, replyThreadContinuation).traverse(commentVisitor);
+                }
         }
-        if (doLog) log.fine(this::getShortResultStat);
-        heartBeatLogger.run(log, INFO, this::getShortResultStat);
     }
 
 }

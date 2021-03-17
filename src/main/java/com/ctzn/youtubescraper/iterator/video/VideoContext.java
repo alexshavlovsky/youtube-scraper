@@ -27,7 +27,7 @@ public class VideoContext {
         handleGrid(handler);
         while (grid != null && grid.hasContinuation()) {
             if (Thread.currentThread().isInterrupted())
-                throw new ScrapperInterruptedException("Thread has been interrupted");
+                throw new ScrapperInterruptedException("Video context iterator thread has been interrupted");
             nextGrid();
             handleGrid(handler);
         }

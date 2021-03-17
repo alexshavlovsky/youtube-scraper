@@ -38,18 +38,18 @@ class CommentReplyContext extends AbstractCommentContext {
     @Override
     public String getShortResultStat() {
         CommentContextMeter m = getMeter();
-        return parentCommentContext.getShortResultStat() + String.format(" > %s #%s replies %s of %s%s", parentComment.commentId, m.getContinuationCounter(), m.getCounter(), m.getTargetCount(), m.formatCompletionString());
+        return parentCommentContext.getShortResultStat() +
+                String.format(" > %s #%s replies %s of %s%s", parentComment.commentId, m.getContinuationCounter(), m.getCounter(), m.getTargetCount(), m.formatCompletionString());
     }
 
     @Override
-    public void traverse(CommentIteratorSettings iteratorSettings) throws ScrapperInterruptedException {
-        traverse(iteratorSettings, iteratorSettings.getReplyThreadCountLimit());
+    public void traverse(CommentVisitor commentVisitor) throws ScrapperInterruptedException {
+        traverse(commentVisitor, commentVisitor.getReplyThreadCountLimit());
     }
 
     @Override
-    public void handle(CommentIteratorSettings iteratorSettings) {
-        iteratorSettings.getHandler().accept(getSection().getComments(getVideoId(), parentComment.commentId));
-        log.fine(this::getShortResultStat);
+    public void handle(CommentVisitor commentVisitor) {
+        commentVisitor.visitAll(getSection().getComments(getVideoId(), parentComment.commentId));
     }
 
 }

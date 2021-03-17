@@ -4,15 +4,19 @@ import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.exception.ScraperParserException;
 import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
 import com.ctzn.youtubescraper.http.YoutubeVideoCommentsClient;
+import com.ctzn.youtubescraper.iterator.HeartBeatLogger;
 import com.ctzn.youtubescraper.model.comments.CommentItemSection;
 import com.ctzn.youtubescraper.model.commons.NextContinuationData;
 import lombok.extern.java.Log;
+
+import static java.util.logging.Level.INFO;
 
 @Log
 abstract class AbstractCommentContext implements IterableCommentContext {
 
     private final CommentContextMeter meter = new CommentContextMeter();
     private final CommentContextMeter replyMeter = new CommentContextMeter();
+    private final HeartBeatLogger heartBeatLogger = new HeartBeatLogger(60000);
     private final YoutubeVideoCommentsClient youtubeHttpClient;
     private CommentItemSection section;
 
@@ -32,12 +36,6 @@ abstract class AbstractCommentContext implements IterableCommentContext {
     public void nextSection(NextContinuationData continuationData) {
         try {
             section = fetchNextSection(youtubeHttpClient, continuationData);
-            // The case when API returns an empty section
-            // For example if comment has 10 replies and size of reply continuation section is 10 then
-            // First continuation section contains 10 replies and the second continuation section is empty so shouldn't we just ignore it
-            if (section == null) return;
-            updateMeters(section.countContentPieces());
-            // TODO maybe it would be better to rethrow the exceptions in some use cases
         } catch (ScraperHttpException | ScraperParserException e) {
             log.warning(youtubeHttpClient.getVideoId() + " " + e.toString());
             section = null;
@@ -82,16 +80,19 @@ abstract class AbstractCommentContext implements IterableCommentContext {
         return replyMeter;
     }
 
-    void traverse(CommentIteratorSettings iteratorContext, int limit) throws ScrapperInterruptedException {
-        while (true) {
-            if (hasSection()) handle(iteratorContext);
-            if (limit > 0 && getMeter().getCounter() >= limit) return;
+    void traverse(CommentVisitor commentVisitor, int limit) throws ScrapperInterruptedException {
+        while (limit == CommentVisitor.NO_LIMIT || getMeter().getCounter() < limit) {
             if (Thread.currentThread().isInterrupted())
-                throw new ScrapperInterruptedException("Thread has been interrupted");
+                throw new ScrapperInterruptedException("Comment thread iterator has been interrupted");
+            if (hasSection()) {
+                handle(commentVisitor);
+                updateMeters(section.countContentPieces());
+                log.fine(this::getShortResultStat);
+                heartBeatLogger.run(log, INFO, this::getShortResultStat);
+            }
             if (hasContinuation()) nextSection(getContinuationData());
             else return;
         }
-
     }
 
 }

@@ -54,7 +54,7 @@ public class CommentItemSection {
 
     // keys - commentId
     // values - reply continuations
-    public Map<String, NextContinuationData> getReplyContinuationsMap() {
+    public Map<String, NextContinuationData> getReplyContinuationMap() {
         if (!hasContent()) return Collections.emptyMap();
         Map<String, NextContinuationData> map = new HashMap<>();
         for (Content content : contents) {

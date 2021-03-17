@@ -24,8 +24,8 @@ public interface IterableCommentContext {
 
     String getShortResultStat();
 
-    void traverse(CommentIteratorSettings iteratorSettings) throws ScrapperInterruptedException;
+    void traverse(CommentVisitor commentVisitor) throws ScrapperInterruptedException;
 
-    void handle(CommentIteratorSettings iteratorSettings) throws ScrapperInterruptedException;
+    void handle(CommentVisitor commentVisitor) throws ScrapperInterruptedException;
 
 }

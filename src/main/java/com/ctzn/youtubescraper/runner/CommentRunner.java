@@ -2,7 +2,7 @@ package com.ctzn.youtubescraper.runner;
 
 import com.ctzn.youtubescraper.exception.ScraperException;
 import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
-import com.ctzn.youtubescraper.iterator.comment.CommentIteratorSettings;
+import com.ctzn.youtubescraper.iterator.comment.CommentVisitor;
 import com.ctzn.youtubescraper.iterator.comment.IterableCommentContext;
 import com.ctzn.youtubescraper.iterator.comment.IterableCommentContextBuilder;
 import lombok.extern.java.Log;
@@ -11,9 +11,9 @@ import lombok.extern.java.Log;
 class CommentRunner implements Runnable {
 
     private final IterableCommentContextBuilder contextBuilder;
-    private final CommentIteratorSettings iteratorContext;
+    private final CommentVisitor iteratorContext;
 
-    public CommentRunner(IterableCommentContextBuilder contextBuilder, CommentIteratorSettings iteratorContext) {
+    public CommentRunner(IterableCommentContextBuilder contextBuilder, CommentVisitor iteratorContext) {
         this.contextBuilder = contextBuilder;
         this.iteratorContext = iteratorContext;
     }

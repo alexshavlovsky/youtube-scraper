@@ -2,7 +2,6 @@ package com.ctzn.youtubescraper.persistence.runner;
 
 import com.ctzn.youtubescraper.exception.ScraperException;
 import com.ctzn.youtubescraper.executor.CustomExecutorService;
-import com.ctzn.youtubescraper.iterator.comment.CommentVisitor;
 import com.ctzn.youtubescraper.model.channelvideos.ChannelDTO;
 import com.ctzn.youtubescraper.persistence.PersistenceContext;
 import com.ctzn.youtubescraper.persistence.entity.ChannelEntity;
@@ -20,7 +19,7 @@ import java.util.stream.Collectors;
 
 public class PersistenceChannelRunner implements Callable<Void> {
 
-    private final static int PROCESS_ALL_VIDEOS = 0;
+    final static int PROCESS_ALL_VIDEOS = 0;
 
     private final String channelId;
     private final PersistenceContext persistenceContext;
@@ -32,15 +31,7 @@ public class PersistenceChannelRunner implements Callable<Void> {
     private final int commentCountPerVideoLimit;
     private final int replyThreadCountLimit;
 
-    public PersistenceChannelRunner(String channelId, PersistenceContext persistenceContext, int nThreads, long timeout, TimeUnit timeUnit) {
-        this(channelId, persistenceContext, nThreads, timeout, timeUnit, true, CommentVisitor.NO_LIMIT, CommentVisitor.NO_LIMIT, PROCESS_ALL_VIDEOS);
-    }
-
-    public PersistenceChannelRunner(String channelId, PersistenceContext persistenceContext, int nThreads, long timeout, TimeUnit timeUnit, boolean sortNewestCommentsFirst, int commentCountPerVideoLimit, int replyThreadCountLimit) {
-        this(channelId, persistenceContext, nThreads, timeout, timeUnit, sortNewestCommentsFirst, commentCountPerVideoLimit, replyThreadCountLimit, PROCESS_ALL_VIDEOS);
-    }
-
-    public PersistenceChannelRunner(String channelId, PersistenceContext persistenceContext, int nThreads, long timeout, TimeUnit timeUnit, boolean sortNewestCommentsFirst, int commentCountPerVideoLimit, int replyThreadCountLimit, int videoCountLimit) {
+    PersistenceChannelRunner(String channelId, PersistenceContext persistenceContext, int nThreads, long timeout, TimeUnit timeUnit, boolean sortNewestCommentsFirst, int commentCountPerVideoLimit, int replyThreadCountLimit, int videoCountLimit) {
         this.channelId = channelId;
         this.persistenceContext = persistenceContext;
         this.nThreads = nThreads;
@@ -50,6 +41,10 @@ public class PersistenceChannelRunner implements Callable<Void> {
         this.commentCountPerVideoLimit = commentCountPerVideoLimit;
         this.replyThreadCountLimit = replyThreadCountLimit;
         this.videoCountLimit = videoCountLimit;
+    }
+
+    public static PersistenceChannelRunnerConfigurer.PersistenceChannelRunnerConfigurerBuilder newBuilder(String channelId) {
+        return PersistenceChannelRunnerConfigurer.newInstance(channelId);
     }
 
     private Map<String, VideoEntity> grabChannelData(String channelId) throws ScraperException {

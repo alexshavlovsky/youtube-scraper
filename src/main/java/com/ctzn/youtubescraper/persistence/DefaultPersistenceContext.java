@@ -1,6 +1,6 @@
 package com.ctzn.youtubescraper.persistence;
 
-import com.ctzn.youtubescraper.persistence.sessionfactory.H2DBSessionFactory;
+import com.ctzn.youtubescraper.persistence.sessionfactory.AbstractSessionFactory;
 import lombok.extern.java.Log;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -11,7 +11,7 @@ import javax.persistence.PersistenceException;
 @Log
 public class DefaultPersistenceContext implements PersistenceContext {
 
-    private final SessionFactory sessionFactory = H2DBSessionFactory.getInstance();
+    private final SessionFactory sessionFactory = AbstractSessionFactory.getInstance();
 
     @Override
     public void commitTransaction(PersistenceStrategy persistenceStrategy) {

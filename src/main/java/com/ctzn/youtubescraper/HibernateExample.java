@@ -1,9 +1,7 @@
 package com.ctzn.youtubescraper;
 
-import com.ctzn.youtubescraper.persistence.DefaultPersistenceContext;
 import com.ctzn.youtubescraper.persistence.runner.PersistenceChannelRunner;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 public class HibernateExample {
@@ -14,13 +12,9 @@ public class HibernateExample {
 
     public static void main(String[] args) throws Exception {
         String channelId = "UCksTNgiRyQGwi2ODBie8HdA";
-        Callable<Void> runner = new PersistenceChannelRunner(
-                channelId,
-                new DefaultPersistenceContext(),
-                10,
-                1,
-                TimeUnit.HOURS
-        );
-        runner.call();
+        PersistenceChannelRunner.newBuilder(channelId)
+                .nThreads(10).timeout(1).timeUnit(TimeUnit.HOURS)
+                .getBuilder().build().call();
     }
+
 }

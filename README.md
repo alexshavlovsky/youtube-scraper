@@ -69,6 +69,14 @@ Get all channel comments by channel ID:
     executor.awaitAndTerminate();
 ```
 
+Store channel comments to a database:
+``` JAVA
+    String channelId = "UCksTNgiRyQGwi2ODBie8HdA";
+    PersistenceChannelRunner.newBuilder(channelId)
+            .nThreads(10).timeout(1).timeUnit(TimeUnit.HOURS)
+            .getBuilder().build().call();
+```
+
 ## Technology Stack
 
 Component          | Technology

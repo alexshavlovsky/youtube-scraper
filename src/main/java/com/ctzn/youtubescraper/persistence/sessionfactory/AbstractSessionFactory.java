@@ -12,7 +12,7 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
 import java.util.Properties;
 
-public class H2DBSessionFactory {
+public class AbstractSessionFactory {
 
     private final static SessionFactory instance = newInstance();
     private final static String HIBERNATE_CFG_FILE_KEY = "hibernate.configuration.xml";

@@ -1,9 +1,7 @@
 package com.ctzn.youtubescraper;
 
-import com.ctzn.youtubescraper.persistence.DefaultPersistenceContext;
 import com.ctzn.youtubescraper.persistence.runner.PersistenceChannelRunner;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 public class HibernateTopCommentsOnlyExample {
@@ -14,20 +12,12 @@ public class HibernateTopCommentsOnlyExample {
 
     public static void main(String[] args) throws Exception {
         String channelId = "UCsAw3WynQJMm7tMy093y37A";
-        Callable<Void> runner = new PersistenceChannelRunner(
-                channelId,
-                new DefaultPersistenceContext(),
-                30, // create 30 worker threads
-                1, TimeUnit.HOURS, // forcibly interrupt the runner if it lasts more than 1 hour
-                false, // request top comments (default youtube behaviour when you scroll down a page)
-                // youtube comment API has a limitation: you can't request more than approximately 80 continuations
-                // in the "top comments first" sorting mode (20 comments per continuation + replies threads)
-                // if you switch to "newest comments first" mode it seems that there are no limitations as for now
-                2000, // request no more than than 2000 comments per video
-                10,  // request no more than than 10 replies per comment
-                100 // process 100 most recent videos
-        );
-        runner.call();
+        PersistenceChannelRunner.newBuilder(channelId)
+                .nThreads(30).timeout(1).timeUnit(TimeUnit.HOURS)
+                .videoCountLimit(100)
+                .sortNewestCommentsFirst(false)
+                .commentCountPerVideoLimit(2000).replyThreadCountLimit(10)
+                .getBuilder().build().call();
     }
 
     // top commentators:

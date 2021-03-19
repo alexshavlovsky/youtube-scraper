@@ -61,13 +61,13 @@ class CommentContext extends AbstractCommentContext {
 
     @Override
     public void traverse(CommentVisitor commentVisitor) throws ScrapperInterruptedException {
-        traverse(commentVisitor, commentVisitor.getCommentCountLimit());
+        traverse(commentVisitor, commentVisitor.getCommentIteratorCfg().getCommentCountPerVideoLimit());
     }
 
     @Override
     public void handle(CommentVisitor commentVisitor) throws ScrapperInterruptedException {
         List<CommentDTO> comments = getSection().getComments(getVideoId(), null);
-        if (commentVisitor.getReplyThreadCountLimit() == 0) commentVisitor.visitAll(comments);
+        if (commentVisitor.getCommentIteratorCfg().getReplyThreadCountLimit() == 0) commentVisitor.visitAll(comments);
         else {
             Map<String, NextContinuationData> replyContinuationMap = getSection().getReplyContinuationMap();
             for (CommentDTO comment : comments)

@@ -8,11 +8,14 @@ import com.ctzn.youtubescraper.persistence.entity.VideoEntity;
 import com.ctzn.youtubescraper.persistence.entity.WorkerLogEntity;
 import com.ctzn.youtubescraper.persistence.repository.CommentRepository;
 import com.ctzn.youtubescraper.persistence.repository.WorkerLogRepository;
+import com.ctzn.youtubescraper.config.CommentIteratorCfg;
+import com.ctzn.youtubescraper.config.CommentOrderCfg;
 import com.ctzn.youtubescraper.runner.CommentRunnerFactory;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 class PersistenceCommentRunner implements Runnable {
@@ -20,18 +23,15 @@ class PersistenceCommentRunner implements Runnable {
     private final String videoId;
     private final Map<String, VideoEntity> videoEntityMap;
     private final PersistenceContext persistenceContext;
-    private final boolean sortNewestCommentsFirst;
-    private final int totalCommentCountLimit;
-    private final int replyThreadCountLimit;
+    private final CommentOrderCfg commentOrderCfg;
+    private final CommentIteratorCfg commentIteratorCfg;
 
-
-    PersistenceCommentRunner(String videoId, Map<String, VideoEntity> videoEntityMap, PersistenceContext persistenceContext, boolean sortNewestCommentsFirst, int totalCommentCountLimit, int replyThreadCountLimit) {
+    PersistenceCommentRunner(String videoId, Map<String, VideoEntity> videoEntityMap, PersistenceContext persistenceContext, CommentOrderCfg commentOrderCfg, CommentIteratorCfg commentIteratorCfg) {
         this.videoId = videoId;
         this.videoEntityMap = videoEntityMap;
         this.persistenceContext = persistenceContext;
-        this.sortNewestCommentsFirst = sortNewestCommentsFirst;
-        this.totalCommentCountLimit = totalCommentCountLimit;
-        this.replyThreadCountLimit = replyThreadCountLimit;
+        this.commentOrderCfg = commentOrderCfg;
+        this.commentIteratorCfg = commentIteratorCfg;
     }
 
     @Override
@@ -39,7 +39,7 @@ class PersistenceCommentRunner implements Runnable {
         WorkerLogEntity logEntry = new WorkerLogEntity(null, videoId, new Date(), null, "STARTED", toString());
         persistenceContext.commitTransaction(session -> WorkerLogRepository.save(logEntry, session));
         DataCollector<CommentDTO> collector = new DataCollector<>();
-        CommentRunnerFactory.newInstance(videoId, collector, sortNewestCommentsFirst, totalCommentCountLimit, replyThreadCountLimit).run();
+        CommentRunnerFactory.newInstance(videoId, collector, commentOrderCfg, commentIteratorCfg).run();
 
         List<CommentEntity> commentEntities = collector.stream().filter(c -> c.getParentCommentId() == null)
                 .map(c -> CommentEntity.fromCommentDTO(c, videoEntityMap, null)).collect(Collectors.toList());
@@ -59,10 +59,10 @@ class PersistenceCommentRunner implements Runnable {
 
     @Override
     public String toString() {
-        return "PersistenceCommentRunner{" +
-                "sortNewestCommentsFirst=" + sortNewestCommentsFirst +
-                ", totalCommentCountLimit=" + totalCommentCountLimit +
-                ", replyThreadCountLimit=" + replyThreadCountLimit +
-                '}';
+        return new StringJoiner(", ", PersistenceCommentRunner.class.getSimpleName() + "[", "]")
+                .add("commentOrderCfg=" + commentOrderCfg)
+                .add("commentIteratorCfg=" + commentIteratorCfg)
+                .toString();
     }
+
 }

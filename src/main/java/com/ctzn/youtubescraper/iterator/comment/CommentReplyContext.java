@@ -44,7 +44,7 @@ class CommentReplyContext extends AbstractCommentContext {
 
     @Override
     public void traverse(CommentVisitor commentVisitor) throws ScrapperInterruptedException {
-        traverse(commentVisitor, commentVisitor.getReplyThreadCountLimit());
+        traverse(commentVisitor, commentVisitor.getCommentIteratorCfg().getReplyThreadCountLimit());
     }
 
     @Override

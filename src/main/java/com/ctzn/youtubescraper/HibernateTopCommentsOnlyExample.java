@@ -2,7 +2,7 @@ package com.ctzn.youtubescraper;
 
 import com.ctzn.youtubescraper.persistence.runner.PersistenceChannelRunner;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 public class HibernateTopCommentsOnlyExample {
 
@@ -13,11 +13,11 @@ public class HibernateTopCommentsOnlyExample {
     public static void main(String[] args) throws Exception {
         String channelId = "UCsAw3WynQJMm7tMy093y37A";
         PersistenceChannelRunner.newBuilder(channelId)
-                .nThreads(30).timeout(1).timeUnit(TimeUnit.HOURS)
+                .withExecutor(20, Duration.ofHours(1))
+                .topCommentsFirst()
                 .videoCountLimit(100)
-                .sortNewestCommentsFirst(false)
-                .commentCountPerVideoLimit(2000).replyThreadCountLimit(10)
-                .getBuilder().build().call();
+                .commentCountLimits(2000, 10)
+                .build().call();
     }
 
     // top commentators:

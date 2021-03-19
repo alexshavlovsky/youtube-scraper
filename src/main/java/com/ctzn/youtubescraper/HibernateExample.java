@@ -2,7 +2,7 @@ package com.ctzn.youtubescraper;
 
 import com.ctzn.youtubescraper.persistence.runner.PersistenceChannelRunner;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 public class HibernateExample {
 
@@ -13,8 +13,8 @@ public class HibernateExample {
     public static void main(String[] args) throws Exception {
         String channelId = "UCksTNgiRyQGwi2ODBie8HdA";
         PersistenceChannelRunner.newBuilder(channelId)
-                .nThreads(10).timeout(1).timeUnit(TimeUnit.HOURS)
-                .getBuilder().build().call();
+                .withExecutor(20, Duration.ofHours(1))
+                .processAllChannelComments().build().call();
     }
 
 }

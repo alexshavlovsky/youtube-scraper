@@ -1,5 +1,6 @@
 package com.ctzn.youtubescraper;
 
+import com.ctzn.youtubescraper.config.CommentOrderCfg;
 import com.ctzn.youtubescraper.runner.CommentRunnerFactory;
 
 public class CommentsNewestFirstExample {
@@ -10,7 +11,7 @@ public class CommentsNewestFirstExample {
 
     public static void main(String[] args) {
         String videoId = "v9ejT8FO-7I";
-        Runnable runner = CommentRunnerFactory.newDefaultFileAppender(videoId, true);
+        Runnable runner = CommentRunnerFactory.newDefaultFileAppender(videoId, CommentOrderCfg.newestFirst());
         runner.run();
     }
 }

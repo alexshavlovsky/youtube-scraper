@@ -3,9 +3,8 @@ package com.ctzn.youtubescraper;
 import com.ctzn.youtubescraper.exception.ScraperException;
 import com.ctzn.youtubescraper.executor.CustomExecutorService;
 import com.ctzn.youtubescraper.model.channelvideos.ChannelDTO;
+import com.ctzn.youtubescraper.config.CommentOrderCfg;
 import com.ctzn.youtubescraper.runner.ChannelVideosCollector;
-
-import java.util.concurrent.TimeUnit;
 
 import static com.ctzn.youtubescraper.runner.CommentRunnerFactory.newDefaultFileAppender;
 
@@ -21,13 +20,13 @@ public class ChannelAllCommentsExample {
         ChannelVideosCollector collector = new ChannelVideosCollector(channelId);
         ChannelDTO channel = collector.call();
 
-        CustomExecutorService executor =
-                new CustomExecutorService("CommentWorker", 10, 10, TimeUnit.MINUTES);
+        CustomExecutorService executor = CustomExecutorService.newInstance();
 
         channel.videos.stream().map(
-                v -> newDefaultFileAppender(v.getVideoId(), true)
+                v -> newDefaultFileAppender(v.getVideoId(), CommentOrderCfg.newestFirst())
         ).forEach(executor::submit);
 
         executor.awaitAndTerminate();
     }
+
 }

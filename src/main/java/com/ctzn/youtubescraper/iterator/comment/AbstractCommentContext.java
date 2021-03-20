@@ -1,5 +1,6 @@
 package com.ctzn.youtubescraper.iterator.comment;
 
+import com.ctzn.youtubescraper.config.CountLimit;
 import com.ctzn.youtubescraper.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.exception.ScraperParserException;
 import com.ctzn.youtubescraper.exception.ScrapperInterruptedException;
@@ -7,7 +8,6 @@ import com.ctzn.youtubescraper.http.YoutubeVideoCommentsClient;
 import com.ctzn.youtubescraper.iterator.HeartBeatLogger;
 import com.ctzn.youtubescraper.model.comments.CommentItemSection;
 import com.ctzn.youtubescraper.model.commons.NextContinuationData;
-import com.ctzn.youtubescraper.config.CommentIteratorCfg;
 import lombok.extern.java.Log;
 
 import static java.util.logging.Level.INFO;
@@ -81,8 +81,8 @@ abstract class AbstractCommentContext implements IterableCommentContext {
         return replyMeter;
     }
 
-    void traverse(CommentVisitor commentVisitor, int limit) throws ScrapperInterruptedException {
-        while (limit == CommentIteratorCfg.NO_LIMIT || getMeter().getCounter() < limit) {
+    void traverse(CommentVisitor commentVisitor, CountLimit limit) throws ScrapperInterruptedException {
+        while (limit.isValueBelowLimit(getMeter().getCounter())) {
             if (Thread.currentThread().isInterrupted())
                 throw new ScrapperInterruptedException("Comment thread iterator has been interrupted");
             if (hasSection()) {

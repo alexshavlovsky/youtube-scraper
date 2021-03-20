@@ -18,7 +18,7 @@ public class MultipleHandlersExample {
                         new CommentConsolePrinter(new CommentHumanReadableFormatter()),
                         new CommentFileAppenderFactory(".output").newInstance(videoId)
                 ),
-                CommentOrderCfg.topFirst(),
+                CommentOrderCfg.TOP_FIRST,
                 CommentIteratorCfg.newInstance(1000, 10)
         );
         runner.run();

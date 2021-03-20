@@ -48,8 +48,9 @@ Get comments by list of video IDs:
             "D2bB1bz9Z9s", "LqihfRVj8hM", "_oaSgmoy9aA", "lIlSNpLkO-A", "XQ_cQ9I7_YA",
             "Dtk2xgBZTec", "pEr1TtCB7_Y", "NMg6DQSO5VE", "bhE2RaN4VcI", "pJJE7R8xteQ"
     };
-    CustomExecutorService executor = new CustomExecutorService("CommentWorker", 10, 5, TimeUnit.MINUTES);
-    Arrays.stream(ids).map(videoId -> newDefaultFileAppender(videoId, true)).forEach(executor::submit);
+
+    CustomExecutorService executor = CustomExecutorService.newInstance();
+    Arrays.stream(ids).map(videoId -> newDefaultFileAppender(videoId, CommentOrderCfg.NEWEST_FIRST)).forEach(executor::submit);
     executor.awaitAndTerminate();
 ```
 
@@ -59,13 +60,13 @@ Get all channel comments by channel ID:
     ChannelVideosCollector collector = new ChannelVideosCollector(channelId);
     ChannelDTO channel = collector.call();
 
-    CustomExecutorService executor =
-            new CustomExecutorService("CommentWorker", 10, 10, TimeUnit.MINUTES);
+    CustomExecutorService executor = CustomExecutorService.configure()
+            .numberOfThreads(10).timeout(Duration.ofMinutes(10)).toBuilder().build();
 
     channel.videos.stream().map(
-            v -> newDefaultFileAppender(v.getVideoId(), true)
+            v -> newDefaultFileAppender(v.getVideoId(), CommentOrderCfg.NEWEST_FIRST)
     ).forEach(executor::submit);
-        
+
     executor.awaitAndTerminate();
 ```
 
@@ -73,8 +74,8 @@ Store channel comments to a database:
 ``` JAVA
     String channelId = "UCksTNgiRyQGwi2ODBie8HdA";
     PersistenceChannelRunner.newBuilder(channelId)
-            .nThreads(10).timeout(1).timeUnit(TimeUnit.HOURS)
-            .getBuilder().build().call();
+            .withExecutor(20, Duration.ofHours(1))
+            .processAllChannelComments().build().call();
 ```
 
 ## Technology Stack

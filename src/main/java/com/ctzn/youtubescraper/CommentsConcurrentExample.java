@@ -21,7 +21,7 @@ public class CommentsConcurrentExample {
     public static void main(String[] args) throws InterruptedException {
         CustomExecutorService executor = CustomExecutorService.newInstance();
 
-        Arrays.stream(ids).map(videoId -> newDefaultFileAppender(videoId, CommentOrderCfg.newestFirst())).forEach(executor::submit);
+        Arrays.stream(ids).map(videoId -> newDefaultFileAppender(videoId, CommentOrderCfg.NEWEST_FIRST)).forEach(executor::submit);
         executor.awaitAndTerminate();
     }
 

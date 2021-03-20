@@ -32,7 +32,7 @@ public class CommentRunnerFactory {
 
     public static Runnable newUnrestrictedInstance(String videoId, DataHandler<CommentDTO> handler) {
         return new CommentRunner(
-                new IterableCommentContextBuilder(videoId, CommentOrderCfg.newestFirst()),
+                new IterableCommentContextBuilder(videoId, CommentOrderCfg.NEWEST_FIRST),
                 new CommentVisitor(handler, CommentIteratorCfg.newInstance())
         );
     }

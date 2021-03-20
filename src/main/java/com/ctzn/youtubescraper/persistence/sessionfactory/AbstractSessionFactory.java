@@ -14,7 +14,10 @@ import java.util.Properties;
 
 public class AbstractSessionFactory {
 
-    private final static SessionFactory instance = newInstance();
+    private static class SingletonHolder {
+        private final static SessionFactory SESSION_FACTORY = newInstance();
+    }
+
     private final static String HIBERNATE_CFG_FILE_KEY = "hibernate.configuration.xml";
 
     private static SessionFactory newInstance() {
@@ -42,6 +45,7 @@ public class AbstractSessionFactory {
     }
 
     public static SessionFactory getInstance() {
-        return instance;
+        return SingletonHolder.SESSION_FACTORY;
     }
+
 }

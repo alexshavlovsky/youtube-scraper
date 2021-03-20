@@ -1,9 +1,9 @@
 package com.ctzn.youtubescraper.iterator.comment;
 
+import com.ctzn.youtubescraper.config.CommentOrderCfg;
 import com.ctzn.youtubescraper.exception.ScraperException;
 import com.ctzn.youtubescraper.http.YoutubeVideoCommentsClient;
 import com.ctzn.youtubescraper.http.useragent.UserAgentAbstractFactory;
-import com.ctzn.youtubescraper.config.CommentOrderCfg;
 
 class IterableCommentContextFactory {
 
@@ -23,7 +23,7 @@ class IterableCommentContextFactory {
     }
 
     static IterableCommentContext newInstance(String videoId, CommentOrderCfg commentOrderCfg) throws ScraperException {
-        return commentOrderCfg.getCommentOrder() == CommentOrderCfg.CommentOrder.NEWEST_FIRST ?
+        return commentOrderCfg.isNewestFirst() ?
                 IterableCommentContextFactory.newNewestCommentsFirstContext(videoId) :
                 IterableCommentContextFactory.newTopCommentsFirstContext(videoId);
     }

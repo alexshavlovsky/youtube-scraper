@@ -1,12 +1,25 @@
 package com.ctzn.youtubescraper.config;
 
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 public class VideoIteratorCfg {
 
-    public static final int PROCESS_ALL_VIDEOS = 0;
+    private final CountLimit videoCountLimit = new CountLimit();
 
-    public int videoCountLimit = PROCESS_ALL_VIDEOS;
+    private VideoIteratorCfg() {
+    }
+
+    private VideoIteratorCfg(int videoCountLimit) {
+        this.videoCountLimit.set(videoCountLimit);
+    }
+
+    public static VideoIteratorCfg newInstance() {
+        return new VideoIteratorCfg();
+    }
+
+    public static VideoIteratorCfg newInstance(int videoCountLimit) {
+        return new VideoIteratorCfg(videoCountLimit);
+    }
 
 }

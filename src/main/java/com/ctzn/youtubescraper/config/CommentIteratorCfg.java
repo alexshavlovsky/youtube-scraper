@@ -1,22 +1,19 @@
 package com.ctzn.youtubescraper.config;
 
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 public class CommentIteratorCfg {
 
-    public static final int NO_LIMIT = -1;
-
-    public int commentCountPerVideoLimit = NO_LIMIT;
-    public int replyThreadCountLimit = NO_LIMIT;
-
+    private final CountLimit commentPerVideoLimit = new CountLimit();
+    private final CountLimit replyPerCommentLimit = new CountLimit();
 
     private CommentIteratorCfg() {
     }
 
-    private CommentIteratorCfg(int commentCountPerVideoLimit, int replyThreadCountLimit) {
-        this.commentCountPerVideoLimit = commentCountPerVideoLimit;
-        this.replyThreadCountLimit = replyThreadCountLimit;
+    private CommentIteratorCfg(int commentPerVideoLimit, int replyPerCommentLimit) {
+        this.commentPerVideoLimit.set(commentPerVideoLimit);
+        this.replyPerCommentLimit.set(replyPerCommentLimit);
     }
 
     public static CommentIteratorCfg newInstance() {

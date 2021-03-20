@@ -1,4 +1,4 @@
-package com.ctzn.youtubescraper.persistence.runner.stepbuilder;
+package com.ctzn.youtubescraper.persistence.runner;
 
 import com.ctzn.youtubescraper.config.CommentIteratorCfg;
 import com.ctzn.youtubescraper.config.CommentOrderCfg;
@@ -6,13 +6,12 @@ import com.ctzn.youtubescraper.config.ExecutorCfg;
 import com.ctzn.youtubescraper.config.VideoIteratorCfg;
 import com.ctzn.youtubescraper.persistence.DefaultPersistenceContext;
 import com.ctzn.youtubescraper.persistence.PersistenceContext;
-import com.ctzn.youtubescraper.persistence.runner.PersistenceChannelRunner;
 
 import java.time.Duration;
 
-public class ChannelPersistenceRunnerStepBuilder {
+public class PersistenceChannelRunnerStepBuilder {
 
-    private ChannelPersistenceRunnerStepBuilder() {
+    private PersistenceChannelRunnerStepBuilder() {
     }
 
     public static ExecutorStep newBuilder(String channelId) {
@@ -28,10 +27,10 @@ public class ChannelPersistenceRunnerStepBuilder {
             this.channelId = channelId;
         }
 
-        private ExecutorCfg executorCfg = ExecutorCfg.newInstance();
-        private CommentOrderCfg commentOrderCfg = new CommentOrderCfg();
-        private VideoIteratorCfg videoIteratorCfg = new VideoIteratorCfg();
-        private CommentIteratorCfg commentIteratorCfg = CommentIteratorCfg.newInstance();
+        private final ExecutorCfg executorCfg = ExecutorCfg.newInstance();
+        private CommentOrderCfg commentOrderCfg = CommentOrderCfg.NEWEST_FIRST;
+        private final VideoIteratorCfg videoIteratorCfg = VideoIteratorCfg.newInstance();
+        private final CommentIteratorCfg commentIteratorCfg = CommentIteratorCfg.newInstance();
 
         @Override
         public CommentOrderStep defaultExecutor() {
@@ -55,25 +54,24 @@ public class ChannelPersistenceRunnerStepBuilder {
 
         @Override
         public VideoIteratorStep topCommentsFirst() {
-            commentOrderCfg.setCommentOrder(CommentOrderCfg.CommentOrder.TOP_FIRST);
+            commentOrderCfg = CommentOrderCfg.TOP_FIRST;
             return this;
         }
 
         @Override
         public VideoIteratorStep newestCommentsFirst() {
-            commentOrderCfg.setCommentOrder(CommentOrderCfg.CommentOrder.NEWEST_FIRST);
+            commentOrderCfg = CommentOrderCfg.NEWEST_FIRST;
             return this;
         }
 
         @Override
         public BuildStep processAllChannelComments() {
-            commentOrderCfg = new CommentOrderCfg();
             return this;
         }
 
         @Override
         public CommentIteratorStep videoCountLimit(int videoCountLimit) {
-            videoIteratorCfg.setVideoCountLimit(videoCountLimit);
+            videoIteratorCfg.getVideoCountLimit().set(videoCountLimit);
             return this;
         }
 
@@ -84,14 +82,39 @@ public class ChannelPersistenceRunnerStepBuilder {
 
         @Override
         public BuildStep commentCountLimits(int commentCountPerVideoLimit, int replyThreadCountLimit) {
-            commentIteratorCfg.setCommentCountPerVideoLimit(commentCountPerVideoLimit);
-            commentIteratorCfg.setReplyThreadCountLimit(replyThreadCountLimit);
+            commentIteratorCfg.getCommentPerVideoLimit().set(commentCountPerVideoLimit);
+            commentIteratorCfg.getReplyPerCommentLimit().set(replyThreadCountLimit);
             return this;
         }
 
         @Override
         public BuildStep processAllComments() {
             return this;
+        }
+
+        @Override
+        public String getChannelId() {
+            return channelId;
+        }
+
+        @Override
+        public ExecutorCfg getExecutorCfg() {
+            return executorCfg;
+        }
+
+        @Override
+        public CommentOrderCfg getCommentOrderCfg() {
+            return commentOrderCfg;
+        }
+
+        @Override
+        public VideoIteratorCfg getVideoIteratorCfg() {
+            return videoIteratorCfg;
+        }
+
+        @Override
+        public CommentIteratorCfg getCommentIteratorCfg() {
+            return commentIteratorCfg;
         }
 
         @Override
@@ -138,9 +161,18 @@ public class ChannelPersistenceRunnerStepBuilder {
 
     public interface BuildStep {
 
+        String getChannelId();
+
+        ExecutorCfg getExecutorCfg();
+
+        CommentOrderCfg getCommentOrderCfg();
+
+        VideoIteratorCfg getVideoIteratorCfg();
+
+        CommentIteratorCfg getCommentIteratorCfg();
+
         PersistenceChannelRunner build();
 
     }
-
 
 }

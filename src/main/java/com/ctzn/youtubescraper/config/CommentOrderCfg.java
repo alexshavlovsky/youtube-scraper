@@ -1,26 +1,26 @@
 package com.ctzn.youtubescraper.config;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class CommentOrderCfg {
 
-    public enum CommentOrder {
+    public enum CommentOrderEnum {
         TOP_FIRST, NEWEST_FIRST
     }
 
-    public CommentOrder commentOrder = CommentOrder.NEWEST_FIRST;
+    private final CommentOrderEnum commentOrder;
 
-    public static CommentOrderCfg topFirst() {
-        return new CommentOrderCfg(CommentOrder.TOP_FIRST);
+    public static CommentOrderCfg TOP_FIRST = new CommentOrderCfg(CommentOrderEnum.TOP_FIRST);
+
+    public static CommentOrderCfg NEWEST_FIRST = new CommentOrderCfg(CommentOrderEnum.NEWEST_FIRST);
+
+    public boolean isNewestFirst() {
+        return commentOrder == CommentOrderEnum.NEWEST_FIRST;
     }
 
-    public static CommentOrderCfg newestFirst() {
-        return new CommentOrderCfg(CommentOrder.NEWEST_FIRST);
+    public boolean isTopFirst() {
+        return commentOrder == CommentOrderEnum.TOP_FIRST;
     }
 
 }

@@ -14,7 +14,6 @@ import com.ctzn.youtubescraper.persistence.entity.WorkerLogEntity;
 import com.ctzn.youtubescraper.persistence.repository.ChannelRepository;
 import com.ctzn.youtubescraper.persistence.repository.VideoRepository;
 import com.ctzn.youtubescraper.persistence.repository.WorkerLogRepository;
-import com.ctzn.youtubescraper.persistence.runner.stepbuilder.*;
 import com.ctzn.youtubescraper.runner.ChannelVideosCollector;
 
 import java.util.*;
@@ -39,8 +38,8 @@ public class PersistenceChannelRunner implements Callable<Void> {
         this.commentIteratorCfg = commentIteratorCfg;
     }
 
-    public static ChannelPersistenceRunnerStepBuilder.ExecutorStep newBuilder(String channelId) {
-        return ChannelPersistenceRunnerStepBuilder.newBuilder(channelId);
+    public static PersistenceChannelRunnerStepBuilder.ExecutorStep newBuilder(String channelId) {
+        return PersistenceChannelRunnerStepBuilder.newBuilder(channelId);
     }
 
     private Map<String, VideoEntity> grabChannelData(String channelId) throws ScraperException {
@@ -48,9 +47,9 @@ public class PersistenceChannelRunner implements Callable<Void> {
         ChannelDTO channel = collector.call();
         ChannelEntity channelEntity = ChannelEntity.fromChannelDTO(channel);
         List<VideoEntity> videoEntities =
-                (videoIteratorCfg.getVideoCountLimit() == VideoIteratorCfg.PROCESS_ALL_VIDEOS ?
+                (videoIteratorCfg.getVideoCountLimit().isUnrestricted() ?
                         channel.getVideos().stream() :
-                        channel.getVideos().stream().limit(videoIteratorCfg.getVideoCountLimit())
+                        channel.getVideos().stream().limit(videoIteratorCfg.getVideoCountLimit().get())
                 ).map(v -> VideoEntity.fromVideoDTO(v, channelEntity)).collect(Collectors.toList());
         persistenceContext.commitTransaction(session -> {
             ChannelRepository.saveOrUpdate(channelEntity, session);

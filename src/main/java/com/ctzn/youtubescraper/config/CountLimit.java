@@ -1,5 +1,8 @@
 package com.ctzn.youtubescraper.config;
 
+import lombok.ToString;
+
+@ToString
 public class CountLimit {
 
     private boolean isUnrestricted = true;

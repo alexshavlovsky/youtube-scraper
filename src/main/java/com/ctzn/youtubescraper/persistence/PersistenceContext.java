@@ -1,5 +1,17 @@
 package com.ctzn.youtubescraper.persistence;
 
+import org.hibernate.Session;
+
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 public interface PersistenceContext {
-    void commitTransaction(PersistenceStrategy persistenceStrategy);
+    default void commitTransaction(Consumer<Session> persistenceStrategy) {
+        commitTransactionAndGetResult(session -> {
+            persistenceStrategy.accept(session);
+            return Void.TYPE;
+        });
+    }
+
+    <T> T commitTransactionAndGetResult(Function<Session, T> supplierPersistenceStrategy);
 }

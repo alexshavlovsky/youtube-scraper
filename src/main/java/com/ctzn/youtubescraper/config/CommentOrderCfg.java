@@ -1,8 +1,10 @@
 package com.ctzn.youtubescraper.config;
 
 import lombok.AllArgsConstructor;
+import lombok.ToString;
 
 @AllArgsConstructor
+@ToString
 public class CommentOrderCfg {
 
     public enum CommentOrderEnum {

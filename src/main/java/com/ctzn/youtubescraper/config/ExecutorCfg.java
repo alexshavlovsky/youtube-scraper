@@ -3,11 +3,13 @@ package com.ctzn.youtubescraper.config;
 import com.ctzn.youtubescraper.executor.CustomExecutorService;
 import lombok.Builder;
 import lombok.Data;
+import lombok.ToString;
 
 import java.time.Duration;
 
 @Data
 @Builder(buildMethodName = "toBuilder")
+@ToString
 public class ExecutorCfg {
 
     @Builder.Default

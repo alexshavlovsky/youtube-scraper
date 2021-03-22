@@ -1,10 +1,8 @@
 package com.ctzn.youtubescraper.config;
 
 import lombok.Getter;
-import lombok.ToString;
 
 @Getter
-@ToString
 public class CommentIteratorCfg {
 
     private final CountLimit commentPerVideoLimit = new CountLimit();
@@ -24,6 +22,12 @@ public class CommentIteratorCfg {
 
     public static CommentIteratorCfg newInstance(int commentCountPerVideoLimit, int replyThreadCountLimit) {
         return new CommentIteratorCfg(commentCountPerVideoLimit, replyThreadCountLimit);
+    }
+
+    @Override
+    public String toString() {
+        return "commentPerVideoLimit=" + commentPerVideoLimit +
+                ", replyPerCommentLimit=" + replyPerCommentLimit;
     }
 
 }

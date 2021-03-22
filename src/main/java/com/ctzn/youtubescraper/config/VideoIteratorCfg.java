@@ -1,10 +1,8 @@
 package com.ctzn.youtubescraper.config;
 
 import lombok.Getter;
-import lombok.ToString;
 
 @Getter
-@ToString
 public class VideoIteratorCfg {
 
     private final CountLimit videoCountLimit = new CountLimit();
@@ -22,6 +20,11 @@ public class VideoIteratorCfg {
 
     public static VideoIteratorCfg newInstance(int videoCountLimit) {
         return new VideoIteratorCfg(videoCountLimit);
+    }
+
+    @Override
+    public String toString() {
+        return "videoCountLimit=" + videoCountLimit;
     }
 
 }

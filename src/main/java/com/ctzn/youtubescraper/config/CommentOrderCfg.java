@@ -1,10 +1,8 @@
 package com.ctzn.youtubescraper.config;
 
 import lombok.AllArgsConstructor;
-import lombok.ToString;
 
 @AllArgsConstructor
-@ToString
 public class CommentOrderCfg {
 
     public enum CommentOrderEnum {
@@ -23,6 +21,11 @@ public class CommentOrderCfg {
 
     public boolean isTopFirst() {
         return commentOrder == CommentOrderEnum.TOP_FIRST;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("commentOrder=%s", commentOrder);
     }
 
 }

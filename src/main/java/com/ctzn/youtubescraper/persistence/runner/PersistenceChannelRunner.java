@@ -75,7 +75,7 @@ public class PersistenceChannelRunner implements Callable<Void> {
             Map<String, VideoEntity> videoEntityMap = grabChannelData(channelId);
             grabComments(videoEntityMap);
             logEntry.setFinishedDate(new Date());
-            logEntry.setStatus("DONE: videoCount=" + videoEntityMap.size());
+            logEntry.setStatus("DONE: videos: " + videoEntityMap.size());
             persistenceContext.commitTransaction(session -> WorkerLogRepository.saveOrUpdate(logEntry, session));
         } catch (Exception e) {
             logEntry.setFinishedDate(new Date());
@@ -88,13 +88,12 @@ public class PersistenceChannelRunner implements Callable<Void> {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", PersistenceChannelRunner.class.getSimpleName() + "[", "]")
+        return new StringJoiner(", ")
                 .add("channelId='" + channelId + "'")
-                .add("persistenceContext=" + persistenceContext)
-                .add("executorCfg=" + executorCfg)
-                .add("commentOrderCfg=" + commentOrderCfg)
-                .add("videoIteratorCfg=" + videoIteratorCfg)
-                .add("commentIteratorCfg=" + commentIteratorCfg)
+                .add(executorCfg.toString())
+                .add(commentOrderCfg.toString())
+                .add(videoIteratorCfg.toString())
+                .add(commentIteratorCfg.toString())
                 .toString();
     }
 

@@ -1,5 +1,7 @@
 package com.ctzn.youtubescraper.persistence.runner;
 
+import com.ctzn.youtubescraper.config.CommentIteratorCfg;
+import com.ctzn.youtubescraper.config.CommentOrderCfg;
 import com.ctzn.youtubescraper.handler.DataCollector;
 import com.ctzn.youtubescraper.model.comments.CommentDTO;
 import com.ctzn.youtubescraper.persistence.PersistenceContext;
@@ -8,8 +10,6 @@ import com.ctzn.youtubescraper.persistence.entity.VideoEntity;
 import com.ctzn.youtubescraper.persistence.entity.WorkerLogEntity;
 import com.ctzn.youtubescraper.persistence.repository.CommentRepository;
 import com.ctzn.youtubescraper.persistence.repository.WorkerLogRepository;
-import com.ctzn.youtubescraper.config.CommentIteratorCfg;
-import com.ctzn.youtubescraper.config.CommentOrderCfg;
 import com.ctzn.youtubescraper.runner.CommentRunnerFactory;
 
 import java.util.Date;
@@ -53,15 +53,18 @@ class PersistenceCommentRunner implements Runnable {
         });
 
         logEntry.setFinishedDate(new Date());
-        logEntry.setStatus("FINISHED: commentCount=" + collector.size());
+        int cs = commentEntities.size(), rs = replyEntities.size();
+        // TODO rewrite the comment runner to make it return exceptions to log error messages here
+        logEntry.setStatus(String.format("DONE: total: %d, comments: %d, replies: %d", cs + rs, cs, rs));
         persistenceContext.commitTransaction(session -> WorkerLogRepository.saveOrUpdate(logEntry, session));
     }
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", PersistenceCommentRunner.class.getSimpleName() + "[", "]")
-                .add("commentOrderCfg=" + commentOrderCfg)
-                .add("commentIteratorCfg=" + commentIteratorCfg)
+        return new StringJoiner(", ")
+                .add("videoId='" + videoId + "'")
+                .add(commentOrderCfg.toString())
+                .add(commentIteratorCfg.toString())
                 .toString();
     }
 

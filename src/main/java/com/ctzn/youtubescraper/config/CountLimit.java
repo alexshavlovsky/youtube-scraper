@@ -1,8 +1,5 @@
 package com.ctzn.youtubescraper.config;
 
-import lombok.ToString;
-
-@ToString
 public class CountLimit {
 
     private boolean isUnrestricted = true;
@@ -11,6 +8,14 @@ public class CountLimit {
     public void set(int value) {
         limit = value;
         isUnrestricted = false;
+    }
+
+    public CountLimit() {
+    }
+
+    public CountLimit(int limit) {
+        this.isUnrestricted = false;
+        this.limit = limit;
     }
 
     public void reset() {
@@ -32,6 +37,11 @@ public class CountLimit {
 
     public boolean isUnrestricted() {
         return isUnrestricted;
+    }
+
+    @Override
+    public String toString() {
+        return isUnrestricted ? "UNRESTRICTED" : isLimitedToZero() ? "ZERO_LIMITED" : String.format("LIMITED(%d)", limit);
     }
 
 }

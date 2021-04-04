@@ -30,16 +30,40 @@ Main features:
 
 ## Usage examples
 
-Get videos list by channel ID:
+Get channel metadata:
+``` JAVA
+    String channelId = "UCksTNgiRyQGwi2ODBie8HdA";
+    YoutubeChannelMetadataClient channelHttpClient = new YoutubeChannelMetadataClient(channelId);
+    System.out.println(channelHttpClient.getChannelMetadata());
+    System.out.println(channelHttpClient.getChannelMicroformat());
+    System.out.println(channelHttpClient.getChannelHeader());
+    System.out.println(channelHttpClient.getChannelMetadata().getVanityChannelUrl());
+    System.out.println(channelHttpClient.getChannelHeader().getSubscriberCountText());
+    System.out.println(channelHttpClient.getChannelVanityName());
+```
+
+Get video list by channel ID:
 ``` JAVA
     String channelId = "UCksTNgiRyQGwi2ODBie8HdA";
     ChannelVideosCollector collector = new ChannelVideosCollector(channelId);
-    ChannelDTO channel = collector.call();
+    ChannelVideosDTO channel = collector.call();
     List<VideoDTO> videos = channel.getVideos();
     for (int i = 0; i < videos.size(); i++) {
         VideoDTO video = videos.get(i);
         System.out.println(String.format("%s [%s] %s", i + 1, video.getVideoId(), video.getTitle()));
     }
+```
+
+Print comments to console by a video ID:
+``` JAVA
+    String videoId = "ipAnwilMncI";
+    Runnable runner = CommentRunnerFactory.newInstance(
+            videoId,
+            new CommentConsolePrinter(new CommentHumanReadableFormatter()),
+            CommentOrderCfg.TOP_FIRST,
+            CommentIteratorCfg.newInstance(1000, 10)
+    );
+    runner.run();
 ```
 
 Get comments by list of video IDs:
@@ -48,7 +72,6 @@ Get comments by list of video IDs:
             "D2bB1bz9Z9s", "LqihfRVj8hM", "_oaSgmoy9aA", "lIlSNpLkO-A", "XQ_cQ9I7_YA",
             "Dtk2xgBZTec", "pEr1TtCB7_Y", "NMg6DQSO5VE", "bhE2RaN4VcI", "pJJE7R8xteQ"
     };
-
     CustomExecutorService executor = CustomExecutorService.newInstance();
     Arrays.stream(ids).map(videoId -> newDefaultFileAppender(videoId, CommentOrderCfg.NEWEST_FIRST)).forEach(executor::submit);
     executor.awaitAndTerminate();
@@ -58,22 +81,19 @@ Get all channel comments by channel ID:
 ``` JAVA
     String channelId = "UCksTNgiRyQGwi2ODBie8HdA";
     ChannelVideosCollector collector = new ChannelVideosCollector(channelId);
-    ChannelDTO channel = collector.call();
-
+    ChannelVideosDTO channelVideos = collector.call();
     CustomExecutorService executor = CustomExecutorService.configure()
             .numberOfThreads(10).timeout(Duration.ofMinutes(10)).toBuilder().build();
-
-    channel.videos.stream().map(
+    channelVideos.getVideos().stream().map(
             v -> newDefaultFileAppender(v.getVideoId(), CommentOrderCfg.NEWEST_FIRST)
     ).forEach(executor::submit);
-
     executor.awaitAndTerminate();
 ```
 
 Store channel comments to a database:
 ``` JAVA
     String channelId = "UCksTNgiRyQGwi2ODBie8HdA";
-    PersistenceChannelRunner.newBuilder(channelId)
+    HibernateChannelRunner.newBuilder(channelId)
             .withExecutor(20, Duration.ofHours(1))
             .processAllChannelComments().build().call();
 ```
@@ -86,18 +106,3 @@ Runtime            | Java 11
 Http client        | java.net.http.HttpClient, [Brotli decoder](https://github.com/google/brotli)
 Data mapping       | Jackson, [ModelMapper](https://github.com/modelmapper/modelmapper)
 Data persistence   | Hibernate 5, H2 database, PostgresSQL
-
-## Class responsibility assignment summary
-
-```
-1. YoutubeChannelMetadataClient resolves channelVanityName by channelId
-
-2. YoutubeChannelVideosClient <-- VideoContext <-- VideoContextIterator fetches list of videos
-
-3. For each video:
-   YoutubeVideoCommentsClient <-- CommentContext      <----- CommentVisitor handles comments
-                                   |                      /
-4. For each comment:            + CommentReplyContext <---                  handles replies
-
-5. Comments and replies are mapped to DTO objects and passed to DataHandlers
-```

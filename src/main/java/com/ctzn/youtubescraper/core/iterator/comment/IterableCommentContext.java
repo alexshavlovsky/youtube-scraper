@@ -22,6 +22,10 @@ public interface IterableCommentContext {
 
     CommentContextMeter getReplyMeter();
 
+    default int getTotalCommentCount() {
+        return getMeter().getTargetCount();
+    }
+
     String getShortResultStat();
 
     void traverse(CommentVisitor commentVisitor) throws ScrapperInterruptedException;

@@ -10,7 +10,7 @@ import com.ctzn.youtubescraper.core.persistence.dto.CommentDTO;
 
 public class CommentRunnerFactory {
 
-    public static Runnable newInstance(String videoId, DataHandler<CommentDTO> handler, CommentOrderCfg commentOrderCfg, CommentIteratorCfg commentIteratorCfg) {
+    public static CommentRunner newInstance(String videoId, DataHandler<CommentDTO> handler, CommentOrderCfg commentOrderCfg, CommentIteratorCfg commentIteratorCfg) {
         return new CommentRunner(
                 new IterableCommentContextBuilder(videoId, commentOrderCfg),
                 new CommentVisitor(handler, commentIteratorCfg)

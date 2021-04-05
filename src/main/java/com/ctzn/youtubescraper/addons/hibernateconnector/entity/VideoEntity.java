@@ -33,6 +33,7 @@ public class VideoEntity implements TimeStamped {
     ContextStatus contextStatus;
     public Date createdDate;
     public Date lastUpdatedDate;
+    public Integer totalCommentCount;
 
     public static VideoEntity fromVideoDTO(VideoDTO dto, ChannelEntity channel) {
         return new VideoEntity(
@@ -43,6 +44,7 @@ public class VideoEntity implements TimeStamped {
                 dto.getViewCountText(),
                 Collections.emptyList(),
                 new ContextStatus(StatusCode.METADATA_FETCHED),
+                null,
                 null,
                 null
         );

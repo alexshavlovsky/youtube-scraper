@@ -2,6 +2,7 @@ package com.ctzn.youtubescraper.core.persistence;
 
 import com.ctzn.youtubescraper.core.config.CommentIteratorCfg;
 import com.ctzn.youtubescraper.core.config.CommentOrderCfg;
+import com.ctzn.youtubescraper.core.exception.ScraperException;
 import com.ctzn.youtubescraper.core.handler.DataCollector;
 import com.ctzn.youtubescraper.core.persistence.dto.CommentDTO;
 import com.ctzn.youtubescraper.core.persistence.dto.StatusCode;
@@ -27,18 +28,23 @@ class PersistenceCommentRunner implements Runnable {
     @Override
     public void run() {
         persistenceService.logVideo(videoId, StatusCode.PASSED_TO_WORKER, toString());
-        DataCollector<CommentDTO> collector = new DataCollector<>();
-        CommentRunnerFactory.newInstance(videoId, collector, commentOrderCfg, commentIteratorCfg).run();
+        try {
+            DataCollector<CommentDTO> collector = new DataCollector<>();
+            int totalCommentCount = CommentRunnerFactory.newInstance(videoId, collector, commentOrderCfg, commentIteratorCfg).call(
+                    commentCount -> persistenceService.updateVideoTotalCommentCount(videoId, commentCount)
+            );
 
-        List<CommentDTO> comments = collector.stream().filter(c -> c.getParentCommentId() == null).collect(Collectors.toList());
-        List<CommentDTO> replies = collector.stream().filter(c -> c.getParentCommentId() != null).collect(Collectors.toList());
-        int cs = comments.size(), rs = replies.size();
+            List<CommentDTO> comments = collector.stream().filter(c -> c.getParentCommentId() == null).collect(Collectors.toList());
+            List<CommentDTO> replies = collector.stream().filter(c -> c.getParentCommentId() != null).collect(Collectors.toList());
+            int cs = comments.size(), rs = replies.size();
 
-        persistenceService.saveVideoComments(videoId, comments, replies);
+            persistenceService.saveVideoComments(videoId, comments, replies);
 
-        persistenceService.logVideo(videoId, StatusCode.DONE,
-                String.format("total: %d, comments: %d, replies: %d", cs + rs, cs, rs));
-        // TODO rewrite the comment runner to make it return exceptions to log error messages here
+            persistenceService.logVideo(videoId, StatusCode.DONE,
+                    String.format("total: %d of %d, comments: %d, replies: %d", cs + rs, totalCommentCount, cs, rs));
+        } catch (ScraperException e) {
+            persistenceService.logVideo(videoId, StatusCode.ERROR, e.getMessage());
+        }
     }
 
     @Override

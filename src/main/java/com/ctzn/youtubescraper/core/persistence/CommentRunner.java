@@ -7,6 +7,8 @@ import com.ctzn.youtubescraper.core.iterator.comment.IterableCommentContext;
 import com.ctzn.youtubescraper.core.iterator.comment.IterableCommentContextBuilder;
 import lombok.extern.java.Log;
 
+import java.util.function.Consumer;
+
 @Log
 public class CommentRunner implements Runnable {
 
@@ -21,13 +23,25 @@ public class CommentRunner implements Runnable {
     @Override
     public void run() {
         try {
-            IterableCommentContext context = contextBuilder.build();
-            context.traverse(iteratorContext);
-            log.info("DONE " + context.getShortResultStat());
-        } catch (ScrapperInterruptedException e) {
-            log.info("INTERRUPTED " + contextBuilder.getVideoId() + ": " + e.toString());
+            call(null);
         } catch (ScraperException e) {
-            log.warning("FAILED " + contextBuilder.getVideoId() + ": " + e.toString());
         }
     }
+
+    public int call(Consumer<Integer> earlyTotalCommentCountConsumer) throws ScraperException {
+        try {
+            IterableCommentContext context = contextBuilder.build();
+            if (earlyTotalCommentCountConsumer!=null) earlyTotalCommentCountConsumer.accept(context.getTotalCommentCount());
+            context.traverse(iteratorContext);
+            log.info("DONE " + context.getShortResultStat());
+            return context.getTotalCommentCount();
+        } catch (ScrapperInterruptedException e) {
+            log.info("INTERRUPTED " + contextBuilder.getVideoId() + ": " + e.toString());
+            throw e;
+        } catch (ScraperException e) {
+            log.warning("FAILED " + contextBuilder.getVideoId() + ": " + e.toString());
+            throw e;
+        }
+    }
+
 }

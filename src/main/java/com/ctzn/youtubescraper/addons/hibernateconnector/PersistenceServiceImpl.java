@@ -1,12 +1,12 @@
 package com.ctzn.youtubescraper.addons.hibernateconnector;
 
-import com.ctzn.youtubescraper.core.persistence.PersistenceService;
-import com.ctzn.youtubescraper.core.persistence.dto.*;
 import com.ctzn.youtubescraper.addons.hibernateconnector.entity.*;
 import com.ctzn.youtubescraper.addons.hibernateconnector.repository.ChannelRepository;
 import com.ctzn.youtubescraper.addons.hibernateconnector.repository.CommentRepository;
 import com.ctzn.youtubescraper.addons.hibernateconnector.repository.VideoRepository;
 import com.ctzn.youtubescraper.addons.hibernateconnector.repository.WorkerLogRepository;
+import com.ctzn.youtubescraper.core.persistence.PersistenceService;
+import com.ctzn.youtubescraper.core.persistence.dto.*;
 import lombok.extern.java.Log;
 import org.hibernate.Session;
 
@@ -44,6 +44,18 @@ public class PersistenceServiceImpl implements PersistenceService {
     }
 
     @Override
+    public void updateVideoTotalCommentCount(String videoId, int totalCommentCount) {
+        persistenceContext.commitTransaction(session -> {
+            VideoEntity videoEntity = VideoRepository.findById(videoId, session);
+            if (videoEntity == null) {
+                log.warning("Can't update video total comment count. The video doesn't exist: " + videoId);
+                return;
+            }
+            videoEntity.setTotalCommentCount(totalCommentCount);
+        });
+    }
+
+    @Override
     public void saveWorkerLog(WorkerLogDTO logEntry) {
         persistenceContext.commitTransaction(session -> saveWorkerLog(logEntry, session));
     }
@@ -76,11 +88,11 @@ public class PersistenceServiceImpl implements PersistenceService {
         });
     }
 
-    public void saveWorkerLog(WorkerLogDTO logEntry, Session session) {
+    private void saveWorkerLog(WorkerLogDTO logEntry, Session session) {
         WorkerLogRepository.save(WorkerLogEntity.fromWorkerLogDTO(logEntry), session);
     }
 
-    public void setChannelStatus(String channelId, ContextStatusDTO status, Session session) {
+    private void setChannelStatus(String channelId, ContextStatusDTO status, Session session) {
         ChannelEntity channel = ChannelRepository.findById(channelId, session);
         if (channel == null) {
             channel = ChannelEntity.newPendingChannel(channelId);
@@ -89,7 +101,7 @@ public class PersistenceServiceImpl implements PersistenceService {
         channel.setContextStatus(ContextStatus.fromContextStatusDTO(status));
     }
 
-    public void setVideoStatus(String videoId, ContextStatusDTO status, Session session) {
+    private void setVideoStatus(String videoId, ContextStatusDTO status, Session session) {
         VideoEntity video = VideoRepository.findById(videoId, session);
         if (video == null) {
             log.warning("Can't save comments. The parent video doesn't exist: " + videoId);

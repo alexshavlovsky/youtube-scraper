@@ -13,7 +13,7 @@ public class ParserUtil {
     private static final String JSON_MARKED_OBJECT_REGEX_TEMPLATE = "%s\\{";  // [marker{]
 
     // TODO refactor this to make it error-prone
-    // maybe need to use a json parser library
+    // maybe use json parser library
     static int nextParenPos(String s, int i0, char p1, char p2) throws ScraperParserException {
         int counter = 0, i = i0;
         while (i < s.length()) {
@@ -44,7 +44,6 @@ public class ParserUtil {
 
     private static int enclosingParenPos(String s, int i, char p1, char p2) throws ScraperParserException {
         // TODO fix this to handle json strings
-        // see nextParenPos and skipJsonString
         int counter = 1;
         while (i >= 0) {
             if (s.charAt(i) == p1 && --counter == 0) return i;

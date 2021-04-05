@@ -10,6 +10,8 @@ public interface PersistenceService {
 
     void saveVideoComments(String videoId, List<CommentDTO> comments, List<CommentDTO> replies);
 
+    void updateVideoTotalCommentCount(String videoId, int totalCommentCount);
+
     void saveWorkerLog(WorkerLogDTO logEntry);
 
     void setChannelStatus(String channelId, ContextStatusDTO status);

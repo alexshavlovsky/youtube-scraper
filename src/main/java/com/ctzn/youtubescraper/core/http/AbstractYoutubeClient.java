@@ -15,6 +15,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.Optional;
 
 import static com.ctzn.youtubescraper.core.http.IoUtil.*;
 
@@ -80,6 +81,32 @@ abstract class AbstractYoutubeClient<E> {
                 .GET().build();
 
         HttpResponse<InputStream> httpResponse = completeRequest(httpClient, request);
+
+        Optional<String> locationOpt;
+        if (httpResponse.statusCode() == 302 && (locationOpt = httpResponse.headers().firstValue("location")).isPresent()) {
+            cookies.put(httpResponse.headers());
+            String location = locationOpt.get();
+            HttpRequest consent = newRequestBuilder(URI.create(location), userAgentCfg.getAccept())
+                    .headers("Upgrade-Insecure-Requests", "1")
+                    .GET().build();
+            HttpResponse<InputStream> consentResponse = completeRequest(httpClient, request);
+            System.out.println("!!!");
+        }
+
+//        GET /m?continue=https%3A%2F%2Fwww.youtube.com%2Fchannel%2FUCOoZWIvTu-onaFbm0YUyY0A&gl=DE&m=0&pc=yt&uxe=23983172&hl=en&src=1 HTTP/2
+//        Host: consent.youtube.com
+//        User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:87.0) Gecko/20100101 Firefox/87.0
+//        Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+//Accept-Language: en-US,ru;q=0.5
+//Accept-Encoding: gzip, deflate, br
+//DNT: 1
+//Connection: keep-alive
+//Cookie: CONSENT=PENDING+280
+//Upgrade-Insecure-Requests: 1
+//Pragma: no-cache
+//Cache-Control: no-cache
+
+
 
         cookies.put(httpResponse.headers());
         cookies.put("PREF=f4=4000000");

@@ -51,7 +51,8 @@ class IoUtil {
 
     static HttpResponse<InputStream> completeRequest(HttpClient httpClient, HttpRequest request) throws ScraperHttpException, ScrapperInterruptedException {
         HttpResponse<InputStream> response = complete(httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofInputStream()));
-        if (response.statusCode() != 200)
+        int status = response.statusCode();
+        if (status != 200 && status != 302 && status != 303)
             throw new ScraperHttpException("Status code [%s] was returned when requesting a resource at [%s]", response.statusCode(), response.uri());
         return response;
     }

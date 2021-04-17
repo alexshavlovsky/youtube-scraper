@@ -3,6 +3,10 @@
 This library is Java 11 Youtube public API HTTP client. Basically this tool is designed to retrieve
 and store in a database all publicly available comments for any youtube channel by a provided channel Id.
 
+Links to related repositories:  
+[Youtube Scraper SpringBoot Web App](https://github.com/alexshavlovsky/yts-service.git).  
+[Youtube Scraper Web App Angular Client](https://github.com/alexshavlovsky/yts-client.git).
+
 Main features:
 - supported endpoints:
     - youtube.com/channel/%s
@@ -105,4 +109,4 @@ Component          | Technology
 Runtime            | Java 11
 Http client        | java.net.http.HttpClient, [Brotli decoder](https://github.com/google/brotli)
 Data mapping       | Jackson, [ModelMapper](https://github.com/modelmapper/modelmapper)
-Data persistence   | Hibernate 5, H2 database, PostgresSQL
+Data persistence   | Hibernate 5, H2 database, PostgreSQL

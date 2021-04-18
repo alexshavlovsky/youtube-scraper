@@ -62,7 +62,7 @@ public class PersistenceChannelRunner implements Callable<Void> {
         try {
             List<VideoDTO> videos = grabChannelData(channelId);
             grabComments(videos);
-            persistenceService.logChannel(channelId, StatusCode.DONE, "videosProcessed: " + videos.size());
+            persistenceService.logChannel(channelId, StatusCode.DONE, "Videos processed: " + videos.size());
         } catch (Exception e) {
             persistenceService.logChannel(channelId, StatusCode.ERROR, e.getMessage());
             throw e;

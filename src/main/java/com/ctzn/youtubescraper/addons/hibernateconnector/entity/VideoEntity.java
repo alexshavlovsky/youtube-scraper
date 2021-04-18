@@ -26,6 +26,7 @@ public class VideoEntity implements TimeStamped {
     ChannelEntity channel;
     String title;
     String publishedTimeText;
+    Date publishedDate;
     int viewCountText;
     @OneToMany(mappedBy = "video")
     List<CommentEntity> comments;
@@ -41,6 +42,7 @@ public class VideoEntity implements TimeStamped {
                 channel,
                 dto.getTitle(),
                 dto.getPublishedTimeText(),
+                dto.getPublishedDate(),
                 dto.getViewCountText(),
                 Collections.emptyList(),
                 new ContextStatus(StatusCode.METADATA_FETCHED),

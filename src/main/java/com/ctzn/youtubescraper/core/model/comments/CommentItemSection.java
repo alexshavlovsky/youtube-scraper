@@ -1,6 +1,7 @@
 package com.ctzn.youtubescraper.core.model.comments;
 
 import com.ctzn.youtubescraper.core.model.commons.*;
+import com.ctzn.youtubescraper.core.parser.ParserUtil;
 import com.ctzn.youtubescraper.core.persistence.dto.CommentDTO;
 
 import java.util.*;
@@ -76,12 +77,14 @@ public class CommentItemSection {
         List<CommentDTO> list = new ArrayList<>();
         for (Content c : contents) {
             CommentRenderer r = c.getCommentRenderer();
+            String publishedTimeText = r.publishedTimeText == null ? null : r.publishedTimeText.toString();
             CommentDTO commentDTO = new CommentDTO(
                     videoId,
                     r.commentId,
                     r.authorText == null ? "" : r.authorText.toString(),
                     r.authorEndpoint == null ? "" : r.authorEndpoint.browseEndpoint.browseId,
-                    r.publishedTimeText.toString(),
+                    publishedTimeText,
+                    ParserUtil.parsePublishedTimeText(publishedTimeText),
                     r.contentText.toString(),
                     r.likeCount,
                     r.replyCount,

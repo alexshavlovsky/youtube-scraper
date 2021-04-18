@@ -1,7 +1,7 @@
 package com.ctzn.youtubescraper.addons.hibernateconnector.entity;
 
-import com.ctzn.youtubescraper.core.persistence.dto.CommentDTO;
 import com.ctzn.youtubescraper.addons.hibernateconnector.sessionfactory.TimeStamped;
+import com.ctzn.youtubescraper.core.persistence.dto.CommentDTO;
 import lombok.*;
 import org.hibernate.annotations.Type;
 
@@ -27,6 +27,7 @@ public class CommentEntity implements TimeStamped {
     public String authorText;
     public String channelId;
     public String publishedTimeText;
+    public Date publishedDate;
     @Lob
     @Type(type = "org.hibernate.type.TextType")
     public String text;
@@ -55,6 +56,7 @@ public class CommentEntity implements TimeStamped {
                 dto.getAuthorText(),
                 dto.getChannelId(),
                 dto.getPublishedTimeText(),
+                dto.getPublishedDate(),
                 dto.getText(),
                 dto.getLikeCount(),
                 dto.getReplyCount(),

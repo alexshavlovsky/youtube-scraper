@@ -1,11 +1,17 @@
 package com.ctzn.youtubescraper.core.parser;
 
 import com.ctzn.youtubescraper.core.exception.ScraperParserException;
+import lombok.extern.java.Log;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Log
 public class ParserUtil {
 
     private static final String JSON_ENTRY_REGEX_TEMPLATE = "\"%s\"\\s*:\\s*\"(?<value>[^\"]+)\""; // ["key":"value"]
@@ -104,12 +110,44 @@ public class ParserUtil {
         return Integer.parseInt(number);
     }
 
+    private static final Map<String, Integer> MULTIPLIERS = Map.of(
+            "", 1,
+            "K", 1_000,
+            "M", 1_000_000,
+            "B", 1_000_000_000
+    );
+
     public static long parseSubCount(String input) {
-        Map<String, Integer> multiplier = Map.of("", 1, "K", 1_000, "M", 1_000_000, "B", 1_000_000_000);
         Matcher matcher = Pattern.compile("([\\d.]+)([KM]?+)").matcher(input);
         if (matcher.find() && matcher.groupCount() == 2)
-            return Math.round(Double.parseDouble(matcher.group(1)) * multiplier.get(matcher.group(2)));
+            return Math.round(Double.parseDouble(matcher.group(1)) * MULTIPLIERS.get(matcher.group(2)));
         return 0;
+    }
+
+    private static final Map<String, ChronoUnit> UNITS = Map.of(
+            "sec", ChronoUnit.SECONDS,
+            "min", ChronoUnit.MINUTES,
+            "hou", ChronoUnit.HOURS,
+            "day", ChronoUnit.DAYS,
+            "wee", ChronoUnit.WEEKS,
+            "mon", ChronoUnit.MONTHS,
+            "yea", ChronoUnit.YEARS
+    );
+
+    public static Date parsePublishedTimeText(String input) {
+        if (input == null) return null;
+        ZonedDateTime dateTime = ZonedDateTime.now(ZoneId.of("Europe/Minsk"));
+        Matcher matcher = Pattern.compile("([\\d.]+)\\p{Zs}+([a-z]+)").matcher(input);
+        try {
+            if (matcher.find() && matcher.groupCount() == 2) {
+                ChronoUnit unit = UNITS.get(matcher.group(2).substring(0, 3));
+                int amount = Integer.parseInt(matcher.group(1));
+                return Date.from(dateTime.minus(amount, unit).toInstant());
+            }
+        } catch (Exception e) {
+            log.warning("Can't parse published time: " + input);
+        }
+        return null;
     }
 
     public static void assertNotNull(String message, Object... objects) throws ScraperParserException {

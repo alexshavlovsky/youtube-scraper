@@ -77,11 +77,13 @@ public class VideosGrid {
                 log.warning("An unknown element occurred in a video grid");
                 continue;
             }
+            String publishedTimeText = r.getPublishedTimeText() == null ? null : r.getPublishedTimeText().toString();
             VideoDTO videoDTO = new VideoDTO(
                     channelId,
                     r.getVideoId(),
                     r.getTitle() == null ? null : r.getTitle().toString(),
-                    r.getPublishedTimeText() == null ? null : r.getPublishedTimeText().toString(), // if null then this video is probably a live stream
+                    publishedTimeText, // if null then this video is probably a live stream
+                    ParserUtil.parsePublishedTimeText(publishedTimeText),
                     r.getViewCountText() == null ? 0 : parseDigitsToInt(r.getViewCountText().toString())
             );
             list.add(videoDTO);

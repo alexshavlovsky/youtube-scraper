@@ -9,7 +9,7 @@ import java.util.*;
 public class CommentItemSection {
     public List<Content> contents;
     public List<Continuation> continuations;
-//    public String trackingParams;
+    //    public String trackingParams;
     public SectionHeader header;
     public String sectionIdentifier;
 
@@ -86,7 +86,7 @@ public class CommentItemSection {
                     publishedTimeText,
                     ParserUtil.parsePublishedTimeText(publishedTimeText),
                     r.contentText.toString(),
-                    r.likeCount,
+                    r.voteCount == null ? 0 : (int) ParserUtil.parseSubCount(r.voteCount.toString()),
                     r.replyCount,
                     parentCommentId
             );
@@ -120,11 +120,11 @@ public class CommentItemSection {
         public Text contentText;
         public Text publishedTimeText;
         public boolean isLiked;
-        public int likeCount;
+        //        public int likeCount;
         public String commentId;
         public boolean authorIsChannelOwner;
         public String voteStatus;
-//        public String trackingParams;
+        //        public String trackingParams;
         public SimpleText voteCount;
         public int replyCount;
     }
@@ -133,7 +133,7 @@ public class CommentItemSection {
         public Comment comment;
         public Replies replies;
         public CommentTargetTitle commentTargetTitle;
-//        public String trackingParams;
+        //        public String trackingParams;
         public String renderingPriority;
     }
 
@@ -150,7 +150,7 @@ public class CommentItemSection {
     static class CommentRepliesRenderer {
         public List<Continuation> continuations;
         public Text moreText;
-//        public String trackingParams;
+        //        public String trackingParams;
         public Text lessText;
     }
 

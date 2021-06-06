@@ -4,7 +4,7 @@ import com.ctzn.youtubescraper.core.config.CommentIteratorCfg;
 import com.ctzn.youtubescraper.core.config.CommentOrderCfg;
 import com.ctzn.youtubescraper.core.config.ExecutorCfg;
 import com.ctzn.youtubescraper.core.config.VideoIteratorCfg;
-import com.ctzn.youtubescraper.core.persistence.PersistenceChannelRunnerStepBuilder;
+import com.ctzn.youtubescraper.core.persistence.PersistenceRunnerStepBuilder;
 import com.ctzn.youtubescraper.core.persistence.PersistenceService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -18,18 +18,16 @@ class PersistenceChannelRunnerStepBuilderTest {
 
     @Test
     void testUnrestricted() {
-        PersistenceChannelRunnerStepBuilder.BuildStep buildStep =
-                PersistenceChannelRunnerStepBuilder
-                        .newBuilder("abc123", Mockito.mock(PersistenceService.class))
+        PersistenceRunnerStepBuilder.BuildStep buildStep =
+                PersistenceRunnerStepBuilder
+                        .newChannelRunnerBuilder("abc123", Mockito.mock(PersistenceService.class))
                         .defaultExecutor()
-                        .processAllChannelComments();
+                        .processAllComments();
 
         ExecutorCfg executorCfg = buildStep.getExecutorCfg();
         CommentOrderCfg commentOrderCfg = buildStep.getCommentOrderCfg();
         CommentIteratorCfg commentIteratorCfg = buildStep.getCommentIteratorCfg();
         VideoIteratorCfg videoIteratorCfg = buildStep.getVideoIteratorCfg();
-
-        assertEquals("abc123", buildStep.getChannelId());
 
         assertEquals(10, executorCfg.getNumberOfThreads());
         assertEquals(Duration.ofDays(1), executorCfg.getTimeout());
@@ -44,9 +42,9 @@ class PersistenceChannelRunnerStepBuilderTest {
 
     @Test
     void testComplex() {
-        PersistenceChannelRunnerStepBuilder.BuildStep buildStep =
-                PersistenceChannelRunnerStepBuilder
-                        .newBuilder("qwerty", Mockito.mock(PersistenceService.class))
+        PersistenceRunnerStepBuilder.BuildStep buildStep =
+                PersistenceRunnerStepBuilder
+                        .newChannelRunnerBuilder("qwerty", Mockito.mock(PersistenceService.class))
                         .withExecutor(17, Duration.ofMinutes(12), "thread123")
                         .topCommentsFirst()
                         .videoCountLimit(5)
@@ -56,8 +54,6 @@ class PersistenceChannelRunnerStepBuilderTest {
         CommentOrderCfg commentOrderCfg = buildStep.getCommentOrderCfg();
         CommentIteratorCfg commentIteratorCfg = buildStep.getCommentIteratorCfg();
         VideoIteratorCfg videoIteratorCfg = buildStep.getVideoIteratorCfg();
-
-        assertEquals("qwerty", buildStep.getChannelId());
 
         assertEquals(17, executorCfg.getNumberOfThreads());
         assertEquals(Duration.ofMinutes(12), executorCfg.getTimeout());

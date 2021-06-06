@@ -1,6 +1,6 @@
 package com.ctzn.youtubescraper.core.iterator.comment;
 
-import com.ctzn.youtubescraper.core.exception.ScrapperInterruptedException;
+import com.ctzn.youtubescraper.core.exception.ScraperException;
 import com.ctzn.youtubescraper.core.model.comments.CommentItemSection;
 import com.ctzn.youtubescraper.core.model.commons.NextContinuationData;
 
@@ -12,7 +12,7 @@ public interface IterableCommentContext {
 
     NextContinuationData getContinuationData();
 
-    void nextSection(NextContinuationData continuationData);
+    void nextSection(NextContinuationData continuationData) throws ScraperException;
 
     boolean hasSection();
 
@@ -28,8 +28,8 @@ public interface IterableCommentContext {
 
     String getShortResultStat();
 
-    void traverse(CommentVisitor commentVisitor) throws ScrapperInterruptedException;
+    void traverse(CommentVisitor commentVisitor) throws ScraperException;
 
-    void handle(CommentVisitor commentVisitor) throws ScrapperInterruptedException;
+    void handle(CommentVisitor commentVisitor) throws ScraperException;
 
 }

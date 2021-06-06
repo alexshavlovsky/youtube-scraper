@@ -1,6 +1,7 @@
 package com.ctzn.youtubescraper.core.iterator.comment;
 
 import com.ctzn.youtubescraper.core.config.CountLimit;
+import com.ctzn.youtubescraper.core.exception.ScraperException;
 import com.ctzn.youtubescraper.core.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.core.exception.ScraperParserException;
 import com.ctzn.youtubescraper.core.exception.ScrapperInterruptedException;
@@ -34,15 +35,8 @@ abstract class AbstractCommentContext implements IterableCommentContext {
     abstract void updateMeters(int itemsCount);
 
     @Override
-    public void nextSection(NextContinuationData continuationData) {
-        try {
-            section = fetchNextSection(youtubeHttpClient, continuationData);
-        } catch (ScraperHttpException | ScraperParserException e) {
-            log.warning(youtubeHttpClient.getVideoId() + " " + e.toString());
-            section = null;
-        } catch (ScrapperInterruptedException e) {
-            section = null;
-        }
+    public void nextSection(NextContinuationData continuationData) throws ScraperException {
+        section = fetchNextSection(youtubeHttpClient, continuationData);
     }
 
     @Override
@@ -81,7 +75,7 @@ abstract class AbstractCommentContext implements IterableCommentContext {
         return replyMeter;
     }
 
-    void traverse(CommentVisitor commentVisitor, CountLimit limit) throws ScrapperInterruptedException {
+    void traverse(CommentVisitor commentVisitor, CountLimit limit) throws ScraperException {
         while (limit.isValueBelowLimit(getMeter().getCounter())) {
             if (Thread.currentThread().isInterrupted())
                 throw new ScrapperInterruptedException("Comment thread iterator has been interrupted");

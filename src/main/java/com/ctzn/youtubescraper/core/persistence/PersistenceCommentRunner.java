@@ -2,15 +2,16 @@ package com.ctzn.youtubescraper.core.persistence;
 
 import com.ctzn.youtubescraper.core.config.CommentIteratorCfg;
 import com.ctzn.youtubescraper.core.config.CommentOrderCfg;
-import com.ctzn.youtubescraper.core.exception.ScraperException;
 import com.ctzn.youtubescraper.core.handler.DataCollector;
 import com.ctzn.youtubescraper.core.persistence.dto.CommentDTO;
 import com.ctzn.youtubescraper.core.persistence.dto.StatusCode;
+import lombok.extern.java.Log;
 
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
+@Log
 class PersistenceCommentRunner implements Runnable {
 
     private final String videoId;
@@ -42,7 +43,8 @@ class PersistenceCommentRunner implements Runnable {
 
             persistenceService.logVideo(videoId, StatusCode.DONE,
                     String.format("total: %d of %d, comments: %d, replies: %d", cs + rs, totalCommentCount, cs, rs));
-        } catch (ScraperException e) {
+        } catch (Exception e) {
+            log.severe("ERROR " + videoId + ' ' + e.getMessage());
             persistenceService.logVideo(videoId, StatusCode.ERROR, e.getMessage());
         }
     }

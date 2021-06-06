@@ -11,5 +11,5 @@ public class VideoDTO {
     public String title;
     public String publishedTimeText;
     public Date publishedDate;
-    public int viewCountText;
+    public Integer viewCountText;
 }

@@ -14,7 +14,7 @@ public class HibernateExample {
         String channelId = "UCksTNgiRyQGwi2ODBie8HdA";
         HibernateChannelRunner.newBuilder(channelId)
                 .withExecutor(20, Duration.ofHours(1))
-                .processAllChannelComments().build().call();
+                .processAllComments().build().call();
     }
 
 }

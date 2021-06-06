@@ -1,9 +1,9 @@
 package com.ctzn.youtubescraper.addons.hibernateconnector;
 
-import com.ctzn.youtubescraper.core.persistence.PersistenceChannelRunnerStepBuilder;
+import com.ctzn.youtubescraper.core.persistence.PersistenceRunnerStepBuilder;
 
 public class HibernateChannelRunner {
-    public static PersistenceChannelRunnerStepBuilder.ExecutorStep newBuilder(String channelId) {
-        return PersistenceChannelRunnerStepBuilder.newBuilder(channelId, PersistenceServiceFactory.getInstance());
+    public static PersistenceRunnerStepBuilder.ExecutorStep newBuilder(String channelId) {
+        return PersistenceRunnerStepBuilder.newChannelRunnerBuilder(channelId, PersistenceServiceFactory.getInstance());
     }
 }

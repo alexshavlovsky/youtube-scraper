@@ -1,5 +1,6 @@
 package com.ctzn.youtubescraper.core.iterator.comment;
 
+import com.ctzn.youtubescraper.core.exception.ScraperException;
 import com.ctzn.youtubescraper.core.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.core.exception.ScraperParserException;
 import com.ctzn.youtubescraper.core.exception.ScrapperInterruptedException;
@@ -20,13 +21,13 @@ class CommentContext extends AbstractCommentContext {
 
     private SectionHeaderDTO commentThreadHeader;
 
-    CommentContext(YoutubeVideoCommentsClient youtubeHttpClient) {
+    CommentContext(YoutubeVideoCommentsClient youtubeHttpClient) throws ScraperException {
         super(youtubeHttpClient);
         reset(youtubeHttpClient.getInitialCommentSectionContinuation());
         log.fine(() -> youtubeHttpClient.getVideoId() + " total comments count: " + getMeter().getTargetCount());
     }
 
-    private void reset(NextContinuationData continuationData) {
+    private void reset(NextContinuationData continuationData) throws ScraperException {
         getMeter().reset();
         getReplyMeter().reset();
         nextSection(continuationData);
@@ -35,7 +36,7 @@ class CommentContext extends AbstractCommentContext {
         getMeter().setTargetCount(totalCommentCount);
     }
 
-    void sortNewestFirst() {
+    void sortNewestFirst() throws ScraperException {
         if (getMeter().getTargetCount() != 0) {
             log.fine("Sort newest first");
             reset(commentThreadHeader.getOrderNewestFirst());
@@ -60,12 +61,12 @@ class CommentContext extends AbstractCommentContext {
     }
 
     @Override
-    public void traverse(CommentVisitor commentVisitor) throws ScrapperInterruptedException {
+    public void traverse(CommentVisitor commentVisitor) throws ScraperException {
         traverse(commentVisitor, commentVisitor.getCommentIteratorCfg().getCommentPerVideoLimit());
     }
 
     @Override
-    public void handle(CommentVisitor commentVisitor) throws ScrapperInterruptedException {
+    public void handle(CommentVisitor commentVisitor) throws ScraperException {
         List<CommentDTO> comments = getSection().getComments(getVideoId(), null);
         if (commentVisitor.getCommentIteratorCfg().getReplyPerCommentLimit().isLimitedToZero())
             commentVisitor.visitAll(comments);

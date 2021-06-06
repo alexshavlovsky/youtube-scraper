@@ -1,5 +1,6 @@
 package com.ctzn.youtubescraper.core.iterator.comment;
 
+import com.ctzn.youtubescraper.core.exception.ScraperException;
 import com.ctzn.youtubescraper.core.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.core.exception.ScraperParserException;
 import com.ctzn.youtubescraper.core.exception.ScrapperInterruptedException;
@@ -15,7 +16,7 @@ class CommentReplyContext extends AbstractCommentContext {
     private final CommentContext parentCommentContext;
     private final CommentDTO parentComment;
 
-    CommentReplyContext(CommentContext parentCommentContext, CommentDTO parentComment, NextContinuationData replyThreadContinuation) {
+    CommentReplyContext(CommentContext parentCommentContext, CommentDTO parentComment, NextContinuationData replyThreadContinuation) throws ScraperException {
         super(parentCommentContext);
         this.parentCommentContext = parentCommentContext;
         this.parentComment = parentComment;
@@ -43,7 +44,7 @@ class CommentReplyContext extends AbstractCommentContext {
     }
 
     @Override
-    public void traverse(CommentVisitor commentVisitor) throws ScrapperInterruptedException {
+    public void traverse(CommentVisitor commentVisitor) throws ScraperException {
         traverse(commentVisitor, commentVisitor.getCommentIteratorCfg().getReplyPerCommentLimit());
     }
 

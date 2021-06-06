@@ -24,7 +24,7 @@ public class HibernateRecursiveExample {
             try {
                 HibernateChannelRunner.newBuilder(channelId)
                         .withExecutor(50, Duration.ofHours(1))
-                        .processAllChannelComments().build().call();
+                        .processAllComments().build().call();
             } catch (Exception e) {
                 System.out.println("Unexpected exception during channel processing: " + channelId);
                 e.printStackTrace();

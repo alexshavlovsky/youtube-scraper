@@ -19,7 +19,7 @@ import java.time.Duration;
 import static com.ctzn.youtubescraper.core.http.IoUtil.*;
 
 @Log
-abstract class AbstractYoutubeClient<E> {
+class GenericYoutubeClient<E> {
     static final YoutubeUriFactory uriFactory = new YoutubeUriFactory();
     static final VideoPageBodyParser videoPageBodyParser = new VideoPageBodyParser();
     final static HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).build();
@@ -31,7 +31,7 @@ abstract class AbstractYoutubeClient<E> {
     final String youtubeCfgJson;
     final YoutubeCfgDTO youtubeCfg;
 
-    AbstractYoutubeClient(UserAgentFactory userAgentFactory, String pageUri, YoutubeInitialDataHandler<E> youtubeInitialDataHandler) throws ScraperHttpException, ScraperParserException, ScrapperInterruptedException {
+    GenericYoutubeClient(UserAgentFactory userAgentFactory, String pageUri, YoutubeInitialDataHandler<E> youtubeInitialDataHandler) throws ScraperHttpException, ScraperParserException, ScrapperInterruptedException {
         this.userAgentCfg = userAgentFactory.getUserAgentCfg();
         this.pageUri = pageUri;
         log.info(String.format("Fetch page: [%s]", pageUri));

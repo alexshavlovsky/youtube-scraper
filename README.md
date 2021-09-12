@@ -1,5 +1,7 @@
 # Youtube Data Scraper Java Library
 
+**IMPORTANT NOTE**: I no longer have time to support this project. At the moment (Sep 2021) everything seems to be working fine. But if the YouTube API changes, some functions may break at any moment.
+
 This library is Java 11 Youtube public API HTTP client. Basically this tool is designed to retrieve
 and store in a database all publicly available comments for any youtube channel by a provided channel Id.
 
@@ -33,6 +35,8 @@ Main features:
     - filesystem
 
 ## Usage examples
+
+See the `youtubescraper.examples` package for up-to-date examples.
 
 Get channel metadata:
 ``` JAVA

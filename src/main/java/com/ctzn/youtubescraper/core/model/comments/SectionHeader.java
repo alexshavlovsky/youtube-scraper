@@ -39,14 +39,7 @@ public class SectionHeader {
     static class CommentSimpleboxRenderer {
         public Thumbnails authorThumbnail;
         public Text placeholderText;
-        public PrepareAccountEndpoint prepareAccountEndpoint;
-//        public String trackingParams;
         public String avatarSize;
-    }
-
-    static class PrepareAccountEndpoint {
-        public String clickTrackingParams;
-        public CommandMetadata commandMetadata;
     }
 
     static class SortFilterSubMenuRenderer {

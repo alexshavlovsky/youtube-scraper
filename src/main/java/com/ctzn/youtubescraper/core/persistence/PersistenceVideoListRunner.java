@@ -4,6 +4,7 @@ import com.ctzn.youtubescraper.core.config.CommentIteratorCfg;
 import com.ctzn.youtubescraper.core.config.CommentOrderCfg;
 import com.ctzn.youtubescraper.core.config.ExecutorCfg;
 import com.ctzn.youtubescraper.core.config.VideoIteratorCfg;
+import com.ctzn.youtubescraper.core.persistence.dto.StatusCode;
 import com.ctzn.youtubescraper.core.persistence.dto.VideoDTO;
 import lombok.extern.java.Log;
 

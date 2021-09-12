@@ -13,11 +13,11 @@ import java.net.http.HttpRequest;
 import java.util.ArrayList;
 
 @Log
-abstract class AbstractYoutubeBrowseClient<E> extends AbstractYoutubeClient<E> {
+class GenericYoutubeV1Client<E> extends GenericYoutubeClient<E> {
 
     final ClientContext clientCtx;
 
-    AbstractYoutubeBrowseClient(UserAgentFactory userAgentFactory, String pageUri, YoutubeInitialDataHandler<E> youtubeInitialDataHandler) throws ScraperHttpException, ScraperParserException, ScrapperInterruptedException {
+    GenericYoutubeV1Client(UserAgentFactory userAgentFactory, String pageUri, YoutubeInitialDataHandler<E> youtubeInitialDataHandler) throws ScraperHttpException, ScraperParserException, ScrapperInterruptedException {
         super(userAgentFactory, pageUri, youtubeInitialDataHandler);
         clientCtx = videoPageBodyParser.parseClientContext(youtubeCfgJson);
         clientCtx.client.screenWidthPoints = 1536;
@@ -36,7 +36,7 @@ abstract class AbstractYoutubeBrowseClient<E> extends AbstractYoutubeClient<E> {
         cookies.put("PREF=f4=4000000&tz=Europe.Minsk");
     }
 
-    HttpRequest.Builder newBrowseApiV1RequestBuilder(URI requestUri) {
+    HttpRequest.Builder newV1ApiRequestBuilder(URI requestUri) {
         return newRequestBuilder(requestUri, "*/*")
                 .headers("Referer", pageUri)
                 .headers("Origin", "https://www.youtube.com")

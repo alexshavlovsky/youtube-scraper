@@ -15,6 +15,7 @@ class YoutubeUriFactory {
     private final static String COMMENT_API_URI_TEMPLATE = "https://www.youtube.com/comment_service_ajax?%s";
     private final static String BROWSE_API_URI_TEMPLATE = "https://www.youtube.com/browse_ajax?%s";
     private final static String BROWSE_API_V1_URI_TEMPLATE = "https://www.youtube.com/youtubei/v1/browse?%s";
+    private final static String NEXT_API_V1_URI_TEMPLATE = "https://www.youtube.com/youtubei/v1/next?%s";
 
     private static String buildCommentApiQueryParams(NextContinuationData continuationData) {
         return joinQueryParamsOrdered(
@@ -66,6 +67,10 @@ class YoutubeUriFactory {
 
     URI newBrowseApiV1RequestUri(YoutubeCfgDTO youtubeCfgDTO) {
         return URI.create(String.format(BROWSE_API_V1_URI_TEMPLATE, buildBrowseV1QueryParams(youtubeCfgDTO)));
+    }
+
+    URI newNextApiV1RequestUri(YoutubeCfgDTO youtubeCfgDTO) {
+        return URI.create(String.format(NEXT_API_V1_URI_TEMPLATE, buildBrowseV1QueryParams(youtubeCfgDTO)));
     }
 
     String newVideoPageUri(String videoId) {

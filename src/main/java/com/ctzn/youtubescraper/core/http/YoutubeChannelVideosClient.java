@@ -4,7 +4,7 @@ import com.ctzn.youtubescraper.core.exception.ScraperHttpException;
 import com.ctzn.youtubescraper.core.exception.ScraperParserException;
 import com.ctzn.youtubescraper.core.exception.ScrapperInterruptedException;
 import com.ctzn.youtubescraper.core.http.useragent.UserAgentFactory;
-import com.ctzn.youtubescraper.core.model.browsev1.BrowseV1Request;
+import com.ctzn.youtubescraper.core.model.browsev1.V1ApiRequest;
 import com.ctzn.youtubescraper.core.model.browsev1.BrowseV1Response;
 import com.ctzn.youtubescraper.core.model.channelvideos.VideosGrid;
 import com.ctzn.youtubescraper.core.model.commons.NextContinuationData;
@@ -18,7 +18,7 @@ import java.net.http.HttpResponse;
 
 import static com.ctzn.youtubescraper.core.http.IoUtil.*;
 
-public class YoutubeChannelVideosClient extends AbstractYoutubeBrowseClient<VideosGrid> implements IterableHttpClient<VideosGrid> {
+public class YoutubeChannelVideosClient extends GenericYoutubeV1Client<VideosGrid> implements IterableHttpClient<VideosGrid> {
 
     private static final BrowseApiResponseParser browseApiResponseParser = new BrowseApiResponseParser();
 
@@ -50,10 +50,10 @@ public class YoutubeChannelVideosClient extends AbstractYoutubeBrowseClient<Vide
         URI requestUri = uriFactory.newBrowseApiV1RequestUri(youtubeCfg);
 
         clientCtx.clickTracking.clickTrackingParams = continuation.getClickTrackingParams();
-        BrowseV1Request requestModel = new BrowseV1Request(clientCtx, continuation.getContinuation());
+        V1ApiRequest requestModel = new V1ApiRequest(clientCtx, continuation.getContinuation());
         String requestBody = JsonMapper.asJson(requestModel);
 
-        HttpRequest request = newBrowseApiV1RequestBuilder(requestUri)
+        HttpRequest request = newV1ApiRequestBuilder(requestUri)
                 .headers("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody)).build();
 

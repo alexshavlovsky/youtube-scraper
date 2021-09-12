@@ -1,11 +1,17 @@
 package com.ctzn.youtubescraper.core.model.comments;
 
-import com.ctzn.youtubescraper.core.model.commons.*;
+import com.ctzn.youtubescraper.core.exception.ScraperParserException;
+import com.ctzn.youtubescraper.core.model.commentsv1next.*;
+import com.ctzn.youtubescraper.core.model.commons.Continuation;
+import com.ctzn.youtubescraper.core.model.commons.ContinuationEndpoint;
+import com.ctzn.youtubescraper.core.model.commons.NextContinuationData;
 import com.ctzn.youtubescraper.core.parser.ParserUtil;
 import com.ctzn.youtubescraper.core.persistence.dto.CommentDTO;
+import lombok.extern.java.Log;
 
 import java.util.*;
 
+@Log
 public class CommentItemSection {
     public List<Content> contents;
     public List<Continuation> continuations;
@@ -22,6 +28,10 @@ public class CommentItemSection {
     }
 
     public boolean hasContinuation() {
+        return hasDeprecatedContinuation() || hasContinuationItemTrigger();
+    }
+
+    public boolean hasDeprecatedContinuation() {
         return continuations != null && !continuations.isEmpty();
     }
 
@@ -34,8 +44,33 @@ public class CommentItemSection {
     }
 
     public NextContinuationData getContinuation() {
-        if (!hasContinuation()) throw new IllegalStateException("The section hasn't continuation data");
-        return continuations.get(0).nextContinuationData;
+        if (!hasContinuation()) throw new IllegalStateException("The grid hasn't continuation data");
+        if (hasDeprecatedContinuation()) return continuations.get(0).nextContinuationData;
+        return contents.get(contents.size() - 1).continuationItemRenderer.continuationEndpoint.asContinuation();
+    }
+
+    private static boolean hasContinuationTrigger(Content content) {
+        ContinuationItemRenderer renderer = content.continuationItemRenderer;
+        return (renderer != null && "CONTINUATION_TRIGGER_ON_ITEM_SHOWN".equals(renderer.trigger));
+    }
+
+    // TODO extract this duplicated code fragment (duplicate is located in the VideosGrid)
+    private boolean hasContinuationItemTrigger() {
+        if (!hasContent()) return false;
+        Content content = contents.get(contents.size() - 1);
+        if (!hasContinuationTrigger(content)) return false;
+        ContinuationEndpoint endpoint = content.continuationItemRenderer.continuationEndpoint;
+        try {
+            ParserUtil.assertNotNull("", endpoint,
+                    endpoint.clickTrackingParams,
+                    endpoint.continuationCommand,
+                    endpoint.continuationCommand.token
+            );
+        } catch (ScraperParserException e) {
+            log.warning("Invalid CONTINUATION_TRIGGER_ON_ITEM_SHOWN occurred");
+            return false;
+        }
+        return true;
     }
 
     public SectionHeaderDTO getHeader() {
@@ -50,8 +85,9 @@ public class CommentItemSection {
 
     public int countReplyContinuations() {
         if (!hasContent()) return 0;
-        return contents.stream().map(c -> c.commentThreadRenderer)
-                .mapToInt(c -> c.replies == null ? 0 : c.replies.commentRepliesRenderer.continuations.size()).sum();
+        return 0;
+//        return contents.stream().map(c -> c.commentThreadRenderer)
+//                .mapToInt(c -> c.replies == null ? 0 : c.replies.commentRepliesRenderer.continuations.size()).sum();
     }
 
     // keys - commentId
@@ -66,7 +102,7 @@ public class CommentItemSection {
             if (commentContext.replies != null) {
                 CommentRenderer comment = commentContext.comment.commentRenderer;
                 CommentRepliesRenderer replies = commentContext.replies.commentRepliesRenderer;
-                map.put(comment.commentId, replies.continuations.get(0).nextContinuationData);
+//                map.put(comment.commentId, replies.continuations.get(0).nextContinuationData);
             }
         }
         return map;
@@ -95,66 +131,4 @@ public class CommentItemSection {
         return list;
     }
 
-    static class Content {
-        public CommentThreadRenderer commentThreadRenderer;
-        public CommentRenderer commentRenderer;
-
-        public CommentRenderer getCommentRenderer() {
-            return commentThreadRenderer != null ? commentThreadRenderer.comment.commentRenderer : commentRenderer;
-        }
-    }
-
-    static class CommentTargetTitle {
-        public String simpleText;
-    }
-
-    static class BrowseEndpoint {
-        public String browseId;
-        public String canonicalBaseUrl;
-    }
-
-    static class CommentRenderer {
-        public SimpleText authorText;
-        public Thumbnails authorThumbnail;
-        public AuthorEndpoint authorEndpoint;
-        public Text contentText;
-        public Text publishedTimeText;
-        public boolean isLiked;
-        //        public int likeCount;
-        public String commentId;
-        public boolean authorIsChannelOwner;
-        public String voteStatus;
-        //        public String trackingParams;
-        public SimpleText voteCount;
-        public int replyCount;
-    }
-
-    static class CommentThreadRenderer {
-        public Comment comment;
-        public Replies replies;
-        public CommentTargetTitle commentTargetTitle;
-        //        public String trackingParams;
-        public String renderingPriority;
-    }
-
-    static class AuthorEndpoint {
-        public String clickTrackingParams;
-        public CommandMetadata commandMetadata;
-        public BrowseEndpoint browseEndpoint;
-    }
-
-    static class Replies {
-        public CommentRepliesRenderer commentRepliesRenderer;
-    }
-
-    static class CommentRepliesRenderer {
-        public List<Continuation> continuations;
-        public Text moreText;
-        //        public String trackingParams;
-        public Text lessText;
-    }
-
-    static class Comment {
-        public CommentRenderer commentRenderer;
-    }
 }

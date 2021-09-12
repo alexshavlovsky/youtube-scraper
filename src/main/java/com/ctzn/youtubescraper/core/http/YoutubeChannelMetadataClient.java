@@ -13,7 +13,7 @@ import com.ctzn.youtubescraper.core.parser.ParserUtil;
 import lombok.extern.java.Log;
 
 @Log
-public class YoutubeChannelMetadataClient extends AbstractYoutubeClient<ChannelMetadata> {
+public class YoutubeChannelMetadataClient extends GenericYoutubeClient<ChannelMetadata> {
 
     private final String channelId;
     private final String channelVanityName;

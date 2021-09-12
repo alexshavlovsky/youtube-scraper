@@ -6,6 +6,7 @@ import com.ctzn.youtubescraper.core.exception.ScraperParserException;
 import com.ctzn.youtubescraper.core.exception.ScrapperInterruptedException;
 import com.ctzn.youtubescraper.core.http.YoutubeVideoCommentsClient;
 import com.ctzn.youtubescraper.core.model.comments.CommentItemSection;
+import com.ctzn.youtubescraper.core.model.comments.CommentItemSectionApiV1Adapter;
 import com.ctzn.youtubescraper.core.model.commons.NextContinuationData;
 import com.ctzn.youtubescraper.core.persistence.dto.CommentDTO;
 import lombok.extern.java.Log;
@@ -26,7 +27,7 @@ class CommentReplyContext extends AbstractCommentContext {
 
     @Override
     CommentItemSection fetchNextSection(YoutubeVideoCommentsClient youtubeHttpClient, NextContinuationData continuationData) throws ScraperParserException, ScraperHttpException, ScrapperInterruptedException {
-        return youtubeHttpClient.requestNextReplySection(continuationData, getMeter());
+        return new CommentItemSectionApiV1Adapter(youtubeHttpClient.requestNextReplySection(continuationData, getMeter()));
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.ctzn.youtubescraper.core.config.VideoIteratorCfg;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.StringJoiner;
 
 public class PersistenceRunnerStepBuilder {
 
@@ -93,23 +94,13 @@ public class PersistenceRunnerStepBuilder {
         public abstract PersistenceRunner build();
 
         @Override
-        public ExecutorCfg getExecutorCfg() {
-            return executorCfg;
-        }
-
-        @Override
-        public CommentOrderCfg getCommentOrderCfg() {
-            return commentOrderCfg;
-        }
-
-        @Override
-        public VideoIteratorCfg getVideoIteratorCfg() {
-            return videoIteratorCfg;
-        }
-
-        @Override
-        public CommentIteratorCfg getCommentIteratorCfg() {
-            return commentIteratorCfg;
+        public String toString() {
+            return new StringJoiner(", ")
+                    .add(executorCfg.toString())
+                    .add(commentOrderCfg.toString())
+                    .add(videoIteratorCfg.toString())
+                    .add(commentIteratorCfg.toString())
+                    .toString();
         }
 
     }
@@ -187,14 +178,6 @@ public class PersistenceRunnerStepBuilder {
     public interface BuildStep {
 
         PersistenceRunner build();
-
-        ExecutorCfg getExecutorCfg();
-
-        CommentOrderCfg getCommentOrderCfg();
-
-        VideoIteratorCfg getVideoIteratorCfg();
-
-        CommentIteratorCfg getCommentIteratorCfg();
 
     }
 
